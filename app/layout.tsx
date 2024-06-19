@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+import { LogoOutlineBg } from "./components/LogoOutlineBg";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +20,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <Providers>
+      <Providers>
+        <body
+          className={`bg-white transition-colors dark:bg-neutral-900 ${inter.className}`}
+        >
           <Navbar />
-          <main className="flex min-h-screen flex-col items-center justify-between bg-white p-24 transition-all dark:bg-neutral-900">
-            {children}
-          </main>
-        </Providers>
-      </body>
+          <div className="max-w-mobile mx-auto flex min-h-screen flex-col items-center px-4 pt-20 transition-all">
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
+          <LogoOutlineBg />
+        </body>
+      </Providers>
     </html>
   );
 }

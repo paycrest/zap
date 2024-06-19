@@ -15,9 +15,9 @@ export const Navbar = () => {
   useEffect(() => setMounted(true), []);
 
   return (
-    <header className="sticky left-0 top-0 w-full bg-white transition-all dark:bg-neutral-900">
+    <header className="fixed left-0 top-0 w-full bg-white transition-all dark:bg-neutral-900">
       <nav
-        className="container mx-auto flex items-center justify-between p-6 text-neutral-900 dark:text-white lg:px-8"
+        className="container mx-auto flex items-center justify-between p-4 text-neutral-900 dark:text-white lg:px-8"
         aria-label="Navbar"
       >
         <div className="flex lg:flex-1">
