@@ -1,4 +1,41 @@
 import Image from "next/image";
+import Link from "next/link";
+
+interface SocialLinkProps {
+  href: string;
+  imagePath: string;
+  alt: string;
+  title?: string;
+}
+
+const SocialLink = ({ href, imagePath, alt, title }: SocialLinkProps) => {
+  return (
+    <Link href={href} title={title}>
+      <Image src={imagePath} alt={alt} width={20} height={20} />
+    </Link>
+  );
+};
+
+const socials = [
+  {
+    href: "https://farcaster.io",
+    imagePath: "/farcaster-icon.svg",
+    alt: "Farcaster icon",
+    title: "Farcaster",
+  },
+  {
+    href: "https://github.com/paycrest",
+    imagePath: "/github-icon.svg",
+    alt: "GitHub icon",
+    title: "GitHub",
+  },
+  {
+    href: "https://x.com/paycrest",
+    imagePath: "/x-icon.svg",
+    alt: "X icon",
+    title: "X",
+  },
+];
 
 export const Footer = () => {
   return (
@@ -10,19 +47,9 @@ export const Footer = () => {
         <span className="text-neutral-900 dark:text-white/50">Paycrest</span>
       </p>
       <div className="flex items-center justify-center gap-2">
-        <Image
-          src="/farcaster-icon.svg"
-          alt="Farcaster icon"
-          width={20}
-          height={20}
-        />
-        <Image
-          src="/github-icon.svg"
-          alt="GitHub icon"
-          width={20}
-          height={20}
-        />
-        <Image src="/x-icon.svg" alt="X icon" width={20} height={20} />
+        {socials.map((social, index) => (
+          <SocialLink key={index} {...social} />
+        ))}
       </div>
     </footer>
   );

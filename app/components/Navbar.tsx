@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaBarsStaggered } from "react-icons/fa6";
-import ThemeSwitch from "./ThemeSwitch";
+import { ThemeSwitch } from "./ThemeSwitch";
 import { WalletSetup } from "./WalletSetup";
 
 export const Navbar = () => {
@@ -14,8 +14,10 @@ export const Navbar = () => {
 
   useEffect(() => setMounted(true), []);
 
+  if (!mounted) return null;
+
   return (
-    <header className="fixed left-0 top-0 w-full bg-white transition-all dark:bg-neutral-900">
+    <header className="fixed left-0 top-0 z-40 w-full bg-white/20 backdrop-blur transition-all dark:bg-neutral-900/80">
       <nav
         className="container mx-auto flex items-center justify-between p-4 text-neutral-900 dark:text-white lg:px-8"
         aria-label="Navbar"

@@ -23,7 +23,7 @@ const IconButton = ({ icon, onClick, isActive }: IconButtonProps) => (
   </button>
 );
 
-export default function ThemeSwitch() {
+export const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
 
@@ -47,4 +47,4 @@ export default function ThemeSwitch() {
       />
     </div>
   );
-}
+};

@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import { Navbar } from "./components/Navbar";
-import { Footer } from "./components/Footer";
-import { LogoOutlineBg } from "./components/LogoOutlineBg";
+import { Footer, LogoOutlineBg, Navbar } from "./components";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,18 +18,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Providers>
-        <body
-          className={`bg-white transition-colors dark:bg-neutral-900 ${inter.className}`}
-        >
-          <Navbar />
-          <div className="max-w-mobile mx-auto flex min-h-screen flex-col items-center px-4 pt-20 transition-all">
-            <main className="flex-grow">{children}</main>
-            <Footer />
+      <body className={inter.className}>
+        <Providers>
+          <div className="min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
+            <Navbar />
+            <div className="mx-auto flex min-h-screen max-w-mobile flex-col items-center px-4 pt-20 transition-all">
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
+            <LogoOutlineBg />
           </div>
-          <LogoOutlineBg />
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   );
 }

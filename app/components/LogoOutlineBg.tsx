@@ -9,6 +9,8 @@ export const LogoOutlineBg = () => {
 
   useEffect(() => setMounted(true), []);
 
+  if (!mounted) return null;
+
   return (
     <>
       <Image
@@ -20,7 +22,8 @@ export const LogoOutlineBg = () => {
             : "/logo-outline-group-left-light.svg"
         }
         alt=""
-        className="absolute bottom-0 left-0 hidden sm:block"
+        className="fixed bottom-0 left-0 hidden transition-all sm:block"
+        tabIndex={-1}
       />
       <Image
         width={416}
@@ -31,7 +34,8 @@ export const LogoOutlineBg = () => {
             : "/logo-outline-group-right-light.svg"
         }
         alt=""
-        className="absolute bottom-0 right-0 hidden sm:block"
+        className="fixed bottom-0 right-0 hidden transition-all sm:block"
+        tabIndex={-1}
       />
     </>
   );
