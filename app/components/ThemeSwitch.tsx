@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useState, useEffect, ReactElement } from "react";
+
 import { FiSun, FiMoon } from "react-icons/fi";
 
 type IconButtonProps = {

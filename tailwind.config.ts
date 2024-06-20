@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       maxWidth: {
-        mobile: "412px",
+        mobile: "428px", // 412px (width) + 16px (padding)
       },
     },
   },

@@ -1,9 +1,11 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
 import { FaBarsStaggered } from "react-icons/fa6";
+
 import { ThemeSwitch } from "./ThemeSwitch";
 import { WalletSetup } from "./WalletSetup";
 
