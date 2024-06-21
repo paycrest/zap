@@ -1,13 +1,15 @@
-import { FaRegHourglass } from "react-icons/fa6";
-import { TransactionDetails } from "./TransactionDetails";
-import { InputError } from "./InputError";
-import { inputClasses } from "../page";
-import { AiOutlineQuestionCircle } from "react-icons/ai";
-import { supportedInstitutions } from "../mocks/supportedInstitutions";
-import { TabButton } from "./TabButton";
+"use client";
 import { PiCaretDown } from "react-icons/pi";
+import { FaRegHourglass } from "react-icons/fa6";
+
+import { inputClasses } from "../page";
+import { TabButton } from "./TabButton";
+import { InputError } from "./InputError";
 import { NetworkButton } from "./NetworkButton";
 import { renderSelectField } from "./SelectField";
+import { TransactionDetails } from "./TransactionDetails";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { InstitutionProps, TransactionFormProps } from "../types";
 
 const tokens = [
   { value: "USDC", label: "USDC" },
@@ -16,8 +18,8 @@ const tokens = [
 
 const currencies = [
   { value: "NGN", label: "Nigerian naira (NGN)" },
-  { value: "KES", label: "Kenyan shilling (KES)", disabled: true },
-  { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: true },
+  { value: "KES", label: "Kenyan shilling (KES)", disabled: false },
+  { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: false },
 ];
 
 export const TransactionForm = ({
@@ -33,7 +35,9 @@ export const TransactionForm = ({
   setSelectedTab,
   selectedNetwork,
   setSelectedNetwork,
-}: any) => {
+  supportedInstitutions,
+  institutionsLoading,
+}: TransactionFormProps) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -41,7 +45,7 @@ export const TransactionForm = ({
       noValidate
     >
       {/* Networks */}
-      <div className="flex items-center gap-3 font-medium">
+      <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
 
         <NetworkButton
@@ -163,19 +167,17 @@ export const TransactionForm = ({
               {renderSelectField(
                 "recipientBank",
                 "Recipient Bank",
-                Object.keys(supportedInstitutions[watch("currency")] || {}).map(
-                  (institutionCode) => ({
-                    value: institutionCode,
-                    label:
-                      supportedInstitutions[watch("currency")][institutionCode],
-                  }),
-                ),
+                supportedInstitutions.map((institution: InstitutionProps) => ({
+                  value: institution.code,
+                  label: institution.name,
+                })),
                 {
                   required: { value: true, message: "Select recipient bank" },
-                  disabled: watch("currency") === "",
+                  disabled: watch("currency") === "" || institutionsLoading,
                 },
                 errors,
                 register,
+                institutionsLoading,
               )}
 
               {/* Recipient Account */}

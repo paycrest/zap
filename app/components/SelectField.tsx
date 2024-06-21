@@ -1,6 +1,8 @@
+import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
+
+import { FormData } from "../types";
 import { InputError } from "./InputError";
-import { FormData } from "../page";
 
 export const renderSelectField = (
   id: string,
@@ -9,6 +11,7 @@ export const renderSelectField = (
   validation: any,
   errors: any,
   register: any,
+  institutionsLoading?: boolean,
 ) => {
   return (
     <div className="grid flex-1 gap-2">
@@ -19,7 +22,7 @@ export const renderSelectField = (
         <select
           {...register(id as keyof FormData, validation)}
           id={id}
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-neutral-900 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/20 dark:bg-neutral-900 dark:text-white/80 dark:focus-visible:ring-offset-neutral-900"
+          className="w-full cursor-pointer rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-neutral-900 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/20 dark:bg-neutral-900 dark:text-white/80 dark:focus-visible:ring-offset-neutral-900"
         >
           <option value="" hidden>
             Select {label.toLowerCase()}
@@ -35,8 +38,12 @@ export const renderSelectField = (
             </option>
           ))}
         </select>
-        <div className="absolute inset-y-0 right-4 flex items-center">
-          <PiCaretDown className="text-lg text-gray-400 dark:text-white/50" />
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+          {institutionsLoading ? (
+            <ImSpinner2 className="animate-spin text-lg text-gray-400 dark:text-white/50" />
+          ) : (
+            <PiCaretDown className="text-lg text-gray-400 dark:text-white/50" />
+          )}
         </div>
       </div>
       {errors[id as keyof FormData] && (

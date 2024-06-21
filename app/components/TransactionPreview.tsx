@@ -1,7 +1,7 @@
 import { TbInfoSquareRounded } from "react-icons/tb";
-import { FormData } from "../page";
+
+import { TransactionPreviewProps } from "../types";
 import { getInstitutionNameByCode } from "../utils";
-import { supportedInstitutions } from "../mocks/supportedInstitutions";
 
 const TransactionPreviewDetail = ({
   title,
@@ -21,10 +21,8 @@ const TransactionPreviewDetail = ({
 export const TransactionPreview = ({
   formValues,
   setFormValues,
-}: {
-  formValues: FormData;
-  setFormValues: (data: FormData) => void;
-}) => {
+  supportedInstitutions,
+}: TransactionPreviewProps) => {
   const handleBackButtonClick = () => {
     setFormValues({
       network: "",
