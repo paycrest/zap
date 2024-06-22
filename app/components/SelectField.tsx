@@ -45,13 +45,7 @@ export const SelectField = ({
             </option>
           ))}
         </select>
-        <div
-          className={`pointer-events-none absolute inset-y-0 right-4 flex items-center text-lg ${
-            value === "" || value === undefined
-              ? "text-gray-400 dark:text-white/30"
-              : "text-neutral-900 dark:text-white/80"
-          }`}
-        >
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-lg text-neutral-900 dark:text-white/80">
           {isLoading ? (
             <ImSpinner2 className="animate-spin" />
           ) : (

@@ -14,6 +14,5 @@ export { NetworkButton } from "./NetworkButton";
 
 export { InputError } from "./InputError";
 export { SelectField } from "./SelectField";
-export { TransactionDetails } from "./TransactionDetails";
 
 export { inputClasses, primaryBtnClasses, secondaryBtnClasses } from "./Styles";

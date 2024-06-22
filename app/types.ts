@@ -2,6 +2,7 @@ import {
   FieldErrors,
   UseFormRegister,
   UseFormHandleSubmit,
+  UseFormSetValue,
 } from "react-hook-form";
 
 export type InstitutionProps = {
@@ -33,6 +34,7 @@ export type FormMethods = {
 };
 
 export type TransactionFormProps = {
+  rates: number | null;
   formMethods: FormMethods;
   onSubmit: any;
   institutionsLoading: boolean;
@@ -55,4 +57,16 @@ export type SelectFieldProps = {
   isLoading?: boolean;
   value?: string | number | undefined;
   defaultValue?: string;
+};
+
+export type RatesPayload = {
+  token: string;
+  amount: number;
+  currency: string;
+};
+
+export type RatesResponse = {
+  status: string;
+  data: number;
+  message: string;
 };

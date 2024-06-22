@@ -1,12 +1,11 @@
 "use client";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 
 import { FormData, InstitutionProps } from "./types";
 import { Preloader, TransactionForm, TransactionPreview } from "./components";
-
-const API_URL = "https://staging-api.paycrest.io/v1/institutions";
+import { fetchSupportedInstitutions } from "./api/institutions";
+import { fetchRates } from "./api/rates";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -19,46 +18,59 @@ const INITIAL_FORM_STATE: FormData = {
 };
 
 export default function Home() {
-  const [pageIsLoading, setPageIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
+  const [isFetchingRates, setIsFetchingRates] = useState(false);
 
-  const [isInstitutionsLoading, setInstitutionsLoading] = useState(false);
-  const [supportedInstitutions, setSupportedInstitutions] = useState<
-    InstitutionProps[]
-  >([]);
+  const [rates, setRates] = useState<number | null>(null);
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
+  const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch } = formMethods;
+  const { currency, amount, token } = watch();
 
   const onSubmit = (data: FormData) => {
     setFormValues(data);
   };
 
   useEffect(() => {
-    const fetchSupportedInstitutions = async () => {
-      if (!watch("currency")) return;
+    const getInstitutions = async () => {
+      if (!currency) return;
 
-      try {
-        setInstitutionsLoading(true);
+      setIsFetchingInstitutions(true);
 
-        const response = await axios.get(`${API_URL}/${watch("currency")}`);
-        const institutions = response.data.data;
-        setSupportedInstitutions(institutions);
-      } catch (error) {
-        console.error(error);
-      }
-      setInstitutionsLoading(false);
+      const institutions = await fetchSupportedInstitutions(currency);
+      setInstitutions(institutions);
+
+      setIsFetchingInstitutions(false);
     };
 
-    fetchSupportedInstitutions();
+    getInstitutions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("currency")]);
+  }, [currency]);
 
   useEffect(() => {
-    setPageIsLoading(false);
+    const getRates = async () => {
+      if (!currency || !amount || !token) return;
+
+      setIsFetchingRates(true);
+
+      const rates = await fetchRates({ token, amount, currency });
+      setRates(rates.data);
+
+      setIsFetchingRates(false);
+    };
+
+    getRates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currency, amount, token]);
+
+  useEffect(() => {
+    setIsPageLoading(false);
   }, []);
 
-  if (pageIsLoading) return <Preloader />;
+  if (isPageLoading) return <Preloader />;
 
   return (
     <>
@@ -66,15 +78,16 @@ export default function Home() {
         (value) => value === "" || value === 0,
       ) ? (
         <TransactionForm
+          rates={rates}
           onSubmit={onSubmit}
           formMethods={formMethods}
-          institutionsLoading={isInstitutionsLoading}
-          supportedInstitutions={supportedInstitutions}
+          institutionsLoading={isFetchingInstitutions}
+          supportedInstitutions={institutions}
         />
       ) : (
         <TransactionPreview
           formValues={formValues}
-          supportedInstitutions={supportedInstitutions}
+          supportedInstitutions={institutions}
           handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
         />
       )}

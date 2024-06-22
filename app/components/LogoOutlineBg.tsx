@@ -12,7 +12,7 @@ export const LogoOutlineBg = () => {
   if (!mounted) return null;
 
   return (
-    <>
+    <div className="fixed inset-x-0 bottom-0 hidden items-end justify-between transition-all xl:flex">
       <Image
         width={416}
         height={416}
@@ -22,7 +22,6 @@ export const LogoOutlineBg = () => {
             : "/logo-outline-group-left-light.svg"
         }
         alt=""
-        className="fixed bottom-0 left-0 hidden transition-all sm:block"
         tabIndex={-1}
       />
       <Image
@@ -34,9 +33,8 @@ export const LogoOutlineBg = () => {
             : "/logo-outline-group-right-light.svg"
         }
         alt=""
-        className="fixed bottom-0 right-0 hidden transition-all sm:block"
         tabIndex={-1}
       />
-    </>
+    </div>
   );
 };

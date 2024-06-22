@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 
 interface NetworkButtonProps {

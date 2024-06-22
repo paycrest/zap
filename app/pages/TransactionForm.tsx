@@ -9,15 +9,17 @@ import {
   NetworkButton,
   SelectField,
   TabButton,
-  TransactionDetails,
   inputClasses,
   primaryBtnClasses,
 } from "../components";
 import { InstitutionProps, TransactionFormProps } from "../types";
 
 const tokens = [
-  { value: "USDC", label: "USDC" },
+  { value: "USDC", label: "USDC", disabled: true },
   { value: "USDT", label: "USDT" },
+  { value: "DAI", label: "DAI", disabled: true },
+  { value: "ETH", label: "ETH", disabled: true },
+  { value: "BTC", label: "BTC", disabled: true },
 ];
 
 const currencies = [
@@ -27,6 +29,7 @@ const currencies = [
 ];
 
 export const TransactionForm = ({
+  rates,
   formMethods,
   onSubmit,
   institutionsLoading,
@@ -41,6 +44,19 @@ export const TransactionForm = ({
     watch,
     formState: { errors, isValid, isDirty, isSubmitting },
   } = formMethods;
+
+  let currency = watch("currency"),
+    amount = parseInt(watch("amount")?.toString() ?? "0");
+
+  const renderedInfo = [
+    { key: "rate", label: "Rate", value: `${currency} ${rates}/$` },
+    { key: "fee", label: "Fee", value: `${currency} 0.00` },
+    {
+      key: "recipientReceives",
+      label: "Recipient Receives",
+      value: `${currency} ${rates ?? 0 * amount}`,
+    },
+  ];
 
   return (
     <form
@@ -92,6 +108,7 @@ export const TransactionForm = ({
           id="token"
           label="Token"
           options={tokens}
+          defaultValue="USDT"
           validation={{
             required: { value: true, message: "Token is required" },
           }}
@@ -274,14 +291,20 @@ export const TransactionForm = ({
       </button>
 
       {/* Rate, Fee and Amount calculations */}
-      <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-white/5">
-        <TransactionDetails title="Rate" details="1 USDC = 1 NGN" />
-        <TransactionDetails title="Fee (0.12%)" details="0.00 NGN" />
-        <TransactionDetails
-          title="Recipient receives"
-          details="0.00 NGN"
-          border={false}
-        />
+      <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
+        {renderedInfo.map(({ key, label, value }) => (
+          <div
+            key={key}
+            className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
+              key !== "recipientReceives" ? "border-b" : ""
+            }`}
+          >
+            <p>{label}</p>
+            <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
+              {value}
+            </p>
+          </div>
+        ))}
       </div>
     </form>
   );
