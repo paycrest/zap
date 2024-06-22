@@ -1,4 +1,16 @@
-export interface FormData {
+import {
+  FieldErrors,
+  UseFormRegister,
+  UseFormHandleSubmit,
+} from "react-hook-form";
+
+export type InstitutionProps = {
+  name: string;
+  code: string;
+  type: string;
+};
+
+export type FormData = {
   network: string;
   token: string;
   amount: number;
@@ -6,33 +18,41 @@ export interface FormData {
   recipientBank: string;
   recipientAccount: string;
   memo: string;
-}
+};
 
-export interface InstitutionProps {
-  name: string;
-  code: string;
-  type: string;
-}
+export type FormMethods = {
+  handleSubmit: UseFormHandleSubmit<FormData, undefined>;
+  register: UseFormRegister<FormData>;
+  watch: (name: string) => string | number | undefined;
+  formState: {
+    errors: FieldErrors<FormData>;
+    isValid: boolean;
+    isDirty: boolean;
+    isSubmitting: boolean;
+  };
+};
 
-export interface TransactionFormProps {
-  handleSubmit: any;
-  register: any;
-  watch: any;
-  errors: any;
+export type TransactionFormProps = {
+  formMethods: FormMethods;
   onSubmit: any;
-  isValid: boolean;
-  isDirty: boolean;
-  isSubmitting: boolean;
-  selectedTab: string;
-  setSelectedTab: (tab: string) => void;
-  selectedNetwork: string;
-  setSelectedNetwork: (network: string) => void;
-  supportedInstitutions: Array<{ name: string; code: string; type: string }>;
   institutionsLoading: boolean;
-}
-
-export interface TransactionPreviewProps {
-  formValues: FormData;
-  setFormValues: (data: FormData) => void;
   supportedInstitutions: InstitutionProps[];
-}
+};
+
+export type TransactionPreviewProps = {
+  formValues: FormData;
+  handleBackButtonClick: () => void;
+  supportedInstitutions: InstitutionProps[];
+};
+
+export type SelectFieldProps = {
+  id: string;
+  label: string;
+  options: { value: string; label: string; disabled?: boolean }[];
+  validation: any;
+  errors: any;
+  register: any;
+  isLoading?: boolean;
+  value?: string | number | undefined;
+  defaultValue?: string;
+};

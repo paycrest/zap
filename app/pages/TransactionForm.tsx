@@ -1,14 +1,18 @@
 "use client";
+import { useState } from "react";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
-
-import { inputClasses } from "../page";
-import { TabButton } from "./TabButton";
-import { InputError } from "./InputError";
-import { NetworkButton } from "./NetworkButton";
-import { renderSelectField } from "./SelectField";
-import { TransactionDetails } from "./TransactionDetails";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
+
+import {
+  InputError,
+  NetworkButton,
+  SelectField,
+  TabButton,
+  TransactionDetails,
+  inputClasses,
+  primaryBtnClasses,
+} from "../components";
 import { InstitutionProps, TransactionFormProps } from "../types";
 
 const tokens = [
@@ -17,27 +21,27 @@ const tokens = [
 ];
 
 const currencies = [
-  { value: "NGN", label: "Nigerian naira (NGN)" },
-  { value: "KES", label: "Kenyan shilling (KES)", disabled: false },
-  { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: false },
+  { value: "NGN", label: "Nigerian Naira (NGN)" },
+  { value: "KES", label: "Kenyan Shilling (KES)", disabled: true },
+  { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: true },
 ];
 
 export const TransactionForm = ({
-  handleSubmit,
-  register,
-  watch,
-  errors,
+  formMethods,
   onSubmit,
-  isValid,
-  isDirty,
-  isSubmitting,
-  selectedTab,
-  setSelectedTab,
-  selectedNetwork,
-  setSelectedNetwork,
-  supportedInstitutions,
   institutionsLoading,
+  supportedInstitutions,
 }: TransactionFormProps) => {
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
+  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
+
+  const {
+    handleSubmit,
+    register,
+    watch,
+    formState: { errors, isValid, isDirty, isSubmitting },
+  } = formMethods;
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -84,16 +88,17 @@ export const TransactionForm = ({
 
       <div className="flex items-start gap-4">
         {/* Token */}
-        {renderSelectField(
-          "token",
-          "Token",
-          tokens,
-          {
+        <SelectField
+          id="token"
+          label="Token"
+          options={tokens}
+          validation={{
             required: { value: true, message: "Token is required" },
-          },
-          errors,
-          register,
-        )}
+          }}
+          errors={errors}
+          register={register}
+          value={watch("token")}
+        />
 
         {/* Amount */}
         <div className="grid flex-1 gap-2">
@@ -152,33 +157,38 @@ export const TransactionForm = ({
           {selectedTab === "bank-transfer" && (
             <div className="grid gap-4">
               {/* Currency */}
-              {renderSelectField(
-                "currency",
-                "Currency",
-                currencies,
-                {
+              <SelectField
+                id="currency"
+                label="Currency"
+                defaultValue="NGN"
+                options={currencies}
+                validation={{
                   required: { value: true, message: "Select currency" },
-                },
-                errors,
-                register,
-              )}
+                }}
+                errors={errors}
+                register={register}
+                value={watch("currency")}
+              />
 
               {/* Recipient Bank */}
-              {renderSelectField(
-                "recipientBank",
-                "Recipient Bank",
-                supportedInstitutions.map((institution: InstitutionProps) => ({
-                  value: institution.code,
-                  label: institution.name,
-                })),
-                {
+              <SelectField
+                id="recipientBank"
+                label="Recipient Bank"
+                options={supportedInstitutions.map(
+                  (institution: InstitutionProps) => ({
+                    value: institution.code,
+                    label: institution.name,
+                  }),
+                )}
+                validation={{
                   required: { value: true, message: "Select recipient bank" },
                   disabled: watch("currency") === "" || institutionsLoading,
-                },
-                errors,
-                register,
-                institutionsLoading,
-              )}
+                }}
+                errors={errors}
+                register={register}
+                isLoading={institutionsLoading}
+                value={watch("recipientBank")}
+              />
 
               {/* Recipient Account */}
               <div className="grid gap-2">
@@ -205,7 +215,7 @@ export const TransactionForm = ({
                     pattern="\d{10}"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
-                    {10 - (watch("recipientAccount")?.length ?? 0)}
+                    {10 - (watch("recipientAccount")?.toString().length ?? 0)}
                   </div>
                 </div>
                 {errors.recipientAccount && (
@@ -233,10 +243,10 @@ export const TransactionForm = ({
                     })}
                     className={inputClasses}
                     placeholder="Enter memo"
-                    maxLength={20}
+                    maxLength={25}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
-                    {20 - (watch("memo")?.length ?? 0)}
+                    {25 - (watch("memo")?.toString().length ?? 0)}
                   </div>
                 </div>
                 {errors.memo && <InputError message={errors.memo.message} />}
@@ -258,7 +268,7 @@ export const TransactionForm = ({
       <button
         type="submit"
         disabled={!isValid || !isDirty || isSubmitting}
-        className="w-full rounded-xl bg-blue-600 px-4 py-2.5 font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-zinc-800 dark:disabled:text-white/50"
+        className={primaryBtnClasses}
       >
         {isSubmitting ? "Submitting..." : "Connect Wallet to Continue"}
       </button>

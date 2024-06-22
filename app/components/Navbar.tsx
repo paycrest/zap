@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -25,7 +26,7 @@ export const Navbar = () => {
         aria-label="Navbar"
       >
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Zap by Paycrest</span>
             <Image
               className="h-7 w-auto"
@@ -38,7 +39,7 @@ export const Navbar = () => {
               width={48}
               height={48}
             />
-          </a>
+          </Link>
         </div>
 
         <div className="flex lg:hidden">
