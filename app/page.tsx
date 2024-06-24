@@ -74,20 +74,35 @@ export default function Home() {
   }, [currency]);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const getRate = async () => {
-      if (!currency || !token) return;
+      if (!currency || !amount || !token) return;
 
       setIsFetchingRate(true);
 
-      const rate = await fetchRate({ token, currency });
+      const rate = await fetchRate({
+        token: "USDT",
+        amount: amount,
+        currency: currency,
+      });
       setRate(rate.data);
 
       setIsFetchingRate(false);
     };
 
-    getRate();
+    const debounceFetchRate = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(getRate, 2000);
+    };
+
+    debounceFetchRate();
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency, token]);
+  }, [currency, amount, token]);
 
   useEffect(() => {
     setIsPageLoading(false);

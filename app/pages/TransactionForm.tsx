@@ -16,8 +16,8 @@ import { formatNumberWithCommas } from "../utils";
 import { ImSpinner2 } from "react-icons/im";
 
 const tokens = [
-  { value: "USDC", label: "USDC", disabled: true },
-  { value: "USDT", label: "USDT" },
+  { value: "USDC", label: "USDC" },
+  { value: "USDT", label: "USDT", disabled: true },
   { value: "DAI", label: "DAI", disabled: true },
   { value: "ETH", label: "ETH", disabled: true },
   { value: "BTC", label: "BTC", disabled: true },
@@ -108,7 +108,7 @@ export const TransactionForm = ({
           id="token"
           label="Token"
           options={tokens}
-          defaultValue="USDT"
+          defaultValue="USDC"
           validation={{
             required: { value: true, message: "Token is required" },
           }}
@@ -301,27 +301,33 @@ export const TransactionForm = ({
       </button>
 
       {/* Rate, Fee and Amount calculations */}
-      <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
-        {isFetchingRate ? (
-          <div className="p-4">
-            <ImSpinner2 className="mx-auto animate-spin text-lg text-neutral-900 dark:text-white" />
-          </div>
-        ) : (
-          renderedInfo.map(({ key, label, value }, index) => (
-            <div
-              key={key}
-              className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
-                index === 1 ? "border-t" : ""
-              }`}
-            >
-              <p>{label}</p>
-              <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
-                {value}
+      {rate > 0 && amount && Number(amount) > 0 && (
+        <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
+          {isFetchingRate ? (
+            <div className="flex items-center justify-center gap-2 px-4 py-11">
+              <ImSpinner2 className="animate-spin text-lg text-neutral-900 dark:text-white" />
+              <p className="text-xs">
+                Fetching rate for {currency}{" "}
+                {formatNumberWithCommas(amount as number)}
               </p>
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            renderedInfo.map(({ key, label, value }, index) => (
+              <div
+                key={key}
+                className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
+                  index === 1 ? "border-t" : ""
+                }`}
+              >
+                <p>{label}</p>
+                <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
+                  {value}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </form>
   );
 };

@@ -5,7 +5,7 @@ const API_URL = "https://staging-api.paycrest.io/v1/rates";
 
 export const fetchRate = async ({
   token,
-  amount = 0,
+  amount,
   currency,
 }: RatePayload): Promise<RateResponse> => {
   try {
