@@ -1,4 +1,5 @@
 import { useAccount } from "wagmi";
+import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
@@ -11,9 +12,8 @@ import {
   inputClasses,
   primaryBtnClasses,
 } from "../components";
-import { InstitutionProps, TransactionFormProps } from "../types";
 import { formatNumberWithCommas } from "../utils";
-import { ImSpinner2 } from "react-icons/im";
+import { InstitutionProps, TransactionFormProps } from "../types";
 
 const tokens = [
   { value: "USDC", label: "USDC" },
@@ -52,11 +52,7 @@ export const TransactionForm = ({
   } = formMethods;
 
   let currency = watch("currency"),
-    amount = watch("amount"),
-    token = watch("token"),
-    recipientBank = watch("recipientBank"),
-    recipientAccount = watch("recipientAccount"),
-    memo = watch("memo");
+    amount = watch("amount");
 
   const renderedInfo = [
     {
@@ -288,16 +284,12 @@ export const TransactionForm = ({
       {/* Submit */}
       <button
         type="submit"
-        disabled={
-          !isValid || !isDirty || isSubmitting || account.status !== "connected"
-        }
+        disabled={!isValid || !isDirty || account.status !== "connected"}
         className={primaryBtnClasses}
       >
-        {isSubmitting
-          ? "Submitting..."
-          : account.status === "connected"
-            ? "Confirm Payment"
-            : "Connect wallet to continue"}
+        {account.status === "connected"
+          ? "Review Info"
+          : "Connect wallet to continue"}
       </button>
 
       {/* Rate, Fee and Amount calculations */}

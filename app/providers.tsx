@@ -13,12 +13,9 @@ import {
 
 const queryClient = new QueryClient();
 
-// WalletConnect Cloud project ID
-const projectId = "1300fc0abe89f84bc8d0ab10368bff6c";
-
 const config = getDefaultConfig({
   appName: "My RainbowKit App",
-  projectId: projectId,
+  projectId: process.env.NEXT_PUBLIC_RAINBOWKIT_PROJECT_ID!,
   chains: [mainnet, polygon, optimism, arbitrum, base],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
