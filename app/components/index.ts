@@ -4,7 +4,7 @@ export { Preloader } from "./Preloader";
 export { LogoOutlineBg } from "./LogoOutlineBg";
 
 export { ThemeSwitch } from "./ThemeSwitch";
-export { WalletSetup } from "./WalletSetup";
+export { WalletButtons } from "./WalletButtons";
 
 export { TransactionForm } from "../pages/TransactionForm";
 export { TransactionPreview } from "../pages/TransactionPreview";

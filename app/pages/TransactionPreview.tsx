@@ -2,21 +2,20 @@ import Image from "next/image";
 import { TbInfoSquareRounded } from "react-icons/tb";
 
 import { TransactionPreviewProps } from "../types";
-import { getInstitutionNameByCode } from "../utils";
+import { formatNumberWithCommas, getInstitutionNameByCode } from "../utils";
 import { primaryBtnClasses, secondaryBtnClasses } from "../components";
 
 export const TransactionPreview = ({
-  formValues,
   handleBackButtonClick,
-  supportedInstitutions,
+  stateProps: { formValues, rate, institutions: supportedInstitutions },
 }: TransactionPreviewProps) => {
   const { amount, token, currency, recipientAccount, recipientBank, memo } =
     formValues;
 
   const renderedInfo = {
-    amount: `${amount} ${token}`,
+    amount: `${formatNumberWithCommas(amount)} ${token}`,
     fees: `${currency} 0.00`,
-    totalValue: `${currency} ${amount}`,
+    totalValue: `${currency} ${formatNumberWithCommas(amount * rate)}`,
     recipient: "...",
     account: `${recipientAccount} • ${getInstitutionNameByCode(recipientBank, supportedInstitutions)}`,
     memo: memo,

@@ -34,17 +34,14 @@ export type FormMethods = {
 };
 
 export type TransactionFormProps = {
-  rates: number | null;
-  formMethods: FormMethods;
   onSubmit: any;
-  institutionsLoading: boolean;
-  supportedInstitutions: InstitutionProps[];
+  formMethods: FormMethods;
+  stateProps: StateProps;
 };
 
 export type TransactionPreviewProps = {
-  formValues: FormData;
   handleBackButtonClick: () => void;
-  supportedInstitutions: InstitutionProps[];
+  stateProps: StateProps;
 };
 
 export type SelectFieldProps = {
@@ -59,14 +56,41 @@ export type SelectFieldProps = {
   defaultValue?: string;
 };
 
-export type RatesPayload = {
+export type RatePayload = {
   token: string;
-  amount: number;
+  amount?: number;
   currency: string;
 };
 
-export type RatesResponse = {
+export type RateResponse = {
   status: string;
   data: number;
   message: string;
+};
+
+export type StateProps = {
+  formValues: FormData;
+  rate: number;
+  isFetchingRate: boolean;
+  institutions: InstitutionProps[];
+  isFetchingInstitutions: boolean;
+  selectedTab: string;
+  handleTabChange: (tab: string) => void;
+  selectedNetwork: string;
+  handleNetworkChange: (network: string) => void;
+};
+
+export type NetworkButtonProps = {
+  network: string;
+  logo: string;
+  alt: string;
+  selectedNetwork: string;
+  handleNetworkChange: (network: string) => void;
+  disabled?: boolean;
+};
+
+export type TabButtonProps = {
+  tab: string;
+  selectedTab: string;
+  handleTabChange: (tab: string) => void;
 };

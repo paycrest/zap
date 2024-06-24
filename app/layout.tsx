@@ -1,6 +1,9 @@
+import "./globals.css";
+import "@rainbow-me/rainbowkit/styles.css";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+
 import Providers from "./providers";
 import { Footer, LogoOutlineBg, Navbar } from "./components";
 

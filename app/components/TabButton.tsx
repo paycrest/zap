@@ -1,13 +1,9 @@
-interface TabButtonProps {
-  tab: string;
-  selectedTab: string;
-  setSelectedTab: (tab: string) => void;
-}
+import { TabButtonProps } from "../types";
 
 export const TabButton = ({
   tab,
   selectedTab,
-  setSelectedTab,
+  handleTabChange,
 }: TabButtonProps) => (
   <button
     type="button"
@@ -16,7 +12,7 @@ export const TabButton = ({
         ? "border border-gray-300 bg-white text-neutral-900 shadow dark:border-white/20 dark:bg-transparent dark:text-white"
         : "border border-transparent text-gray-400 dark:text-white/40"
     }`}
-    onClick={() => setSelectedTab(tab)}
+    onClick={() => handleTabChange(tab)}
   >
     {
       {

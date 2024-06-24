@@ -1,20 +1,20 @@
 import axios from "axios";
-import { RatesPayload, RatesResponse } from "../types";
+import { RatePayload, RateResponse } from "../types";
 
 const API_URL = "https://staging-api.paycrest.io/v1/rates";
 
-export const fetchRates = async ({
+export const fetchRate = async ({
   token,
-  amount,
+  amount = 0,
   currency,
-}: RatesPayload): Promise<RatesResponse> => {
+}: RatePayload): Promise<RateResponse> => {
   try {
     const response = await axios.get(
       `${API_URL}/${token}/${amount}/${currency}`,
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching rates:", error);
+    console.error("Error fetching rate:", error);
     throw error;
   }
 };

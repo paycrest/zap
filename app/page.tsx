@@ -2,10 +2,10 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 
-import { FormData, InstitutionProps } from "./types";
-import { Preloader, TransactionForm, TransactionPreview } from "./components";
+import { fetchRate } from "./api/rate";
+import { FormData, InstitutionProps, StateProps } from "./types";
 import { fetchSupportedInstitutions } from "./api/institutions";
-import { fetchRates } from "./api/rates";
+import { Preloader, TransactionForm, TransactionPreview } from "./components";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -20,11 +20,14 @@ const INITIAL_FORM_STATE: FormData = {
 export default function Home() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
-  const [isFetchingRates, setIsFetchingRates] = useState(false);
+  const [isFetchingRate, setIsFetchingRate] = useState(false);
 
-  const [rates, setRates] = useState<number | null>(null);
+  const [rate, setRate] = useState<number>(0);
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
+
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
+  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
 
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch } = formMethods;
@@ -32,6 +35,26 @@ export default function Home() {
 
   const onSubmit = (data: FormData) => {
     setFormValues(data);
+  };
+
+  const handleNetworkChange = (network: string) => {
+    setSelectedNetwork(network);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab);
+  };
+
+  const stateProps: StateProps = {
+    formValues,
+    rate,
+    isFetchingRate,
+    institutions,
+    isFetchingInstitutions,
+    selectedTab,
+    handleTabChange,
+    selectedNetwork,
+    handleNetworkChange,
   };
 
   useEffect(() => {
@@ -51,20 +74,20 @@ export default function Home() {
   }, [currency]);
 
   useEffect(() => {
-    const getRates = async () => {
-      if (!currency || !amount || !token) return;
+    const getRate = async () => {
+      if (!currency || !token) return;
 
-      setIsFetchingRates(true);
+      setIsFetchingRate(true);
 
-      const rates = await fetchRates({ token, amount, currency });
-      setRates(rates.data);
+      const rate = await fetchRate({ token, currency });
+      setRate(rate.data);
 
-      setIsFetchingRates(false);
+      setIsFetchingRate(false);
     };
 
-    getRates();
+    getRate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency, amount, token]);
+  }, [currency, token]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -78,17 +101,14 @@ export default function Home() {
         (value) => value === "" || value === 0,
       ) ? (
         <TransactionForm
-          rates={rates}
           onSubmit={onSubmit}
           formMethods={formMethods}
-          institutionsLoading={isFetchingInstitutions}
-          supportedInstitutions={institutions}
+          stateProps={stateProps}
         />
       ) : (
         <TransactionPreview
-          formValues={formValues}
-          supportedInstitutions={institutions}
           handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
+          stateProps={stateProps}
         />
       )}
     </>

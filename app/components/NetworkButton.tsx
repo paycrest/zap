@@ -1,29 +1,20 @@
 import Image from "next/image";
-import { useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
-
-interface NetworkButtonProps {
-  network: string;
-  logo: string;
-  alt: string;
-  selectedNetwork: string;
-  setSelectedNetwork: (network: string) => void;
-  disabled?: boolean;
-}
+import { NetworkButtonProps } from "../types";
 
 export const NetworkButton = ({
   network,
   logo,
   alt,
   selectedNetwork,
-  setSelectedNetwork,
+  handleNetworkChange,
   disabled,
 }: NetworkButtonProps) => (
   <button
     type="button"
     disabled={disabled}
     className={`relative flex items-center justify-center gap-2 rounded-full px-3 py-2.5 ${selectedNetwork === network ? "border border-blue-500" : "border border-gray-300 dark:border-white/20"} disabled:cursor-not-allowed disabled:opacity-70`}
-    onClick={() => setSelectedNetwork(network)}
+    onClick={() => handleNetworkChange(network)}
   >
     <Image src={logo} width={18} height={18} alt={alt} />
     <p>

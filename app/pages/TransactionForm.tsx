@@ -1,5 +1,4 @@
-"use client";
-import { useState } from "react";
+import { useAccount } from "wagmi";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
@@ -13,6 +12,8 @@ import {
   primaryBtnClasses,
 } from "../components";
 import { InstitutionProps, TransactionFormProps } from "../types";
+import { formatNumberWithCommas } from "../utils";
+import { ImSpinner2 } from "react-icons/im";
 
 const tokens = [
   { value: "USDC", label: "USDC", disabled: true },
@@ -29,15 +30,20 @@ const currencies = [
 ];
 
 export const TransactionForm = ({
-  rates,
   formMethods,
   onSubmit,
-  institutionsLoading,
-  supportedInstitutions,
+  stateProps: {
+    rate,
+    isFetchingRate,
+    selectedNetwork,
+    handleNetworkChange,
+    selectedTab,
+    handleTabChange,
+    isFetchingInstitutions: institutionsLoading,
+    institutions: supportedInstitutions,
+  },
 }: TransactionFormProps) => {
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
-  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
-
+  const account = useAccount();
   const {
     handleSubmit,
     register,
@@ -46,17 +52,22 @@ export const TransactionForm = ({
   } = formMethods;
 
   let currency = watch("currency"),
-    amount = parseInt(watch("amount")?.toString() ?? "0");
+    amount = watch("amount"),
+    token = watch("token"),
+    recipientBank = watch("recipientBank"),
+    recipientAccount = watch("recipientAccount"),
+    memo = watch("memo");
 
   const renderedInfo = [
-    { key: "rate", label: "Rate", value: `${currency} ${rates}/$` },
-    { key: "fee", label: "Fee", value: `${currency} 0.00` },
     {
-      key: "recipientReceives",
-      label: "Recipient Receives",
-      value: `${currency} ${rates ?? 0 * amount}`,
+      key: "rate",
+      label: "Rate",
+      value: `${currency} ${formatNumberWithCommas(rate)}/$`,
     },
+    { key: "fee", label: "Fee", value: `0.1%` },
   ];
+
+  const networks = ["base", "arbitrum", "polygon"];
 
   return (
     <form
@@ -68,29 +79,18 @@ export const TransactionForm = ({
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
 
-        <NetworkButton
-          network="base"
-          logo="/base-logo.svg"
-          alt="Base logo"
-          selectedNetwork={selectedNetwork}
-          setSelectedNetwork={setSelectedNetwork}
-        />
-        <NetworkButton
-          network="arbitrum"
-          logo="/arbitrum-logo.svg"
-          alt="Arbitrum logo"
-          selectedNetwork={selectedNetwork}
-          setSelectedNetwork={setSelectedNetwork}
-          disabled
-        />
-        <NetworkButton
-          network="polygon"
-          logo="/polygon-matic-logo.svg"
-          alt="Polygon logo"
-          selectedNetwork={selectedNetwork}
-          setSelectedNetwork={setSelectedNetwork}
-          disabled
-        />
+        {networks.map((network) => (
+          <NetworkButton
+            key={network}
+            network={network}
+            logo={`/${network}-logo.svg`}
+            alt={`${network} logo`}
+            selectedNetwork={selectedNetwork}
+            handleNetworkChange={handleNetworkChange}
+            disabled={network !== "base"}
+          />
+        ))}
+
         {/* Other network buttons */}
         <button
           type="button"
@@ -138,6 +138,10 @@ export const TransactionForm = ({
                   value: 1000000,
                   message: "Max. amount is 1,000,000",
                 },
+                pattern: {
+                  value: /^\d+(\.\d{1,2})?$/,
+                  message: "Invalid amount",
+                },
               })}
               className={`${inputClasses} pl-4 pr-14`}
               placeholder="0.00"
@@ -161,12 +165,12 @@ export const TransactionForm = ({
             <TabButton
               tab="bank-transfer"
               selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
+              handleTabChange={handleTabChange}
             />
             <TabButton
               tab="mobile-money"
               selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
+              handleTabChange={handleTabChange}
             />
           </div>
 
@@ -284,27 +288,39 @@ export const TransactionForm = ({
       {/* Submit */}
       <button
         type="submit"
-        disabled={!isValid || !isDirty || isSubmitting}
+        disabled={
+          !isValid || !isDirty || isSubmitting || account.status !== "connected"
+        }
         className={primaryBtnClasses}
       >
-        {isSubmitting ? "Submitting..." : "Connect Wallet to Continue"}
+        {isSubmitting
+          ? "Submitting..."
+          : account.status === "connected"
+            ? "Confirm Payment"
+            : "Connect wallet to continue"}
       </button>
 
       {/* Rate, Fee and Amount calculations */}
       <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
-        {renderedInfo.map(({ key, label, value }) => (
-          <div
-            key={key}
-            className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
-              key !== "recipientReceives" ? "border-b" : ""
-            }`}
-          >
-            <p>{label}</p>
-            <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
-              {value}
-            </p>
+        {isFetchingRate ? (
+          <div className="p-4">
+            <ImSpinner2 className="mx-auto animate-spin text-lg text-neutral-900 dark:text-white" />
           </div>
-        ))}
+        ) : (
+          renderedInfo.map(({ key, label, value }, index) => (
+            <div
+              key={key}
+              className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
+                index === 1 ? "border-t" : ""
+              }`}
+            >
+              <p>{label}</p>
+              <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
+                {value}
+              </p>
+            </div>
+          ))
+        )}
       </div>
     </form>
   );

@@ -13,3 +13,13 @@ export function getInstitutionNameByCode(
   const institution = supportedInstitutions.find((inst) => inst.code === code);
   return institution ? institution.name : undefined;
 }
+
+/**
+ * Formats a number with commas.
+ * 
+ * @param num - The number to format.
+ * @returns The formatted number as a string.
+ */
+export function formatNumberWithCommas(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

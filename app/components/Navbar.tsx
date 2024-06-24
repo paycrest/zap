@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { FaBarsStaggered } from "react-icons/fa6";
 
 import { ThemeSwitch } from "./ThemeSwitch";
-import { WalletSetup } from "./WalletSetup";
+import { WalletButtons } from "./WalletButtons";
 
 export const Navbar = () => {
   const { resolvedTheme } = useTheme();
@@ -54,7 +54,7 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden text-sm lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-3">
-          <WalletSetup />
+          <WalletButtons />
           <ThemeSwitch />
         </div>
       </nav>
