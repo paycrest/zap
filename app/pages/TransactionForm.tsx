@@ -1,4 +1,5 @@
-import { useAccount } from "wagmi";
+"use client";
+import { useAccount, useBalance } from "wagmi";
 import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
@@ -14,6 +15,7 @@ import {
 } from "../components";
 import { formatNumberWithCommas } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
+import { useEffect } from "react";
 
 const tokens = [
   { value: "USDC", label: "USDC" },
@@ -44,6 +46,11 @@ export const TransactionForm = ({
   },
 }: TransactionFormProps) => {
   const account = useAccount();
+
+  const result = useBalance({
+    address: account.address,
+  });
+
   const {
     handleSubmit,
     register,
@@ -64,6 +71,12 @@ export const TransactionForm = ({
   ];
 
   const networks = ["base", "arbitrum", "polygon"];
+
+  useEffect(() => {
+    if (result.data) {
+      console.log(result.data);
+    }
+  }, [result.data]);
 
   return (
     <form
