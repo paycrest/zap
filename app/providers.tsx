@@ -14,10 +14,10 @@ import {
 const queryClient = new QueryClient();
 
 const config = getDefaultConfig({
-  appName: "My RainbowKit App",
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+  appName: "Zap by Paycrest",
+  projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
   chains: [mainnet, polygon, optimism, arbitrum, base],
-  ssr: true, // If your dApp uses server side rendering (SSR)
+  ssr: true,
 });
 
 export default function Providers({ children }: { children: React.ReactNode }) {
