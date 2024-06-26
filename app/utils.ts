@@ -16,7 +16,7 @@ export function getInstitutionNameByCode(
 
 /**
  * Formats a number with commas.
- * 
+ *
  * @param num - The number to format.
  * @returns The formatted number as a string.
  */
@@ -34,15 +34,15 @@ export function formatNumberWithCommas(num: number): string {
  */
 export const formatCurrency = (
   value: number,
-  currency: string = 'NGN',
-  locale: string = 'en-US'
+  currency: string = "NGN",
+  locale: string = "en-NG",
 ) => {
   // Create a new instance of Intl.NumberFormat with the 'en-US' locale and currency set to 'NGN'.
   // This object provides methods to format numbers based on the specified locale and options.
   return new Intl.NumberFormat(locale, {
     // Set the style to 'currency' to format the number as a currency value.
-    style: 'currency',
-    // Set the currency to 'NGN' to format the number as US dollars.
+    style: "currency",
+    // Set the currency to 'NGN' to format the number as Nigerian Naira.
     currency,
   }).format(value); // Format the provided value as a currency string.
 };
