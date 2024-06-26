@@ -1,11 +1,8 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-
-import { FaBarsStaggered } from "react-icons/fa6";
 
 import { ThemeSwitch } from "./ThemeSwitch";
 import { WalletButtons } from "./WalletButtons";
@@ -13,7 +10,6 @@ import { WalletButtons } from "./WalletButtons";
 export const Navbar = () => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -42,20 +38,11 @@ export const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <FaBarsStaggered className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className="hidden text-sm lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-3">
+        <div className="flex flex-1 items-center justify-end gap-3 text-sm">
           <WalletButtons />
-          <ThemeSwitch />
+          <div className="hidden lg:block">
+            <ThemeSwitch />
+          </div>
         </div>
       </nav>
     </header>
