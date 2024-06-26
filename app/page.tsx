@@ -206,15 +206,13 @@ export default function Home() {
       Number(protocolFeeDetails?.[0]!) / Number(protocolFeeDetails?.[1]!),
     );
 
-    setFee(0.1 * Number(amount));
-
-    // setFee(
-    //   parseFloat(
-    //     Number(protocolFeePercent * Number(amount))
-    //       .toFixed(5)
-    //       .toString(),
-    //   ),
-    // );
+    setFee(
+      parseFloat(
+        Number(protocolFeePercent * Number(amount))
+          .toFixed(5)
+          .toString(),
+      ),
+    );
   }, [protocolFeeDetails, amount, protocolFeePercent]);
 
   useEffect(() => {
