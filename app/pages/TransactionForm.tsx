@@ -1,10 +1,14 @@
 "use client";
-import { useAccount, useBalance } from "wagmi";
+import { formatUnits } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { useEffect, useState } from "react";
+
 import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 
+import { erc20Abi } from "../api/abi";
 import {
   InputError,
   NetworkButton,
@@ -13,16 +17,13 @@ import {
   inputClasses,
   primaryBtnClasses,
 } from "../components";
-import { formatNumberWithCommas } from "../utils";
+import { formatNumberWithCommas, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
-import { useEffect } from "react";
 
 const tokens = [
-  { value: "USDC", label: "USDC" },
+  { value: "DAI", label: "DAI" },
+  { value: "USDC", label: "USDC", disabled: true },
   { value: "USDT", label: "USDT", disabled: true },
-  { value: "DAI", label: "DAI", disabled: true },
-  { value: "ETH", label: "ETH", disabled: true },
-  { value: "BTC", label: "BTC", disabled: true },
 ];
 
 const currencies = [
@@ -34,7 +35,10 @@ const currencies = [
 export const TransactionForm = ({
   formMethods,
   onSubmit,
-  stateProps: {
+  stateProps,
+}: TransactionFormProps) => {
+  const {
+    fee,
     rate,
     isFetchingRate,
     selectedNetwork,
@@ -43,13 +47,18 @@ export const TransactionForm = ({
     handleTabChange,
     isFetchingInstitutions: institutionsLoading,
     institutions: supportedInstitutions,
-  },
-}: TransactionFormProps) => {
+  } = stateProps;
+
   const account = useAccount();
 
-  const result = useBalance({
-    address: account.address,
+  const { data: tokenBalanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: "0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9",
+    functionName: "balanceOf",
+    args: [account.address!],
   });
+
+  const [tokenBalance, setTokenBalance] = useState<number>(0);
 
   const {
     handleSubmit,
@@ -59,24 +68,29 @@ export const TransactionForm = ({
   } = formMethods;
 
   let currency = watch("currency"),
-    amount = watch("amount");
+    amount = watch("amount"),
+    token = watch("token");
 
   const renderedInfo = [
     {
       key: "rate",
       label: "Rate",
-      value: `${currency} ${formatNumberWithCommas(rate)}/$`,
+      value: `${formatCurrency(rate, currency?.toString())}/DAI`,
     },
-    { key: "fee", label: "Fee", value: `0.1%` },
+    {
+      key: "fee",
+      label: "Fee",
+      value: `${fee} ${token}`,
+    },
   ];
 
   const networks = ["base", "arbitrum", "polygon"];
 
   useEffect(() => {
-    if (result.data) {
-      console.log(result.data);
+    if (account.status == "connected") {
+      setTokenBalance(Number(formatUnits(tokenBalanceInWei!, 18)));
     }
-  }, [result.data]);
+  }, [account.status]);
 
   return (
     <form
@@ -84,6 +98,9 @@ export const TransactionForm = ({
       className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
+      {/* TODO: add proper styles */}
+      <p>Token Balance: {tokenBalance}</p>
+
       {/* Networks */}
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
@@ -117,7 +134,7 @@ export const TransactionForm = ({
           id="token"
           label="Token"
           options={tokens}
-          defaultValue="USDC"
+          defaultValue="DAI"
           validation={{
             required: { value: true, message: "Token is required" },
           }}
@@ -202,7 +219,7 @@ export const TransactionForm = ({
 
               {/* Recipient Bank */}
               <SelectField
-                id="recipientBank"
+                id="institution"
                 label="Recipient Bank"
                 options={supportedInstitutions.map(
                   (institution: InstitutionProps) => ({
@@ -217,7 +234,7 @@ export const TransactionForm = ({
                 errors={errors}
                 register={register}
                 isLoading={institutionsLoading}
-                value={watch("recipientBank")}
+                value={watch("institution")}
               />
 
               {/* Recipient Account */}
@@ -229,7 +246,7 @@ export const TransactionForm = ({
                   <input
                     type="text"
                     id="recipient-account"
-                    {...register("recipientAccount", {
+                    {...register("accountIdentifier", {
                       required: {
                         value: true,
                         message: "Enter recipient account",
@@ -245,13 +262,13 @@ export const TransactionForm = ({
                     pattern="\d{10}"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
-                    {10 - (watch("recipientAccount")?.toString().length ?? 0)}
+                    {10 - (watch("accountIdentifier")?.toString().length ?? 0)}
                   </div>
                 </div>
-                {errors.recipientAccount && (
-                  <InputError message={errors.recipientAccount.message} />
+                {errors.accountIdentifier && (
+                  <InputError message={errors.accountIdentifier.message} />
                 )}
-                {!errors.recipientAccount && (
+                {!errors.accountIdentifier && (
                   <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
                     <AiOutlineQuestionCircle />
                     <p>Usually 10 digits.</p>
@@ -306,14 +323,14 @@ export const TransactionForm = ({
       </button>
 
       {/* Rate, Fee and Amount calculations */}
-      {rate > 0 && amount && Number(amount) > 0 && (
+      {rate > 0 && Number(amount) > 0 && (
         <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
           {isFetchingRate ? (
             <div className="flex items-center justify-center gap-2 px-4 py-11">
               <ImSpinner2 className="animate-spin text-lg text-neutral-900 dark:text-white" />
               <p className="text-xs">
-                Fetching rate for {currency}{" "}
-                {formatNumberWithCommas(amount as number)}
+                Fetching rate for {formatNumberWithCommas(amount as number)}{" "}
+                {token}
               </p>
             </div>
           ) : (

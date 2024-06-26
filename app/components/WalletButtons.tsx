@@ -18,14 +18,14 @@ export const WalletButtons = () => {
 
   return (
     <>
-      <ConnectButton accountStatus={"avatar"} chainStatus={"none"} />
+      <ConnectButton accountStatus={"avatar"} chainStatus={"none"} label={"Connect"} />
 
       <button
         type="button"
         className={secondaryBtnClasses}
         onClick={createWallet}
       >
-        Create Wallet
+        Create wallet
       </button>
     </>
   );

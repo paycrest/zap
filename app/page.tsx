@@ -2,18 +2,19 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 
-import { fetchRate } from "./api/rate";
 import { FormData, InstitutionProps, StateProps } from "./types";
-import { fetchSupportedInstitutions } from "./api/institutions";
+import { fetchSupportedInstitutions, fetchRate } from "./api/aggregator";
 import { Preloader, TransactionForm, TransactionPreview } from "./components";
+import { useReadContract } from "wagmi";
+import { gatewayAbi } from "./api/abi";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
   token: "",
   amount: 0,
   currency: "",
-  recipientBank: "",
-  recipientAccount: "",
+  institution: "",
+  accountIdentifier: "",
   memo: "",
 };
 
@@ -22,6 +23,14 @@ export default function Home() {
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
   const [isFetchingRate, setIsFetchingRate] = useState(false);
 
+  const { data: protocolFeeDetails } = useReadContract({
+    abi: gatewayAbi,
+    address: "0x847dfdAa218F9137229CF8424378871A1DA8f625",
+    functionName: "getFeeDetails",
+  });
+
+  const [protocolFeePercent, setProtocolFeePercent] = useState<number>(0);
+  const [fee, setFee] = useState<number>(0);
   const [rate, setRate] = useState<number>(0);
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
@@ -45,8 +54,13 @@ export default function Home() {
     setSelectedTab(tab);
   };
 
+  const handlePaymentConfirmation = () => {
+    console.log("hello world");
+  };
+
   const stateProps: StateProps = {
     formValues,
+    fee,
     rate,
     isFetchingRate,
     institutions,
@@ -105,6 +119,20 @@ export default function Home() {
   }, [currency, amount, token]);
 
   useEffect(() => {
+    setProtocolFeePercent(
+      Number(protocolFeeDetails?.[0]!) / Number(protocolFeeDetails?.[1]!),
+    );
+
+    setFee(
+      parseFloat(
+        Number(protocolFeePercent * Number(amount))
+          .toFixed(5)
+          .toString(),
+      ),
+    );
+  });
+
+  useEffect(() => {
     setIsPageLoading(false);
   }, []);
 
@@ -123,6 +151,7 @@ export default function Home() {
       ) : (
         <TransactionPreview
           handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
+          handlePaymentConfirmation={handlePaymentConfirmation}
           stateProps={stateProps}
         />
       )}

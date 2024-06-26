@@ -2,22 +2,27 @@ import Image from "next/image";
 import { TbInfoSquareRounded } from "react-icons/tb";
 
 import { TransactionPreviewProps } from "../types";
-import { formatNumberWithCommas, getInstitutionNameByCode } from "../utils";
+import {
+  formatCurrency,
+  formatNumberWithCommas,
+  getInstitutionNameByCode,
+} from "../utils";
 import { primaryBtnClasses, secondaryBtnClasses } from "../components";
 
 export const TransactionPreview = ({
   handleBackButtonClick,
-  stateProps: { formValues, rate, institutions: supportedInstitutions },
+  handlePaymentConfirmation,
+  stateProps: { formValues, fee, rate, institutions: supportedInstitutions },
 }: TransactionPreviewProps) => {
-  const { amount, token, currency, recipientAccount, recipientBank, memo } =
+  const { amount, token, currency, accountIdentifier, institution, memo } =
     formValues;
 
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amount)} ${token}`,
-    fees: `${currency} 0.00`,
-    totalValue: `${currency} ${formatNumberWithCommas(amount * rate)}`,
+    fee: `${fee} ${token}`,
+    totalValue: `${formatCurrency(amount * rate, currency)}`,
     recipient: "...",
-    account: `${recipientAccount} • ${getInstitutionNameByCode(recipientBank, supportedInstitutions)}`,
+    account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
     memo: memo,
   };
 
@@ -41,7 +46,7 @@ export const TransactionPreview = ({
                 : key.charAt(0).toUpperCase() + key.slice(1)}
             </h3>
             <p className="flex flex-1 items-center gap-1 font-medium text-neutral-900 dark:text-white/80">
-              {key === "amount" && (
+              {(key === "amount" || key === "fee") && (
                 <Image
                   src={token === "USDT" ? "/usdt-logo.svg" : "/usdc-logo.svg"}
                   alt={`${token} logo`}
@@ -71,8 +76,11 @@ export const TransactionPreview = ({
         >
           Back
         </button>
-        <button type="submit" className={`w-full ${primaryBtnClasses}`}>
-          Confirm Payment
+        <button
+          onClick={handlePaymentConfirmation}
+          className={`w-full ${primaryBtnClasses}`}
+        >
+          Confirm payment
         </button>
       </div>
     </div>

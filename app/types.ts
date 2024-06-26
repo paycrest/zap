@@ -16,8 +16,8 @@ export type FormData = {
   token: string;
   amount: number;
   currency: string;
-  recipientBank: string;
-  recipientAccount: string;
+  institution: string;
+  accountIdentifier: string;
   memo: string;
 };
 
@@ -41,6 +41,7 @@ export type TransactionFormProps = {
 
 export type TransactionPreviewProps = {
   handleBackButtonClick: () => void;
+  handlePaymentConfirmation: () => void;
   stateProps: StateProps;
 };
 
@@ -70,6 +71,7 @@ export type RateResponse = {
 
 export type StateProps = {
   formValues: FormData;
+  fee: number;
   rate: number;
   isFetchingRate: boolean;
   institutions: InstitutionProps[];
