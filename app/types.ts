@@ -18,6 +18,7 @@ export type FormData = {
   currency: string;
   institution: string;
   accountIdentifier: string;
+  recipientName: string;
   memo: string;
 };
 
@@ -43,6 +44,15 @@ export type TransactionPreviewProps = {
   handleBackButtonClick: () => void;
   handlePaymentConfirmation: () => void;
   stateProps: StateProps;
+};
+
+export type TransactionStatusProps = {
+  transactionStatus: "idle" | "pending" | "settled" | "failed";
+  errorMessage: string;
+  createdAt: string;
+  clearForm: () => void;
+  clearTransactionStatus: () => void;
+  formMethods: FormMethods;
 };
 
 export type SelectFieldProps = {

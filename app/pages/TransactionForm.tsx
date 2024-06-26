@@ -166,11 +166,11 @@ export const TransactionForm = ({
                 disabled: watch("token") === "",
                 min: {
                   value: 0.01,
-                  message: "Minimum amount is 0.01",
+                  message: `Minimum amount is 0.01 ${token}`,
                 },
                 max: {
-                  value: 1000000,
-                  message: "Max. amount is 1,000,000",
+                  value: 500,
+                  message: `Max. amount is 500 ${token}`,
                 },
                 pattern: {
                   value: /^\d+(\.\d{1,2})?$/,
@@ -283,6 +283,12 @@ export const TransactionForm = ({
                   </div>
                 )}
               </div>
+
+              <input
+                type="hidden"
+                {...register("recipientName")}
+                value="John Doe"
+              />
 
               {/* Memo */}
               <div className="grid gap-2">

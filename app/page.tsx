@@ -13,6 +13,7 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { erc20Abi, gatewayAbi } from "./api/abi";
 import { getAddress, parseUnits } from "viem";
 import { publicKeyEncrypt } from "./utils";
+import TransactionStatus from "./pages/TransactionStatus";
 
 const GATEWAY_CONTRACT_ADDRESS = "0x847dfdAa218F9137229CF8424378871A1DA8f625";
 
@@ -23,6 +24,7 @@ const INITIAL_FORM_STATE: FormData = {
   currency: "",
   institution: "",
   accountIdentifier: "",
+  recipientName: "",
   memo: "",
 };
 
@@ -58,6 +60,16 @@ export default function Home() {
     isPending,
     writeContractAsync,
   } = useWriteContract();
+
+  const [transactionStatus, setTransactionStatus] = useState<
+    "idle" | "pending" | "settled" | "failed"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [createdAt, setCreatedAt] = useState<string>("");
+
+  useEffect(() => {
+    if (isPending) setTransactionStatus("pending");
+  }, [isPending]);
 
   const onSubmit = (data: FormData) => {
     setFormValues(data);
@@ -97,6 +109,8 @@ export default function Home() {
     };
 
     try {
+      setCreatedAt(new Date().toISOString());
+
       // Approve gateway contract to spend token
       await writeContractAsync({
         abi: erc20Abi,
@@ -120,8 +134,12 @@ export default function Home() {
           params.messageHash,
         ],
       });
+
+      setTransactionStatus("settled");
     } catch (e) {
       console.log(error?.message);
+      setErrorMessage(error?.message as string);
+      setTransactionStatus("failed");
     }
 
     console.log("hash", hash);
@@ -158,19 +176,15 @@ export default function Home() {
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-
     const getRate = async () => {
       if (!currency || !amount || !token) return;
-
       setIsFetchingRate(true);
-
       const rate = await fetchRate({
         token: "USDT",
         amount: amount,
         currency: currency,
       });
       setRate(rate.data);
-
       setIsFetchingRate(false);
     };
 
@@ -192,14 +206,16 @@ export default function Home() {
       Number(protocolFeeDetails?.[0]!) / Number(protocolFeeDetails?.[1]!),
     );
 
-    setFee(
-      parseFloat(
-        Number(protocolFeePercent * Number(amount))
-          .toFixed(5)
-          .toString(),
-      ),
-    );
-  });
+    setFee(0.1 * Number(amount));
+
+    // setFee(
+    //   parseFloat(
+    //     Number(protocolFeePercent * Number(amount))
+    //       .toFixed(5)
+    //       .toString(),
+    //   ),
+    // );
+  }, [protocolFeeDetails, amount, protocolFeePercent]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -209,20 +225,36 @@ export default function Home() {
 
   return (
     <>
-      {Object.values(formValues).every(
-        (value) => value === "" || value === 0,
-      ) ? (
-        <TransactionForm
-          onSubmit={onSubmit}
+      {transactionStatus !== "idle" ? (
+        <TransactionStatus
           formMethods={formMethods}
-          stateProps={stateProps}
+          errorMessage={errorMessage}
+          transactionStatus={transactionStatus}
+          createdAt={createdAt}
+          clearForm={() => setFormValues(INITIAL_FORM_STATE)}
+          clearTransactionStatus={() => {
+            setTransactionStatus("idle");
+            setErrorMessage("");
+          }}
         />
       ) : (
-        <TransactionPreview
-          handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
-          handlePaymentConfirmation={handlePaymentConfirmation}
-          stateProps={stateProps}
-        />
+        <>
+          {Object.values(formValues).every(
+            (value) => value === "" || value === 0,
+          ) ? (
+            <TransactionForm
+              onSubmit={onSubmit}
+              formMethods={formMethods}
+              stateProps={stateProps}
+            />
+          ) : (
+            <TransactionPreview
+              handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
+              handlePaymentConfirmation={handlePaymentConfirmation}
+              stateProps={stateProps}
+            />
+          )}
+        </>
       )}
     </>
   );

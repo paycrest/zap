@@ -39,7 +39,7 @@ const socials = [
 
 export const Footer = () => {
   return (
-    <footer className="flex w-full items-center justify-between border-t border-dashed border-gray-200 pb-6 pt-4 dark:border-white/10">
+    <footer className="mt-8 flex w-full items-center justify-between border-t border-dashed border-gray-200 pb-6 pt-4 dark:border-white/10">
       <p className="text-xs font-medium">
         <span className="text-gray-500 dark:text-white/80">
           &copy; 2024 Powered by

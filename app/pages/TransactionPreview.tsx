@@ -14,14 +14,21 @@ export const TransactionPreview = ({
   handlePaymentConfirmation,
   stateProps: { formValues, fee, rate, institutions: supportedInstitutions },
 }: TransactionPreviewProps) => {
-  const { amount, token, currency, accountIdentifier, institution, memo } =
-    formValues;
+  const {
+    amount,
+    token,
+    currency,
+    accountIdentifier,
+    institution,
+    recipientName,
+    memo,
+  } = formValues;
 
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amount)} ${token}`,
     fee: `${fee} ${token}`,
     totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
-    recipient: "...",
+    recipient: recipientName,
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
     memo: memo,
   };
