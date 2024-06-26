@@ -6,6 +6,16 @@ import { PiCheckCircle, PiSpinnerBold, PiXCircle } from "react-icons/pi";
 import { TransactionStatusProps } from "../types";
 import { secondaryBtnClasses } from "../components";
 
+/**
+ * Renders the transaction status component.
+ *
+ * @param transactionStatus - The status of the transaction.
+ * @param errorMessage - The error message, if any.
+ * @param createdAt - The creation date of the transaction.
+ * @param clearForm - Function to clear the form.
+ * @param clearTransactionStatus - Function to clear the transaction status.
+ * @param formMethods - The form methods.
+ */
 export default function TransactionStatus({
   transactionStatus,
   errorMessage,
@@ -22,6 +32,10 @@ export default function TransactionStatus({
     recipientName = watch("recipientName"),
     amount = watch("amount");
 
+  /**
+   * Handles the back button click event.
+   * Clears the transaction status if it's failed, otherwise clears the form and transaction status.
+   */
   const handleBackButtonClick = () => {
     if (transactionStatus === "failed") {
       clearTransactionStatus();
@@ -31,12 +45,20 @@ export default function TransactionStatus({
     }
   };
 
+  /**
+   * Returns the image source based on the transaction status and theme.
+   * @returns The image source.
+   */
   const getImageSrc = () => {
     const base = transactionStatus === "pending" ? "/stepper" : "/stepper-long";
     const themeSuffix = resolvedTheme === "dark" ? "-dark.svg" : ".svg";
     return base + themeSuffix;
   };
 
+  /**
+   * Renders the status indicator based on the transaction status.
+   * @returns The status indicator component.
+   */
   const StatusIndicator = () =>
     transactionStatus === "settled" ? (
       <Image
@@ -57,6 +79,10 @@ export default function TransactionStatus({
       </div>
     );
 
+  /**
+   * Renders the payment details component if the transaction status is settled.
+   * @returns The payment details component.
+   */
   const PaymentDetails = () =>
     transactionStatus === "settled" && (
       <div className="flex w-full flex-col gap-4 text-neutral-900 dark:text-white/50">
@@ -74,6 +100,11 @@ export default function TransactionStatus({
       </div>
     );
 
+  /**
+   * Formats the error message by extracting the relevant part.
+   * @param message - The error message.
+   * @returns The formatted error message.
+   */
   const formatErrorMessage = (message: string) => {
     const formattedPart = message.match(
       /The contract function.*\s+- The address is not a contract\./s,
@@ -85,6 +116,7 @@ export default function TransactionStatus({
     <div className="flex w-full items-center justify-between gap-10 text-sm">
       <div className="flex flex-col gap-2">
         <div className="flex w-fit flex-col items-end gap-2">
+          {/* Token and Amount */}
           <div className="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
             <Image
               src={`${token}-logo.svg`}
@@ -96,6 +128,7 @@ export default function TransactionStatus({
               {amount} {token}
             </p>
           </div>
+          {/* Transaction Progress */}
           <Image
             src={getImageSrc()}
             alt="Progress"
@@ -103,6 +136,7 @@ export default function TransactionStatus({
             height={200}
             className="w-auto"
           />
+          {/* Recipient Name */}
           <p className="whitespace-nowrap rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
             {recipientName}
           </p>
@@ -110,8 +144,10 @@ export default function TransactionStatus({
       </div>
 
       <div className="flex flex-col items-start gap-4">
+        {/* Status Indicator */}
         <StatusIndicator />
 
+        {/* Transaction Status */}
         <h2 className="text-xl font-medium text-neutral-900 dark:text-white">
           {transactionStatus === "pending"
             ? "Processing payment..."
@@ -120,10 +156,12 @@ export default function TransactionStatus({
               : "Payment completed"}
         </h2>
 
+        {/* Pending Transaction Separator */}
         {transactionStatus === "pending" && (
           <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
         )}
 
+        {/* Transaction Status Message */}
         <p className="leading-normal text-gray-500 dark:text-white/50">
           {transactionStatus === "pending"
             ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
@@ -132,6 +170,7 @@ export default function TransactionStatus({
               : `Your payment of ${amount} ${token} to ${recipientName} has been completed successfully`}
         </p>
 
+        {/* Back Button */}
         {transactionStatus !== "pending" && (
           <>
             <div className="flex w-full gap-3">
@@ -144,12 +183,14 @@ export default function TransactionStatus({
               </button>
             </div>
 
+            {/* Error Separator */}
             {errorMessage && (
               <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
             )}
           </>
         )}
 
+        {/* Error Details */}
         {errorMessage && (
           <div className="flex w-full flex-col gap-2 font-mono text-gray-500 dark:text-white/50">
             <h3 className="font-medium">Error details:</h3>
@@ -159,6 +200,7 @@ export default function TransactionStatus({
           </div>
         )}
 
+        {/* Payment Details */}
         <PaymentDetails />
       </div>
     </div>

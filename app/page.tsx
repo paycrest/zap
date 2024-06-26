@@ -28,7 +28,12 @@ const INITIAL_FORM_STATE: FormData = {
   memo: "",
 };
 
+/**
+ * Represents the Home component.
+ * This component handles the logic and rendering of the home page.
+ */
 export default function Home() {
+  // State variables
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
   const [isFetchingRate, setIsFetchingRate] = useState(false);
@@ -42,18 +47,18 @@ export default function Home() {
   const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
   const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
 
+  // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch } = formMethods;
   const { currency, amount, token } = watch();
 
+  // Custom hooks for account and contract interactions
   const account = useAccount();
-
   const { data: protocolFeeDetails } = useReadContract({
     abi: gatewayAbi,
     address: GATEWAY_CONTRACT_ADDRESS,
     functionName: "getFeeDetails",
   });
-
   const {
     data: hash,
     error,
@@ -61,29 +66,48 @@ export default function Home() {
     writeContractAsync,
   } = useWriteContract();
 
+  // Transaction status and error handling
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "pending" | "settled" | "failed"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [createdAt, setCreatedAt] = useState<string>("");
 
+  // Effect to update transaction status
   useEffect(() => {
     if (isPending) setTransactionStatus("pending");
   }, [isPending]);
 
+  /**
+   * Handles form submission.
+   * @param data - The form data.
+   */
   const onSubmit = (data: FormData) => {
     setFormValues(data);
   };
 
+  /**
+   * Handles network change.
+   * @param network - The selected network.
+   */
   const handleNetworkChange = (network: string) => {
     setSelectedNetwork(network);
   };
 
+  /**
+   * Handles tab change.
+   * @param tab - The selected tab.
+   */
   const handleTabChange = (tab: string) => {
     setSelectedTab(tab);
   };
 
+  /**
+   * Handles payment confirmation.
+   * This function is called when the user confirms the payment.
+   */
   const handlePaymentConfirmation = async () => {
+    // Prepare recipient data
     const recipient = {
       accountIdentifier: formValues.accountIdentifier,
       accountName: "John Doe",
@@ -92,10 +116,11 @@ export default function Home() {
       memo: formValues.memo,
     };
 
-    // fetch aggregator public key
+    // Fetch aggregator public key
     const publicKey = await fetchAggregatorPublicKey();
     const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
 
+    // Prepare transaction parameters
     const params = {
       token: getAddress("0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9"),
       amount: parseUnits(amount.toString(), 18),
@@ -145,6 +170,7 @@ export default function Home() {
     console.log("hash", hash);
   };
 
+  // State props for child components
   const stateProps: StateProps = {
     formValues,
     fee,
@@ -158,6 +184,7 @@ export default function Home() {
     handleNetworkChange,
   };
 
+  // Fetch supported institutions based on currency
   useEffect(() => {
     const getInstitutions = async () => {
       if (!currency) return;
@@ -174,6 +201,7 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
 
+  // Fetch rate based on currency, amount, and token
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     const getRate = async () => {
@@ -201,6 +229,7 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency, amount, token]);
 
+  // Calculate fee based on protocol fee details and amount
   useEffect(() => {
     setProtocolFeePercent(
       Number(protocolFeeDetails?.[0]!) / Number(protocolFeeDetails?.[1]!),
@@ -215,10 +244,12 @@ export default function Home() {
     );
   }, [protocolFeeDetails, amount, protocolFeePercent]);
 
+  // Set page loading state to false after initial render
   useEffect(() => {
     setIsPageLoading(false);
   }, []);
 
+  // Render loading spinner if page is still loading
   if (isPageLoading) return <Preloader />;
 
   return (

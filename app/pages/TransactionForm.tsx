@@ -33,11 +33,21 @@ const currencies = [
   { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: true },
 ];
 
+/**
+ * TransactionForm component renders a form for submitting a transaction.
+ * It includes fields for selecting network, token, amount, and recipient details.
+ * The form also displays rate and fee information based on the selected token.
+ *
+ * @param formMethods - Form methods from react-hook-form library.
+ * @param onSubmit - Function to handle form submission.
+ * @param stateProps - State properties for the form.
+ */
 export const TransactionForm = ({
   formMethods,
   onSubmit,
   stateProps,
 }: TransactionFormProps) => {
+  // Destructure stateProps
   const {
     fee,
     rate,
@@ -50,8 +60,10 @@ export const TransactionForm = ({
     institutions: supportedInstitutions,
   } = stateProps;
 
+  // Get account information using custom hook
   const account = useAccount();
 
+  // Get token balance using custom hook and Ethereum contract interaction
   const { data: tokenBalanceInWei } = useReadContract({
     abi: erc20Abi,
     address: "0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9",
@@ -59,8 +71,10 @@ export const TransactionForm = ({
     args: [account.address!],
   });
 
+  // State for token balance
   const [tokenBalance, setTokenBalance] = useState<number>(0);
 
+  // Destructure formMethods from react-hook-form
   const {
     handleSubmit,
     register,
@@ -68,10 +82,12 @@ export const TransactionForm = ({
     formState: { errors, isValid, isDirty, isSubmitting },
   } = formMethods;
 
+  // Get values of currency, amount, and token from form
   let currency = watch("currency"),
     amount = watch("amount"),
     token = watch("token");
 
+  // Array of objects for rendering rate and fee information
   const renderedInfo = [
     {
       key: "rate",
@@ -85,8 +101,10 @@ export const TransactionForm = ({
     },
   ];
 
+  // Array of available networks
   const networks = ["base", "arbitrum", "polygon"];
 
+  // Update token balance when account is connected and token balance is available
   useEffect(() => {
     if (account.isConnected && tokenBalanceInWei) {
       setTokenBalance(Number(formatUnits(tokenBalanceInWei!, 18)));
@@ -104,6 +122,7 @@ export const TransactionForm = ({
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
 
+        {/* Render network buttons */}
         {networks.map((network) => (
           <NetworkButton
             key={network}
@@ -144,6 +163,7 @@ export const TransactionForm = ({
             value={watch("token")}
           />
 
+          {/* Display token balance if account is connected */}
           {account.status === "connected" && (
             <p className="text-gray-500 dark:text-white/50">
               Bal: {tokenBalance} {token}
@@ -284,6 +304,7 @@ export const TransactionForm = ({
                 )}
               </div>
 
+              {/* Hidden field for recipient name */}
               <input
                 type="hidden"
                 {...register("recipientName")}
@@ -325,7 +346,7 @@ export const TransactionForm = ({
         </div>
       </div>
 
-      {/* Submit */}
+      {/* Submit button */}
       <button
         type="submit"
         disabled={!isValid || !isDirty || !account.isConnected}

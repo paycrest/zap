@@ -9,6 +9,13 @@ import {
 } from "../utils";
 import { primaryBtnClasses, secondaryBtnClasses } from "../components";
 
+/**
+ * Renders a preview of a transaction with the provided details.
+ *
+ * @param handleBackButtonClick - Function to handle the back button click event.
+ * @param handlePaymentConfirmation - Function to handle the payment confirmation button click event.
+ * @param stateProps - Object containing the form values, fee, rate, and supported institutions.
+ */
 export const TransactionPreview = ({
   handleBackButtonClick,
   handlePaymentConfirmation,
@@ -24,6 +31,7 @@ export const TransactionPreview = ({
     memo,
   } = formValues;
 
+  // Rendered transaction information
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amount)} ${token}`,
     fee: `${fee} ${token}`,
@@ -45,14 +53,17 @@ export const TransactionPreview = ({
       </div>
 
       <div className="grid gap-4">
+        {/* Render transaction information */}
         {Object.entries(renderedInfo).map(([key, value]) => (
           <div key={key} className="flex items-center justify-between gap-2">
             <h3 className="flex-1 text-gray-500 dark:text-white/50">
+              {/* Capitalize the first letter of the key */}
               {key === "totalValue"
                 ? "Total Value"
                 : key.charAt(0).toUpperCase() + key.slice(1)}
             </h3>
             <p className="flex flex-1 items-center gap-1 font-medium text-neutral-900 dark:text-white/80">
+              {/* Render token logo for amount and fee */}
               {(key === "amount" || key === "fee") && (
                 <Image
                   src={`/${token.toLowerCase()}-logo.svg`}
@@ -67,6 +78,7 @@ export const TransactionPreview = ({
         ))}
       </div>
 
+      {/* Transaction detail disclaimer */}
       <div className="flex gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-white/50">
         <TbInfoSquareRounded className="w-8 text-xl" />
         <p>
@@ -75,6 +87,7 @@ export const TransactionPreview = ({
         </p>
       </div>
 
+      {/* CTAs */}
       <div className="flex gap-6">
         <button
           type="button"
