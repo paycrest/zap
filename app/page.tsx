@@ -9,13 +9,8 @@ import {
   fetchAggregatorPublicKey,
 } from "./api/aggregator";
 import { Preloader, TransactionForm, TransactionPreview } from "./components";
-import {
-  useAccount,
-  useReadContract,
-  useSimulateContract,
-  useWriteContract,
-} from "wagmi";
-import { gatewayAbi } from "./api/abi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { erc20Abi, gatewayAbi } from "./api/abi";
 import { getAddress, parseUnits } from "viem";
 import { publicKeyEncrypt } from "./utils";
 
@@ -57,7 +52,12 @@ export default function Home() {
     functionName: "getFeeDetails",
   });
 
-  const { data: hash, error, isPending, writeContractAsync } = useWriteContract();
+  const {
+    data: hash,
+    error,
+    isPending,
+    writeContractAsync,
+  } = useWriteContract();
 
   const onSubmit = (data: FormData) => {
     setFormValues(data);
@@ -84,8 +84,6 @@ export default function Home() {
     const publicKey = await fetchAggregatorPublicKey();
     const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
 
-    console.log(encryptedRecipient);
-
     const params = {
       token: getAddress("0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9"),
       amount: parseUnits(amount.toString(), 18),
@@ -98,24 +96,35 @@ export default function Home() {
       messageHash: encryptedRecipient,
     };
 
-    await writeContractAsync({
-      abi: gatewayAbi,
-      address: GATEWAY_CONTRACT_ADDRESS,
-      functionName: "createOrder",
-      args: [
-        params.token,
-        params.amount,
-        params.rate,
-        params.senderFeeRecipient,
-        params.senderFee,
-        params.refundAddress!,
-        params.messageHash,
-      ],
-    });
+    try {
+      // Approve gateway contract to spend token
+      await writeContractAsync({
+        abi: erc20Abi,
+        address: "0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9",
+        functionName: "approve",
+        args: [GATEWAY_CONTRACT_ADDRESS, params.amount],
+      });
 
-    console.log(hash);
-    console.log(error?.cause);
-    console.log(isPending);
+      // Create order
+      await writeContractAsync({
+        abi: gatewayAbi,
+        address: GATEWAY_CONTRACT_ADDRESS,
+        functionName: "createOrder",
+        args: [
+          params.token,
+          params.amount,
+          params.rate,
+          params.senderFeeRecipient,
+          params.senderFee,
+          params.refundAddress!,
+          params.messageHash,
+        ],
+      });
+    } catch (e) {
+      console.log(error?.message);
+    }
+
+    console.log("hash", hash);
   };
 
   const stateProps: StateProps = {
