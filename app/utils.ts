@@ -1,3 +1,4 @@
+import JSEncrypt from "jsencrypt";
 import { InstitutionProps } from "./types";
 
 /**
@@ -46,3 +47,21 @@ export const formatCurrency = (
     currency,
   }).format(value); // Format the provided value as a currency string.
 };
+
+/**
+ * Encrypts data using the provided public key.
+ * @param data - The data to be encrypted.
+ * @param publicKeyPEM - The public key in PEM format.
+ * @returns The encrypted data as a base64-encoded string.
+ */
+export function publicKeyEncrypt(data: any, publicKeyPEM: string): string {
+  const encrypt = new JSEncrypt();
+  encrypt.setPublicKey(publicKeyPEM);
+
+  const encrypted = encrypt.encrypt(JSON.stringify(data));
+  if (encrypted === false) {
+    throw new Error("Failed to encrypt data");
+  }
+
+  return encrypted;
+}

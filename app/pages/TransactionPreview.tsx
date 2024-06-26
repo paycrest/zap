@@ -20,7 +20,7 @@ export const TransactionPreview = ({
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amount)} ${token}`,
     fee: `${fee} ${token}`,
-    totalValue: `${formatCurrency(amount * rate, currency)}`,
+    totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
     recipient: "...",
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
     memo: memo,

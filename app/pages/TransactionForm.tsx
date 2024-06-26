@@ -75,7 +75,7 @@ export const TransactionForm = ({
     {
       key: "rate",
       label: "Rate",
-      value: `${formatCurrency(rate, currency?.toString())}/DAI`,
+      value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/DAI`,
     },
     {
       key: "fee",
@@ -87,11 +87,11 @@ export const TransactionForm = ({
   const networks = ["base", "arbitrum", "polygon"];
 
   useEffect(() => {
-    if (account.status == "connected") {
+    if (account.isConnected && tokenBalanceInWei) {
       setTokenBalance(Number(formatUnits(tokenBalanceInWei!, 18)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account.status]);
+  }, [account.isConnected]);
 
   return (
     <form
@@ -310,12 +310,10 @@ export const TransactionForm = ({
       {/* Submit */}
       <button
         type="submit"
-        disabled={!isValid || !isDirty || account.status !== "connected"}
+        disabled={!isValid || !isDirty || !account.isConnected}
         className={primaryBtnClasses}
       >
-        {account.status === "connected"
-          ? "Review Info"
-          : "Connect wallet to continue"}
+        {account.isConnected ? "Review Info" : "Connect wallet to continue"}
       </button>
 
       {/* Rate, Fee and Amount calculations */}

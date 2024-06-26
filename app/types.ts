@@ -69,6 +69,12 @@ export type RateResponse = {
   message: string;
 };
 
+export type PubkeyResponse = {
+  status: string;
+  data: string;
+  message: string;
+};
+
 export type StateProps = {
   formValues: FormData;
   fee: number;
