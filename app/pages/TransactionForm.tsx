@@ -90,6 +90,7 @@ export const TransactionForm = ({
     if (account.status == "connected") {
       setTokenBalance(Number(formatUnits(tokenBalanceInWei!, 18)));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.status]);
 
   return (
@@ -98,9 +99,6 @@ export const TransactionForm = ({
       className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
-      {/* TODO: add proper styles */}
-      <p>Token Balance: {tokenBalance}</p>
-
       {/* Networks */}
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
@@ -116,32 +114,30 @@ export const TransactionForm = ({
             disabled={network !== "base"}
           />
         ))}
-
-        {/* Other network buttons */}
-        <button
-          type="button"
-          disabled
-          aria-label="Other networks"
-          className="flex cursor-not-allowed items-center justify-center gap-2 rounded-full border border-gray-300 p-2.5 opacity-70 dark:border-white/20"
-        >
-          <PiCaretDown className="cursor-pointer text-lg text-gray-400 dark:text-white/50" />
-        </button>
       </div>
 
       <div className="flex items-start gap-4">
         {/* Token */}
-        <SelectField
-          id="token"
-          label="Token"
-          options={tokens}
-          defaultValue="DAI"
-          validation={{
-            required: { value: true, message: "Token is required" },
-          }}
-          errors={errors}
-          register={register}
-          value={watch("token")}
-        />
+        <div className="grid gap-2">
+          <SelectField
+            id="token"
+            label="Token"
+            options={tokens}
+            defaultValue="DAI"
+            validation={{
+              required: { value: true, message: "Token is required" },
+            }}
+            errors={errors}
+            register={register}
+            value={watch("token")}
+          />
+
+          {account.status === "connected" && (
+            <p className="text-gray-500 dark:text-white/50">
+              Bal: {tokenBalance} {token}
+            </p>
+          )}
+        </div>
 
         {/* Amount */}
         <div className="grid flex-1 gap-2">
