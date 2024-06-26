@@ -18,7 +18,12 @@ export const WalletButtons = () => {
 
   return (
     <>
-      <ConnectButton accountStatus={"avatar"} chainStatus={"none"} label={"Connect"} />
+      <ConnectButton
+        accountStatus={"address"}
+        chainStatus={"none"}
+        label={"Connect"}
+        showBalance={false}
+      />
 
       <button
         type="button"

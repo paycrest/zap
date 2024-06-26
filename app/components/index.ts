@@ -6,6 +6,7 @@ export { LogoOutlineBg } from "./LogoOutlineBg";
 export { ThemeSwitch } from "./ThemeSwitch";
 export { WalletButtons } from "./WalletButtons";
 
+export { Tooltip } from "./Tooltip";
 export { TransactionForm } from "../pages/TransactionForm";
 export { TransactionPreview } from "../pages/TransactionPreview";
 

@@ -14,6 +14,7 @@ import {
   NetworkButton,
   SelectField,
   TabButton,
+  Tooltip,
   inputClasses,
   primaryBtnClasses,
 } from "../components";
@@ -114,6 +115,17 @@ export const TransactionForm = ({
             disabled={network !== "base"}
           />
         ))}
+
+        {/* Other network buttons */}
+        <Tooltip message="Other networks (coming soon)">
+          <button
+            type="button"
+            aria-label="Other networks (coming soon)"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-300 p-2.5 opacity-70 dark:border-white/20"
+          >
+            <PiCaretDown className="text-lg text-gray-400 dark:text-white/50" />
+          </button>
+        </Tooltip>
       </div>
 
       <div className="flex items-start gap-4">
