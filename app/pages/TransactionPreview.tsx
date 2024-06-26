@@ -48,7 +48,7 @@ export const TransactionPreview = ({
             <p className="flex flex-1 items-center gap-1 font-medium text-neutral-900 dark:text-white/80">
               {(key === "amount" || key === "fee") && (
                 <Image
-                  src={token === "USDT" ? "/usdt-logo.svg" : "/usdc-logo.svg"}
+                  src={`/${token.toLowerCase()}-logo.svg`}
                   alt={`${token} logo`}
                   width={14}
                   height={14}
@@ -77,6 +77,7 @@ export const TransactionPreview = ({
           Back
         </button>
         <button
+          type="submit"
           onClick={handlePaymentConfirmation}
           className={`w-full ${primaryBtnClasses}`}
         >

@@ -118,7 +118,7 @@ export const TransactionForm = ({
 
       <div className="flex items-start gap-4">
         {/* Token */}
-        <div className="grid gap-2">
+        <div className="grid flex-1 gap-2">
           <SelectField
             id="token"
             label="Token"
