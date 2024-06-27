@@ -109,11 +109,11 @@ export const TransactionForm = ({
 
   // Update token balance when account is connected and token balance is available
   useEffect(() => {
-    if (account.isConnected && tokenBalanceInWei) {
-      setTokenBalance(Number(formatUnits(tokenBalanceInWei!, 18)));
+    if (tokenBalanceInWei) {
+      setTokenBalance(Number(formatUnits(tokenBalanceInWei, 18)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account.isConnected]);
+  }, [tokenBalanceInWei]);
 
   return (
     <form

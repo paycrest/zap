@@ -41,14 +41,21 @@ export type TransactionFormProps = {
 };
 
 export type TransactionPreviewProps = {
+  errorMessage: string;
   handleBackButtonClick: () => void;
   handlePaymentConfirmation: () => void;
   stateProps: StateProps;
 };
 
 export type TransactionStatusProps = {
-  transactionStatus: "idle" | "pending" | "settled" | "failed";
-  errorMessage: string;
+  transactionStatus:
+    | "idle"
+    | "pending"
+    | "processing"
+    | "fulfilled"
+    | "validated"
+    | "settled"
+    | "refunded";
   createdAt: string;
   clearForm: () => void;
   clearTransactionStatus: () => void;

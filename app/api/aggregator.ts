@@ -15,7 +15,7 @@ export const fetchRate = async ({
 }: RatePayload): Promise<RateResponse> => {
   try {
     const response = await axios.get(
-      `${API_URL}/rates/${token}/${amount}/${currency}`,
+      `${API_URL}/rates/${token}/${amount}/${currency}?provider_id=zmLQezZk`,
     );
     return response.data;
   } catch (error) {

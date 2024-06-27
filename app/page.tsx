@@ -15,7 +15,12 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import {
+  type BaseError,
+  useAccount,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
 import { erc20Abi, gatewayAbi } from "./api/abi";
 import { getAddress, parseUnits } from "viem";
 import { publicKeyEncrypt } from "./utils";
@@ -74,15 +79,16 @@ export default function Home() {
 
   // Transaction status and error handling
   const [transactionStatus, setTransactionStatus] = useState<
-    "idle" | "pending" | "settled" | "failed"
+    | "idle"
+    | "pending"
+    | "processing"
+    | "fulfilled"
+    | "validated"
+    | "settled"
+    | "refunded"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [createdAt, setCreatedAt] = useState<string>("");
-
-  // Effect to update transaction status
-  useEffect(() => {
-    if (isPending) setTransactionStatus("pending");
-  }, [isPending]);
 
   /**
    * Handles form submission.
@@ -116,9 +122,9 @@ export default function Home() {
     // Prepare recipient data
     const recipient = {
       accountIdentifier: formValues.accountIdentifier,
-      accountName: "John Doe",
+      accountName: "Chibuotu Amadi",
       institution: formValues.institution,
-      providerId: "",
+      providerId: "zmLQezZk",
       memo: formValues.memo,
     };
 
@@ -166,11 +172,13 @@ export default function Home() {
         ],
       });
 
-      setTransactionStatus("settled");
-    } catch (e) {
-      console.log(error?.message);
-      setErrorMessage(error?.message as string);
-      setTransactionStatus("failed");
+      setTransactionStatus("pending");
+    } catch (e: any) {
+      if (error) {
+        setErrorMessage((error as BaseError).shortMessage || error!.message);
+      } else {
+        setErrorMessage((e as BaseError).shortMessage);
+      }
     }
 
     console.log("hash", hash);
@@ -264,7 +272,6 @@ export default function Home() {
           <AnimatedPage key="transaction-status">
             <TransactionStatus
               formMethods={formMethods}
-              errorMessage={errorMessage}
               transactionStatus={transactionStatus}
               createdAt={createdAt}
               clearForm={() => setFormValues(INITIAL_FORM_STATE)}
@@ -289,6 +296,7 @@ export default function Home() {
             ) : (
               <AnimatedPage key="transaction-preview">
                 <TransactionPreview
+                  errorMessage={errorMessage}
                   handleBackButtonClick={() =>
                     setFormValues(INITIAL_FORM_STATE)
                   }

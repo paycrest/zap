@@ -25,7 +25,6 @@ import {
  */
 export default function TransactionStatus({
   transactionStatus,
-  errorMessage,
   createdAt,
   clearForm,
   clearTransactionStatus,
@@ -44,7 +43,7 @@ export default function TransactionStatus({
    * Clears the transaction status if it's failed, otherwise clears the form and transaction status.
    */
   const handleBackButtonClick = () => {
-    if (transactionStatus === "failed") {
+    if (transactionStatus === "refunded") {
       clearTransactionStatus();
     } else {
       clearForm();
@@ -78,7 +77,7 @@ export default function TransactionStatus({
             className="h-auto w-10"
           />
         </AnimatedComponent>
-      ) : transactionStatus === "failed" ? (
+      ) : transactionStatus === "refunded" ? (
         <AnimatedComponent
           variant={{
             ...scaleInOut,
@@ -86,7 +85,7 @@ export default function TransactionStatus({
             initial: { scale: 0, rotate: -90 },
             exit: { scale: 0, rotate: 90 },
           }}
-          key="failed"
+          key="refunded"
         >
           <PiXCircle className="text-4xl text-rose-500" />
         </AnimatedComponent>
@@ -171,7 +170,7 @@ export default function TransactionStatus({
         >
           {transactionStatus === "pending"
             ? "Processing payment..."
-            : transactionStatus === "failed"
+            : transactionStatus === "refunded"
               ? "Payment failed"
               : "Payment completed"}
         </AnimatedComponent>
@@ -189,7 +188,7 @@ export default function TransactionStatus({
         >
           {transactionStatus === "pending"
             ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
-            : transactionStatus === "failed"
+            : transactionStatus === "refunded"
               ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful. Please try again later or contact support for assistance.`
               : `Your payment of ${amount} ${token} to ${recipientName} has been completed successfully`}
         </AnimatedComponent>
@@ -208,38 +207,12 @@ export default function TransactionStatus({
                   type="button"
                   className={`w-fit ${secondaryBtnClasses}`}
                 >
-                  {transactionStatus === "failed"
+                  {transactionStatus === "refunded"
                     ? "Try again"
                     : "Back to home"}
                 </button>
               </AnimatedComponent>
-
-              {/* Error Separator */}
-              {errorMessage && (
-                <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
-              )}
             </>
-          )}
-        </AnimatePresence>
-
-        {/* Error Details */}
-        <AnimatePresence>
-          {errorMessage && (
-            <AnimatedComponent
-              variant={{
-                ...fadeInOut,
-                animate: { opacity: 1, height: "auto" },
-                initial: { opacity: 0, height: 0 },
-                exit: { opacity: 0, height: 0 },
-              }}
-              delay={0.6}
-              className="flex w-full flex-col gap-2 font-mono text-gray-500 dark:text-white/50"
-            >
-              <h3 className="font-medium">Error details:</h3>
-              <pre className="whitespace-pre-wrap text-xs">
-                {formatErrorMessage(errorMessage)}
-              </pre>
-            </AnimatedComponent>
           )}
         </AnimatePresence>
 

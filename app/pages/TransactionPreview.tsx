@@ -17,6 +17,7 @@ import { primaryBtnClasses, secondaryBtnClasses } from "../components";
  * @param stateProps - Object containing the form values, fee, rate, and supported institutions.
  */
 export const TransactionPreview = ({
+  errorMessage,
   handleBackButtonClick,
   handlePaymentConfirmation,
   stateProps: { formValues, fee, rate, institutions: supportedInstitutions },
@@ -104,6 +105,7 @@ export const TransactionPreview = ({
           Confirm payment
         </button>
       </div>
+      <p>{ errorMessage }</p>
     </div>
   );
 };
