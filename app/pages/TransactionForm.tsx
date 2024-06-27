@@ -1,7 +1,8 @@
 "use client";
 import { formatUnits } from "viem";
-import { useAccount, useReadContract } from "wagmi";
 import { useEffect, useState } from "react";
+import { useAccount, useReadContract } from "wagmi";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
@@ -10,6 +11,7 @@ import { AiOutlineQuestionCircle } from "react-icons/ai";
 
 import { erc20Abi } from "../api/abi";
 import {
+  AnimatedComponent,
   InputError,
   NetworkButton,
   SelectField,
@@ -17,6 +19,7 @@ import {
   Tooltip,
   inputClasses,
   primaryBtnClasses,
+  slideInOut,
 } from "../components";
 import { formatNumberWithCommas, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
@@ -230,7 +233,14 @@ export const TransactionForm = ({
 
           {/* Bank Transfer Tab Contents */}
           {selectedTab === "bank-transfer" && (
-            <div className="grid gap-4">
+            <motion.div
+              key="bank-transfer"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="grid gap-4"
+            >
               {/* Currency */}
               <SelectField
                 id="currency"
@@ -333,15 +343,22 @@ export const TransactionForm = ({
                 </div>
                 {errors.memo && <InputError message={errors.memo.message} />}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Mobile Money Tab Contents */}
           {selectedTab === "mobile-money" && (
-            <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-5 dark:border-white/10">
+            <motion.div
+              key="mobile-money"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-5 dark:border-white/10"
+            >
               <FaRegHourglass className="text-yellow-700 dark:text-yellow-400" />
               <p className="text-gray-500">Coming soon</p>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -356,33 +373,35 @@ export const TransactionForm = ({
       </button>
 
       {/* Rate, Fee and Amount calculations */}
-      {rate > 0 && Number(amount) > 0 && (
-        <div className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5">
-          {isFetchingRate ? (
-            <div className="flex items-center justify-center gap-2 px-4 py-11">
-              <ImSpinner2 className="animate-spin text-lg text-neutral-900 dark:text-white" />
-              <p className="text-xs">
-                Fetching rate for {formatNumberWithCommas(amount as number)}{" "}
-                {token}
-              </p>
-            </div>
-          ) : (
-            renderedInfo.map(({ key, label, value }, index) => (
-              <div
+      <AnimatePresence>
+        {rate > 0 && Number(amount) > 0 && (
+          <AnimatedComponent
+            variant={slideInOut}
+            className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5"
+          >
+            {renderedInfo.map(({ key, label, value }, index) => (
+              <AnimatedComponent
                 key={key}
-                className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${
-                  index === 1 ? "border-t" : ""
-                }`}
+                delay={index * 0.1}
+                className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${index === 1 ? "border-t" : ""}`}
               >
                 <p>{label}</p>
-                <p className="rounded-full bg-white px-2 py-1 transition-all dark:bg-neutral-900">
-                  {value}
+                <p
+                  className={`rounded-full px-2 py-1 transition-all ${
+                    isFetchingRate
+                      ? "animate-pulse bg-gradient-to-r from-white to-gray-100 dark:from-neutral-800 dark:to-neutral-900"
+                      : "bg-white dark:bg-neutral-900"
+                  }`}
+                >
+                  <span className={`${isFetchingRate ? "blur-xl" : ""}`}>
+                    {value}
+                  </span>
                 </p>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+              </AnimatedComponent>
+            ))}
+          </AnimatedComponent>
+        )}
+      </AnimatePresence>
     </form>
   );
 };

@@ -1,10 +1,17 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { AnimatePresence } from "framer-motion";
 import { PiCheckCircle, PiSpinnerBold, PiXCircle } from "react-icons/pi";
 
 import { TransactionStatusProps } from "../types";
-import { secondaryBtnClasses } from "../components";
+import {
+  AnimatedComponent,
+  scaleInOut,
+  secondaryBtnClasses,
+  fadeInOut,
+  slideInOut,
+} from "../components";
 
 /**
  * Renders the transaction status component.
@@ -59,46 +66,44 @@ export default function TransactionStatus({
    * Renders the status indicator based on the transaction status.
    * @returns The status indicator component.
    */
-  const StatusIndicator = () =>
-    transactionStatus === "settled" ? (
-      <Image
-        src="/checkmark.svg"
-        alt="Checkmark"
-        width={24}
-        height={24}
-        className="h-auto w-10"
-      />
-    ) : transactionStatus === "failed" ? (
-      <PiXCircle className="text-4xl text-rose-500" />
-    ) : (
-      <div className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 dark:bg-white/10">
-        <PiSpinnerBold className="animate-spin text-yellow-700 dark:text-yellow-400" />
-        <p className="text-yellow-900 dark:text-yellow-400">
-          {transactionStatus}
-        </p>
-      </div>
-    );
-
-  /**
-   * Renders the payment details component if the transaction status is settled.
-   * @returns The payment details component.
-   */
-  const PaymentDetails = () =>
-    transactionStatus === "settled" && (
-      <div className="flex w-full flex-col gap-4 text-neutral-900 dark:text-white/50">
-        <div className="flex items-center justify-between gap-1">
-          <p className="flex-1">Status</p>
-          <div className="flex flex-1 items-center gap-1">
-            <PiCheckCircle className="text-green-700 dark:text-green-500" />
-            <p className="text-green-900 dark:text-green-500">Settled</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between gap-1">
-          <p className="flex-1">Created</p>
-          <p className="flex-1">{createdAt}</p>
-        </div>
-      </div>
-    );
+  const StatusIndicator = () => (
+    <AnimatePresence mode="wait">
+      {transactionStatus === "settled" ? (
+        <AnimatedComponent variant={scaleInOut} key="settled">
+          <Image
+            src="/checkmark.svg"
+            alt="Checkmark"
+            width={24}
+            height={24}
+            className="h-auto w-10"
+          />
+        </AnimatedComponent>
+      ) : transactionStatus === "failed" ? (
+        <AnimatedComponent
+          variant={{
+            ...scaleInOut,
+            animate: { scale: 1, rotate: 0 },
+            initial: { scale: 0, rotate: -90 },
+            exit: { scale: 0, rotate: 90 },
+          }}
+          key="failed"
+        >
+          <PiXCircle className="text-4xl text-rose-500" />
+        </AnimatedComponent>
+      ) : (
+        <AnimatedComponent
+          variant={fadeInOut}
+          key="pending"
+          className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 dark:bg-white/10"
+        >
+          <PiSpinnerBold className="animate-spin text-yellow-700 dark:text-yellow-400" />
+          <p className="text-yellow-900 dark:text-yellow-400">
+            {transactionStatus}
+          </p>
+        </AnimatedComponent>
+      )}
+    </AnimatePresence>
+  );
 
   /**
    * Formats the error message by extracting the relevant part.
@@ -113,11 +118,18 @@ export default function TransactionStatus({
   };
 
   return (
-    <div className="flex w-full items-center justify-between gap-10 text-sm">
+    <AnimatedComponent
+      variant={slideInOut}
+      className="flex w-full items-center justify-between gap-10 text-sm"
+    >
       <div className="flex flex-col gap-2">
         <div className="flex w-fit flex-col items-end gap-2">
           {/* Token and Amount */}
-          <div className="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+          <AnimatedComponent
+            variant={slideInOut}
+            delay={0.2}
+            className="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5"
+          >
             <Image
               src={`${token}-logo.svg`}
               alt={`${token} logo`}
@@ -127,7 +139,7 @@ export default function TransactionStatus({
             <p className="whitespace-nowrap pr-4 font-medium">
               {amount} {token}
             </p>
-          </div>
+          </AnimatedComponent>
           {/* Transaction Progress */}
           <Image
             src={getImageSrc()}
@@ -137,9 +149,13 @@ export default function TransactionStatus({
             className="w-auto"
           />
           {/* Recipient Name */}
-          <p className="whitespace-nowrap rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+          <AnimatedComponent
+            variant={slideInOut}
+            delay={0.4}
+            className="whitespace-nowrap rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5"
+          >
             {recipientName}
-          </p>
+          </AnimatedComponent>
         </div>
       </div>
 
@@ -148,13 +164,17 @@ export default function TransactionStatus({
         <StatusIndicator />
 
         {/* Transaction Status */}
-        <h2 className="text-xl font-medium text-neutral-900 dark:text-white">
+        <AnimatedComponent
+          variant={slideInOut}
+          delay={0.2}
+          className="text-xl font-medium text-neutral-900 dark:text-white"
+        >
           {transactionStatus === "pending"
             ? "Processing payment..."
             : transactionStatus === "failed"
               ? "Payment failed"
               : "Payment completed"}
-        </h2>
+        </AnimatedComponent>
 
         {/* Pending Transaction Separator */}
         {transactionStatus === "pending" && (
@@ -162,47 +182,95 @@ export default function TransactionStatus({
         )}
 
         {/* Transaction Status Message */}
-        <p className="leading-normal text-gray-500 dark:text-white/50">
+        <AnimatedComponent
+          variant={slideInOut}
+          delay={0.4}
+          className="leading-normal text-gray-500 dark:text-white/50"
+        >
           {transactionStatus === "pending"
             ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
             : transactionStatus === "failed"
               ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful. Please try again later or contact support for assistance.`
               : `Your payment of ${amount} ${token} to ${recipientName} has been completed successfully`}
-        </p>
+        </AnimatedComponent>
 
         {/* Back Button */}
-        {transactionStatus !== "pending" && (
-          <>
-            <div className="flex w-full gap-3">
-              <button
-                onClick={handleBackButtonClick}
-                type="button"
-                className={`w-fit ${secondaryBtnClasses}`}
+        <AnimatePresence>
+          {transactionStatus !== "pending" && (
+            <>
+              <AnimatedComponent
+                variant={slideInOut}
+                delay={0.5}
+                className="flex w-full gap-3"
               >
-                {transactionStatus === "failed" ? "Try again" : "Back to home"}
-              </button>
-            </div>
+                <button
+                  onClick={handleBackButtonClick}
+                  type="button"
+                  className={`w-fit ${secondaryBtnClasses}`}
+                >
+                  {transactionStatus === "failed"
+                    ? "Try again"
+                    : "Back to home"}
+                </button>
+              </AnimatedComponent>
 
-            {/* Error Separator */}
-            {errorMessage && (
-              <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
-            )}
-          </>
-        )}
+              {/* Error Separator */}
+              {errorMessage && (
+                <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
+              )}
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Error Details */}
-        {errorMessage && (
-          <div className="flex w-full flex-col gap-2 font-mono text-gray-500 dark:text-white/50">
-            <h3 className="font-medium">Error details:</h3>
-            <pre className="whitespace-pre-wrap text-xs">
-              {formatErrorMessage(errorMessage)}
-            </pre>
-          </div>
-        )}
+        <AnimatePresence>
+          {errorMessage && (
+            <AnimatedComponent
+              variant={{
+                ...fadeInOut,
+                animate: { opacity: 1, height: "auto" },
+                initial: { opacity: 0, height: 0 },
+                exit: { opacity: 0, height: 0 },
+              }}
+              delay={0.6}
+              className="flex w-full flex-col gap-2 font-mono text-gray-500 dark:text-white/50"
+            >
+              <h3 className="font-medium">Error details:</h3>
+              <pre className="whitespace-pre-wrap text-xs">
+                {formatErrorMessage(errorMessage)}
+              </pre>
+            </AnimatedComponent>
+          )}
+        </AnimatePresence>
 
         {/* Payment Details */}
-        <PaymentDetails />
+        <AnimatePresence>
+          {transactionStatus === "settled" && (
+            <AnimatedComponent
+              variant={{
+                ...fadeInOut,
+                animate: { opacity: 1, height: "auto" },
+                initial: { opacity: 0, height: 0 },
+                exit: { opacity: 0, height: 0 },
+              }}
+              delay={0.7}
+              className="flex w-full flex-col gap-4 text-neutral-900 dark:text-white/50"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <p className="flex-1">Status</p>
+                <div className="flex flex-1 items-center gap-1">
+                  <PiCheckCircle className="text-green-700 dark:text-green-500" />
+                  <p className="text-green-900 dark:text-green-500">Settled</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-1">
+                <p className="flex-1">Created</p>
+                <p className="flex-1">{createdAt}</p>
+              </div>
+            </AnimatedComponent>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </AnimatedComponent>
   );
 }

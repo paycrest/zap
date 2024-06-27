@@ -5,6 +5,13 @@ export { LogoOutlineBg } from "./LogoOutlineBg";
 
 export { ThemeSwitch } from "./ThemeSwitch";
 export { WalletButtons } from "./WalletButtons";
+export {
+  AnimatedPage,
+  AnimatedComponent,
+  slideInOut,
+  scaleInOut,
+  fadeInOut,
+} from "./AnimatedComponents";
 
 export { Tooltip } from "./Tooltip";
 export { TransactionForm } from "../pages/TransactionForm";

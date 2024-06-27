@@ -1,8 +1,8 @@
+import { ReactNode } from "react";
 import {
   FieldErrors,
   UseFormRegister,
   UseFormHandleSubmit,
-  UseFormSetValue,
 } from "react-hook-form";
 
 export type InstitutionProps = {
@@ -111,4 +111,11 @@ export type TabButtonProps = {
   tab: string;
   selectedTab: string;
   handleTabChange: (tab: string) => void;
+};
+
+export type AnimatedComponentProps = {
+  children: ReactNode;
+  variant?: { initial: any; animate: any; exit: any };
+  className?: string;
+  delay?: number;
 };

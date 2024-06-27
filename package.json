@@ -12,6 +12,7 @@
     "@rainbow-me/rainbowkit": "^2.1.2",
     "@tanstack/react-query": "^5.45.1",
     "axios": "^1.7.2",
+    "framer-motion": "^11.2.12",
     "jsencrypt": "^3.3.2",
     "next": "14.2.4",
     "next-themes": "^0.3.0",
@@ -23,7 +24,6 @@
     "wagmi": "^2.10.4"
   },
   "devDependencies": {
-    "@hookform/devtools": "^4.3.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

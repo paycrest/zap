@@ -1,6 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 import { FormData, InstitutionProps, StateProps } from "./types";
 import {
@@ -8,7 +9,12 @@ import {
   fetchRate,
   fetchAggregatorPublicKey,
 } from "./api/aggregator";
-import { Preloader, TransactionForm, TransactionPreview } from "./components";
+import {
+  AnimatedPage,
+  Preloader,
+  TransactionForm,
+  TransactionPreview,
+} from "./components";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { erc20Abi, gatewayAbi } from "./api/abi";
 import { getAddress, parseUnits } from "viem";
@@ -218,7 +224,7 @@ export default function Home() {
 
     const debounceFetchRate = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(getRate, 2000);
+      timeoutId = setTimeout(getRate, 1000);
     };
 
     debounceFetchRate();
@@ -249,42 +255,51 @@ export default function Home() {
     setIsPageLoading(false);
   }, []);
 
-  // Render loading spinner if page is still loading
-  if (isPageLoading) return <Preloader />;
-
   return (
     <>
-      {transactionStatus !== "idle" ? (
-        <TransactionStatus
-          formMethods={formMethods}
-          errorMessage={errorMessage}
-          transactionStatus={transactionStatus}
-          createdAt={createdAt}
-          clearForm={() => setFormValues(INITIAL_FORM_STATE)}
-          clearTransactionStatus={() => {
-            setTransactionStatus("idle");
-            setErrorMessage("");
-          }}
-        />
-      ) : (
-        <>
-          {Object.values(formValues).every(
-            (value) => value === "" || value === 0,
-          ) ? (
-            <TransactionForm
-              onSubmit={onSubmit}
+      <Preloader isLoading={isPageLoading} />
+
+      <AnimatePresence mode="wait">
+        {transactionStatus !== "idle" ? (
+          <AnimatedPage key="transaction-status">
+            <TransactionStatus
               formMethods={formMethods}
-              stateProps={stateProps}
+              errorMessage={errorMessage}
+              transactionStatus={transactionStatus}
+              createdAt={createdAt}
+              clearForm={() => setFormValues(INITIAL_FORM_STATE)}
+              clearTransactionStatus={() => {
+                setTransactionStatus("idle");
+                setErrorMessage("");
+              }}
             />
-          ) : (
-            <TransactionPreview
-              handleBackButtonClick={() => setFormValues(INITIAL_FORM_STATE)}
-              handlePaymentConfirmation={handlePaymentConfirmation}
-              stateProps={stateProps}
-            />
-          )}
-        </>
-      )}
+          </AnimatedPage>
+        ) : (
+          <>
+            {Object.values(formValues).every(
+              (value) => value === "" || value === 0,
+            ) ? (
+              <AnimatedPage key="transaction-form">
+                <TransactionForm
+                  onSubmit={onSubmit}
+                  formMethods={formMethods}
+                  stateProps={stateProps}
+                />
+              </AnimatedPage>
+            ) : (
+              <AnimatedPage key="transaction-preview">
+                <TransactionPreview
+                  handleBackButtonClick={() =>
+                    setFormValues(INITIAL_FORM_STATE)
+                  }
+                  handlePaymentConfirmation={handlePaymentConfirmation}
+                  stateProps={stateProps}
+                />
+              </AnimatedPage>
+            )}
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
