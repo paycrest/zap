@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { TbInfoSquareRounded } from "react-icons/tb";
 
@@ -6,8 +7,28 @@ import {
   formatCurrency,
   formatNumberWithCommas,
   getInstitutionNameByCode,
+  publicKeyEncrypt,
 } from "../utils";
 import { primaryBtnClasses, secondaryBtnClasses } from "../components";
+import {
+  useAccount,
+  useWriteContract,
+  useWatchContractEvent,
+  useReadContract,
+} from "wagmi";
+import { fetchAggregatorPublicKey } from "../api/aggregator";
+import {
+  BaseError,
+  decodeEventLog,
+  formatUnits,
+  getAddress,
+  parseUnits,
+} from "viem";
+import { erc20Abi, gatewayAbi } from "../api/abi";
+import { useEffect, useState } from "react";
+
+const GATEWAY_CONTRACT_ADDRESS = "0x847dfdaa218f9137229cf8424378871a1da8f625";
+const TOKEN_CONTRACT_ADDRESS = "0x7683022d84f726a96c4a6611cd31dbf5409c0ac9";
 
 /**
  * Renders a preview of a transaction with the provided details.
@@ -17,11 +38,37 @@ import { primaryBtnClasses, secondaryBtnClasses } from "../components";
  * @param stateProps - Object containing the form values, fee, rate, and supported institutions.
  */
 export const TransactionPreview = ({
-  errorMessage,
   handleBackButtonClick,
-  handlePaymentConfirmation,
-  stateProps: { formValues, fee, rate, institutions: supportedInstitutions },
+  stateProps: {
+    formValues,
+    fee,
+    rate,
+    institutions: supportedInstitutions,
+    setCreatedAt,
+    setTransactionStatus,
+  },
 }: TransactionPreviewProps) => {
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
+  const {
+    data: hash,
+    error,
+    isPending,
+    writeContractAsync,
+  } = useWriteContract();
+
+  // Update token balance when token balance is available
+  useEffect(() => {
+    if (isPending) {
+      setIsConfirming(true);
+    }
+
+    if (errorMessage) {
+      setIsConfirming(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, errorMessage]);
+
   const {
     amount,
     token,
@@ -40,6 +87,140 @@ export const TransactionPreview = ({
     recipient: recipientName,
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
     memo: memo,
+  };
+
+  const account = useAccount();
+
+  // Get allowance given to gateway contract
+  const { data: tokenAllowanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: TOKEN_CONTRACT_ADDRESS,
+    functionName: "allowance",
+    args: [account.address!, GATEWAY_CONTRACT_ADDRESS],
+  });
+
+  // State for token allowance
+  const [tokenAllowance, setTokenAllowance] = useState<number>(0);
+
+  // Update token balance when token balance is available
+  useEffect(() => {
+    if (tokenAllowanceInWei) {
+      setTokenAllowance(Number(formatUnits(tokenAllowanceInWei, 18)));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenAllowanceInWei]);
+
+  // Watch for token Approval event
+  useWatchContractEvent({
+    address: TOKEN_CONTRACT_ADDRESS,
+    abi: erc20Abi,
+    args: {
+      owner: account.address,
+      spender: getAddress(GATEWAY_CONTRACT_ADDRESS),
+    },
+    eventName: "Approval",
+    async onLogs(logs: any) {
+      console.log("New approval logs!", logs);
+      await createOrder();
+    },
+  });
+
+  // Watch for OrderCreated event
+  useWatchContractEvent({
+    address: GATEWAY_CONTRACT_ADDRESS,
+    abi: gatewayAbi,
+    eventName: "OrderCreated",
+    args: {
+      sender: account.address,
+      token: getAddress(TOKEN_CONTRACT_ADDRESS),
+    },
+    onLogs(logs: any) {
+      const decodedLog = decodeEventLog({
+        abi: gatewayAbi,
+        eventName: "OrderCreated",
+        data: logs[0].data,
+        topics: logs[0].topics,
+      });
+      console.log("orderId", decodedLog.args.orderId);
+      setIsConfirming(false);
+      setTransactionStatus("pending");
+    },
+  });
+
+  const createOrder = async () => {
+    try {
+      // Prepare recipient data
+      const recipient = {
+        accountIdentifier: formValues.accountIdentifier,
+        accountName: "Chibuotu Amadi",
+        institution: formValues.institution,
+        providerId: "RKVeHPBP",
+        memo: formValues.memo,
+      };
+
+      // Fetch aggregator public key
+      const publicKey = await fetchAggregatorPublicKey();
+      const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
+
+      // Prepare transaction parameters
+      const params = {
+        token: getAddress("0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9"),
+        amount: parseUnits(amount.toString(), 18),
+        rate: parseUnits(rate.toString(), 0),
+        senderFeeRecipient: getAddress(
+          "0x0000000000000000000000000000000000000000",
+        ),
+        senderFee: BigInt(0),
+        refundAddress: account.address,
+        messageHash: encryptedRecipient,
+      };
+
+      setCreatedAt(new Date().toISOString());
+
+      // // Create order
+      await writeContractAsync({
+        abi: gatewayAbi,
+        address: GATEWAY_CONTRACT_ADDRESS,
+        functionName: "createOrder",
+        args: [
+          params.token,
+          params.amount,
+          params.rate,
+          params.senderFeeRecipient,
+          params.senderFee,
+          params.refundAddress!,
+          params.messageHash,
+        ],
+      });
+    } catch (e: any) {
+      if (error) {
+        setErrorMessage((error as BaseError).shortMessage || error!.message);
+      } else {
+        setErrorMessage((e as BaseError).shortMessage);
+      }
+    }
+  };
+
+  const handlePaymentConfirmation = async () => {
+    try {
+      if (tokenAllowance < amount) {
+        // Approve gateway contract to spend token
+        await writeContractAsync({
+          address: TOKEN_CONTRACT_ADDRESS,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [GATEWAY_CONTRACT_ADDRESS, parseUnits(amount.toString(), 18)],
+        });
+      } else {
+        createOrder();
+      }
+    } catch (e: any) {
+      if (error) {
+        setErrorMessage((error as BaseError).shortMessage || error!.message);
+      } else {
+        setErrorMessage((e as BaseError).shortMessage);
+      }
+    }
   };
 
   return (
@@ -101,11 +282,16 @@ export const TransactionPreview = ({
           type="submit"
           onClick={handlePaymentConfirmation}
           className={`w-full ${primaryBtnClasses}`}
+          disabled={isConfirming}
         >
-          Confirm payment
+          {isConfirming ? "Confirming..." : "Confirm payment"}
         </button>
       </div>
-      <p>{ errorMessage }</p>
+
+      <div>
+        {errorMessage && <p>{errorMessage}</p>}
+        {hash && <p>{hash}</p>}
+      </div>
     </div>
   );
 };

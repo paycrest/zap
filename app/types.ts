@@ -41,9 +41,7 @@ export type TransactionFormProps = {
 };
 
 export type TransactionPreviewProps = {
-  errorMessage: string;
   handleBackButtonClick: () => void;
-  handlePaymentConfirmation: () => void;
   stateProps: StateProps;
 };
 
@@ -103,6 +101,8 @@ export type StateProps = {
   handleTabChange: (tab: string) => void;
   selectedNetwork: string;
   handleNetworkChange: (network: string) => void;
+  setCreatedAt: (createdAt: string) => void;
+  setTransactionStatus: (status: "idle" | "pending" | "processing" | "fulfilled" | "validated" | "settled" | "refunded") => void;
 };
 
 export type NetworkButtonProps = {

@@ -4,26 +4,15 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { FormData, InstitutionProps, StateProps } from "./types";
-import {
-  fetchSupportedInstitutions,
-  fetchRate,
-  fetchAggregatorPublicKey,
-} from "./api/aggregator";
+import { fetchSupportedInstitutions, fetchRate } from "./api/aggregator";
 import {
   AnimatedPage,
   Preloader,
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import {
-  type BaseError,
-  useAccount,
-  useReadContract,
-  useWriteContract,
-} from "wagmi";
-import { erc20Abi, gatewayAbi } from "./api/abi";
-import { getAddress, parseUnits } from "viem";
-import { publicKeyEncrypt } from "./utils";
+import { useReadContract } from "wagmi";
+import { gatewayAbi } from "./api/abi";
 import TransactionStatus from "./pages/TransactionStatus";
 
 const GATEWAY_CONTRACT_ADDRESS = "0x847dfdAa218F9137229CF8424378871A1DA8f625";
@@ -64,18 +53,11 @@ export default function Home() {
   const { currency, amount, token } = watch();
 
   // Custom hooks for account and contract interactions
-  const account = useAccount();
   const { data: protocolFeeDetails } = useReadContract({
     abi: gatewayAbi,
     address: GATEWAY_CONTRACT_ADDRESS,
     functionName: "getFeeDetails",
   });
-  const {
-    data: hash,
-    error,
-    isPending,
-    writeContractAsync,
-  } = useWriteContract();
 
   // Transaction status and error handling
   const [transactionStatus, setTransactionStatus] = useState<
@@ -87,7 +69,6 @@ export default function Home() {
     | "settled"
     | "refunded"
   >("idle");
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [createdAt, setCreatedAt] = useState<string>("");
 
   /**
@@ -114,76 +95,6 @@ export default function Home() {
     setSelectedTab(tab);
   };
 
-  /**
-   * Handles payment confirmation.
-   * This function is called when the user confirms the payment.
-   */
-  const handlePaymentConfirmation = async () => {
-    // Prepare recipient data
-    const recipient = {
-      accountIdentifier: formValues.accountIdentifier,
-      accountName: "Chibuotu Amadi",
-      institution: formValues.institution,
-      providerId: "zmLQezZk",
-      memo: formValues.memo,
-    };
-
-    // Fetch aggregator public key
-    const publicKey = await fetchAggregatorPublicKey();
-    const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
-
-    // Prepare transaction parameters
-    const params = {
-      token: getAddress("0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9"),
-      amount: parseUnits(amount.toString(), 18),
-      rate: parseUnits(rate.toString(), 0),
-      senderFeeRecipient: getAddress(
-        "0x0000000000000000000000000000000000000000",
-      ),
-      senderFee: BigInt(0),
-      refundAddress: account.address,
-      messageHash: encryptedRecipient,
-    };
-
-    try {
-      setCreatedAt(new Date().toISOString());
-
-      // Approve gateway contract to spend token
-      await writeContractAsync({
-        abi: erc20Abi,
-        address: "0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9",
-        functionName: "approve",
-        args: [GATEWAY_CONTRACT_ADDRESS, params.amount],
-      });
-
-      // Create order
-      await writeContractAsync({
-        abi: gatewayAbi,
-        address: GATEWAY_CONTRACT_ADDRESS,
-        functionName: "createOrder",
-        args: [
-          params.token,
-          params.amount,
-          params.rate,
-          params.senderFeeRecipient,
-          params.senderFee,
-          params.refundAddress!,
-          params.messageHash,
-        ],
-      });
-
-      setTransactionStatus("pending");
-    } catch (e: any) {
-      if (error) {
-        setErrorMessage((error as BaseError).shortMessage || error!.message);
-      } else {
-        setErrorMessage((e as BaseError).shortMessage);
-      }
-    }
-
-    console.log("hash", hash);
-  };
-
   // State props for child components
   const stateProps: StateProps = {
     formValues,
@@ -195,7 +106,9 @@ export default function Home() {
     selectedTab,
     handleTabChange,
     selectedNetwork,
+    setCreatedAt,
     handleNetworkChange,
+    setTransactionStatus,
   };
 
   // Fetch supported institutions based on currency
@@ -277,7 +190,6 @@ export default function Home() {
               clearForm={() => setFormValues(INITIAL_FORM_STATE)}
               clearTransactionStatus={() => {
                 setTransactionStatus("idle");
-                setErrorMessage("");
               }}
             />
           </AnimatedPage>
@@ -296,11 +208,9 @@ export default function Home() {
             ) : (
               <AnimatedPage key="transaction-preview">
                 <TransactionPreview
-                  errorMessage={errorMessage}
                   handleBackButtonClick={() =>
                     setFormValues(INITIAL_FORM_STATE)
                   }
-                  handlePaymentConfirmation={handlePaymentConfirmation}
                   stateProps={stateProps}
                 />
               </AnimatedPage>

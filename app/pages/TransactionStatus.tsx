@@ -40,7 +40,7 @@ export default function TransactionStatus({
 
   /**
    * Handles the back button click event.
-   * Clears the transaction status if it's failed, otherwise clears the form and transaction status.
+   * Clears the transaction status if it's refunded, otherwise clears the form and transaction status.
    */
   const handleBackButtonClick = () => {
     if (transactionStatus === "refunded") {
@@ -104,18 +104,6 @@ export default function TransactionStatus({
     </AnimatePresence>
   );
 
-  /**
-   * Formats the error message by extracting the relevant part.
-   * @param message - The error message.
-   * @returns The formatted error message.
-   */
-  const formatErrorMessage = (message: string) => {
-    const formattedPart = message.match(
-      /The contract function.*\s+- The address is not a contract\./s,
-    );
-    return formattedPart ? formattedPart[0] : message;
-  };
-
   return (
     <AnimatedComponent
       variant={slideInOut}
@@ -171,7 +159,7 @@ export default function TransactionStatus({
           {transactionStatus === "pending"
             ? "Processing payment..."
             : transactionStatus === "refunded"
-              ? "Payment failed"
+              ? "Payment refunded"
               : "Payment completed"}
         </AnimatedComponent>
 

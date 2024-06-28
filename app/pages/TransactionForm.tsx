@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
@@ -21,7 +20,7 @@ import {
   primaryBtnClasses,
   slideInOut,
 } from "../components";
-import { formatNumberWithCommas, formatCurrency } from "../utils";
+import { formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
 
 const tokens = [
@@ -107,7 +106,7 @@ export const TransactionForm = ({
   // Array of available networks
   const networks = ["base", "arbitrum", "polygon"];
 
-  // Update token balance when account is connected and token balance is available
+  // Update token balance when token balance is available
   useEffect(() => {
     if (tokenBalanceInWei) {
       setTokenBalance(Number(formatUnits(tokenBalanceInWei, 18)));

@@ -6,7 +6,7 @@ import {
   PubkeyResponse,
 } from "../types";
 
-const API_URL = "https://staging-api.paycrest.io/v1";
+const API_URL = "http://localhost:8000/v1";
 
 export const fetchRate = async ({
   token,
@@ -15,7 +15,7 @@ export const fetchRate = async ({
 }: RatePayload): Promise<RateResponse> => {
   try {
     const response = await axios.get(
-      `${API_URL}/rates/${token}/${amount}/${currency}?provider_id=zmLQezZk`,
+      `${API_URL}/rates/${token}/${amount}/${currency}?provider_id=RKVeHPBP`,
     );
     return response.data;
   } catch (error) {
