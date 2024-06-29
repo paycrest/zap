@@ -14,8 +14,8 @@ export const LogoOutlineBg = () => {
   return (
     <div className="fixed inset-x-0 bottom-0 hidden items-end justify-between transition-all xl:flex">
       <Image
-        width={416}
-        height={416}
+        width={0}
+        height={0}
         src={
           mounted && resolvedTheme === "dark"
             ? "/logo-outline-group-left-dark.svg"
@@ -23,10 +23,12 @@ export const LogoOutlineBg = () => {
         }
         alt=""
         tabIndex={-1}
+        className="h-auto w-auto"
+        priority
       />
       <Image
-        width={416}
-        height={416}
+        width={0}
+        height={0}
         src={
           mounted && resolvedTheme === "dark"
             ? "/logo-outline-group-right-dark.svg"
@@ -34,6 +36,8 @@ export const LogoOutlineBg = () => {
         }
         alt=""
         tabIndex={-1}
+        className="h-auto w-auto"
+        priority
       />
     </div>
   );
