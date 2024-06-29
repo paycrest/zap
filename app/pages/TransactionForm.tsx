@@ -142,10 +142,16 @@ export const TransactionForm = ({
             }
             validation={{
               required: { value: true, message: "Token is required" },
+              disabled: !account.isConnected,
             }}
             errors={errors}
             register={register}
             value={watch("token")}
+            title={
+              account.isConnected
+                ? "Select token to send"
+                : "Connect wallet to select token"
+            }
           />
 
           {/* Display token balance if account is connected */}
@@ -170,7 +176,7 @@ export const TransactionForm = ({
               step="0.01"
               {...register("amount", {
                 required: { value: true, message: "Amount is required" },
-                disabled: watch("token") === "",
+                disabled: !account.isConnected || token === "",
                 min: {
                   value: 0.01,
                   message: `Minimum amount is 0.01 ${token}`,
@@ -186,6 +192,13 @@ export const TransactionForm = ({
               })}
               className={`${inputClasses} pl-4 pr-14`}
               placeholder="0.00"
+              title={
+                token === ""
+                  ? "Select token to enable amount field"
+                  : !account.isConnected
+                    ? "Connect wallet to enable amount field"
+                    : "Enter amount to send"
+              }
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-4">
               {watch("token")}
@@ -256,6 +269,11 @@ export const TransactionForm = ({
                 register={register}
                 isLoading={institutionsLoading}
                 value={watch("institution")}
+                title={
+                  watch("currency") === ""
+                    ? "Select currency to enable recipient bank"
+                    : "Select recipient bank"
+                }
               />
 
               {/* Recipient Account */}

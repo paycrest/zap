@@ -82,6 +82,7 @@ export type SelectFieldProps = {
   isLoading?: boolean;
   value?: string | number | undefined;
   defaultValue?: string;
+  title?: string;
 };
 
 export type VerifyAccountPayload = {
