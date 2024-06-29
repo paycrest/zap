@@ -9,7 +9,7 @@
 
 Zap by Paycrest is a decentralized application (dApp) developed for the [OnChain Hackathon](https://onchain-summer.devfolio.co/). Our goal is to simplify the conversion of cryptocurrency to fiat currency. Leveraging modern web technologies, we aim to provide a seamless and efficient user experience. 
 
-Check out our live demo at [zapsend.xyz](https://zapsend.xyz).
+Check out our live demo at [zap.paycrest.io](https://zap.paycrest.io).
 
 ## 🚀 Running Locally
 
