@@ -185,9 +185,12 @@ export default function TransactionStatus({
           <AnimatedComponent
             variant={slideInOut}
             delay={0.4}
-            className="whitespace-nowrap rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5"
+            className="whitespace-nowrap rounded-full bg-gray-50 px-2 py-1 capitalize dark:bg-white/5"
           >
-            {recipientName}
+            {recipientName.split(" ")[0].length > 10
+              ? recipientName.toLocaleLowerCase().split(" ")[0].slice(0, 10) +
+                "..."
+              : recipientName.toLocaleLowerCase().split(" ")[0]}
           </AnimatedComponent>
         </div>
       </div>
