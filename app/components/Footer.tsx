@@ -21,7 +21,7 @@ const SocialLink = ({ href, imagePath, alt, title }: SocialLinkProps) => {
 
 const socialsDark = [
   {
-    href: "https://farcaster.io",
+    href: "https://warpcast.com/~/channel/paycrest",
     imagePath: "/farcaster-icon.svg",
     alt: "Farcaster icon",
     title: "Farcaster",
@@ -42,7 +42,7 @@ const socialsDark = [
 
 const socialsLight = [
   {
-    href: "https://farcaster.io",
+    href: "https://warpcast.com/~/channel/paycrest",
     imagePath: "/farcaster-icon-dark.svg",
     alt: "Farcaster icon",
     title: "Farcaster",
