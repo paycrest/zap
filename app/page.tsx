@@ -15,11 +15,12 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import { useReadContract } from "wagmi";
-import { gatewayAbi } from "./api/abi";
+import { useAccount, useReadContract } from "wagmi";
+import { erc20Abi, gatewayAbi } from "./api/abi";
 import TransactionStatus from "./pages/TransactionStatus";
-
-const GATEWAY_CONTRACT_ADDRESS = "0x847dfdAa218F9137229CF8424378871A1DA8f625";
+import { fetchSupportedTokens, getGatewayContractAddress } from "./utils";
+import { useSmartAccount } from "@biconomy/use-aa";
+import { formatUnits } from "viem";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -58,10 +59,38 @@ export default function Home() {
   const { watch } = formMethods;
   const { currency, amount, token, accountIdentifier, institution } = watch();
 
+  // Get account information using custom hook
+  const account = useAccount();
+  const { smartAccountAddress } = useSmartAccount();
+
+  // State for tokens
+  const [smartTokenBalance, setSmartTokenBalance] = useState<number>(0);
+  const [tokenBalance, setTokenBalance] = useState<number>(0);
+
+  // Get token balances using custom hook and Ethereum contract interaction
+  const { data: smartTokenBalanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: fetchSupportedTokens(account.chain?.name)?.find(
+      (t) => t.symbol.toUpperCase() === token,
+    )?.address as `0x${string}`,
+    functionName: "balanceOf",
+    args: [smartAccountAddress!],
+  });
+
+  const { data: tokenBalanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: fetchSupportedTokens(account.chain?.name)?.find(
+      (t) => t.symbol.toUpperCase() === token,
+    )?.address as `0x${string}`,
+    functionName: "balanceOf",
+    args: [account.address!],
+  });
+
+
   // Custom hooks for account and contract interactions
   const { data: protocolFeeDetails } = useReadContract({
     abi: gatewayAbi,
-    address: GATEWAY_CONTRACT_ADDRESS,
+    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     functionName: "getFeeDetails",
   });
 
@@ -105,6 +134,8 @@ export default function Home() {
   // State props for child components
   const stateProps: StateProps = {
     formValues,
+    tokenBalance,
+    smartTokenBalance,
     fee,
     rate,
     isFetchingRate,
@@ -221,6 +252,18 @@ export default function Home() {
       ),
     );
   }, [protocolFeeDetails, amount, protocolFeePercent]);
+
+  // Update token balance when token balance is available
+  useEffect(() => {
+    if (tokenBalanceInWei) {
+      setTokenBalance(Number(formatUnits(tokenBalanceInWei, 18)));
+    }
+
+    if (smartTokenBalanceInWei) {
+      setSmartTokenBalance(Number(formatUnits(smartTokenBalanceInWei, 18)));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenBalanceInWei, smartTokenBalanceInWei]);
 
   // Set page loading state to false after initial render
   useEffect(() => {

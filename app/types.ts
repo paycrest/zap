@@ -109,6 +109,8 @@ export type PubkeyResponse = {
 
 export type StateProps = {
   formValues: FormData;
+  tokenBalance: number;
+  smartTokenBalance: number;
   fee: number;
   rate: number;
   isFetchingRate: boolean;
@@ -154,4 +156,11 @@ export type AnimatedComponentProps = {
   variant?: { initial: any; animate: any; exit: any };
   className?: string;
   delay?: number;
+};
+
+export type Token = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  address: string;
 };

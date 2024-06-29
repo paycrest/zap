@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { PiCheckCircle, PiSpinnerBold, PiXCircle } from "react-icons/pi";
 
+import { formatTimeAgo, getGatewayContractAddress } from "../utils";
 import { TransactionStatusProps } from "../types";
 import {
   AnimatedComponent,
@@ -12,12 +14,9 @@ import {
   fadeInOut,
   slideInOut,
 } from "../components";
-import { useWatchContractEvent } from "wagmi";
+import { useAccount, useWatchContractEvent } from "wagmi";
 import { gatewayAbi } from "../api/abi";
 import { decodeEventLog } from "viem";
-
-const GATEWAY_CONTRACT_ADDRESS = process.env
-  .NEXT_PUBLIC_GATEWAY_CONTRACT_ADDRESS as `0x${string}`;
 
 /**
  * Renders the transaction status component.
@@ -41,6 +40,8 @@ export default function TransactionStatus({
   formMethods,
 }: TransactionStatusProps) {
   const { resolvedTheme } = useTheme();
+  const account = useAccount();
+  const [settledAt, setSettledAt] = useState<string>("");
 
   const { watch } = formMethods;
 
@@ -49,12 +50,12 @@ export default function TransactionStatus({
 
   // Watch for OrderSettled event
   useWatchContractEvent({
-    address: GATEWAY_CONTRACT_ADDRESS,
+    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     abi: gatewayAbi,
     eventName: "OrderSettled",
-    args: {
-      orderId: orderId as `0x${string}`,
-    },
+    // args: {
+    //   orderId: orderId as `0x${string}`,
+    // },
     onLogs(logs: any) {
       const decodedLog = decodeEventLog({
         abi: gatewayAbi,
@@ -67,13 +68,14 @@ export default function TransactionStatus({
 
       if (decodedLog.args.settlePercent == BigInt("100000")) {
         setTransactionStatus("settled");
+        setSettledAt(new Date().toISOString());
       }
     },
   });
 
   // Watch for OrderRefunded event
   useWatchContractEvent({
-    address: GATEWAY_CONTRACT_ADDRESS,
+    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     abi: gatewayAbi,
     eventName: "OrderRefunded",
     args: {
@@ -272,7 +274,11 @@ export default function TransactionStatus({
               </div>
               <div className="flex items-center justify-between gap-1">
                 <p className="flex-1">Created</p>
-                <p className="flex-1">{createdAt}</p>
+                <p className="flex-1">{formatTimeAgo(createdAt)}</p>
+              </div>
+              <div className="flex items-center justify-between gap-1">
+                <p className="flex-1">Settled (<a href="#">receipt</a>)</p>
+                <p className="flex-1">{formatTimeAgo(settledAt)} (<a href="#">receipt</a>)</p>
               </div>
             </AnimatedComponent>
           )}

@@ -1,14 +1,10 @@
 "use client";
-import { formatUnits } from "viem";
-import { useEffect, useState } from "react";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { PiCaretDown, PiCheckCircle } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
-import { AiOutlineQuestionCircle } from "react-icons/ai";
 
-import { erc20Abi } from "../api/abi";
 import {
   AnimatedComponent,
   InputError,
@@ -20,15 +16,10 @@ import {
   primaryBtnClasses,
   slideInOut,
 } from "../components";
-import { formatCurrency } from "../utils";
+import { fetchSupportedTokens, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
 import { ImSpinner2 } from "react-icons/im";
-
-const tokens = [
-  { value: "DAI", label: "DAI" },
-  { value: "USDC", label: "USDC", disabled: true },
-  { value: "USDT", label: "USDT", disabled: true },
-];
+import { useSmartAccount } from "@biconomy/use-aa";
 
 const currencies = [
   { value: "NGN", label: "Nigerian Naira (NGN)" },
@@ -52,6 +43,8 @@ export const TransactionForm = ({
 }: TransactionFormProps) => {
   // Destructure stateProps
   const {
+    tokenBalance,
+    smartTokenBalance,
     fee,
     rate,
     isFetchingRate,
@@ -65,20 +58,6 @@ export const TransactionForm = ({
     institutions: supportedInstitutions,
   } = stateProps;
 
-  // Get account information using custom hook
-  const account = useAccount();
-
-  // Get token balance using custom hook and Ethereum contract interaction
-  const { data: tokenBalanceInWei } = useReadContract({
-    abi: erc20Abi,
-    address: "0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9",
-    functionName: "balanceOf",
-    args: [account.address!],
-  });
-
-  // State for token balance
-  const [tokenBalance, setTokenBalance] = useState<number>(0);
-
   // Destructure formMethods from react-hook-form
   const {
     handleSubmit,
@@ -91,6 +70,10 @@ export const TransactionForm = ({
   let currency = watch("currency"),
     amount = watch("amount"),
     token = watch("token");
+
+  // Get account information using custom hook
+  const account = useAccount();
+  const { smartAccountAddress } = useSmartAccount();
 
   // Array of objects for rendering rate and fee information
   const rateInfo = {
@@ -110,20 +93,13 @@ export const TransactionForm = ({
   // Array of available networks
   const networks = ["base", "arbitrum", "polygon"];
 
-  // Update token balance when token balance is available
-  useEffect(() => {
-    if (tokenBalanceInWei) {
-      setTokenBalance(Number(formatUnits(tokenBalanceInWei, 18)));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenBalanceInWei]);
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
+      {smartAccountAddress == "0x" ? "" : smartAccountAddress}
       {/* Networks */}
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
@@ -152,15 +128,18 @@ export const TransactionForm = ({
           </button>
         </Tooltip>
       </div>
-
       <div className="flex items-start gap-4">
         {/* Token */}
         <div className="grid flex-1 gap-2">
           <SelectField
             id="token"
             label="Token"
-            options={tokens}
-            defaultValue="DAI"
+            options={
+              fetchSupportedTokens(account.chain?.name)?.map((token) => ({
+                value: token.symbol,
+                label: token.symbol,
+              })) ?? []
+            }
             validation={{
               required: { value: true, message: "Token is required" },
             }}
@@ -173,6 +152,8 @@ export const TransactionForm = ({
           {account.status === "connected" && (
             <p className="text-gray-500 dark:text-white/50">
               Bal: {tokenBalance} {token}
+              <br />
+              Smart Bal: {smartTokenBalance} {token}
             </p>
           )}
         </div>
@@ -213,7 +194,6 @@ export const TransactionForm = ({
           {errors.amount && <InputError message={errors.amount.message} />}
         </div>
       </div>
-
       <div>
         <h3 className="pb-2 font-medium">
           Recipient details <span className="text-rose-500">*</span>
@@ -388,7 +368,6 @@ export const TransactionForm = ({
           )}
         </div>
       </div>
-
       {/* Submit button */}
       <button
         type="submit"
@@ -399,7 +378,6 @@ export const TransactionForm = ({
       >
         {account.isConnected ? "Review Info" : "Connect wallet to continue"}
       </button>
-
       {/* Rate and fee */}
       <AnimatePresence>
         {rate > 0 && Number(amount) > 0 && account.isConnected && (

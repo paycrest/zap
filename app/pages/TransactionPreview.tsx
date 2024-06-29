@@ -4,8 +4,10 @@ import { TbInfoSquareRounded } from "react-icons/tb";
 
 import { TransactionPreviewProps } from "../types";
 import {
+  fetchSupportedTokens,
   formatCurrency,
   formatNumberWithCommas,
+  getGatewayContractAddress,
   getInstitutionNameByCode,
   publicKeyEncrypt,
 } from "../utils";
@@ -20,19 +22,20 @@ import { fetchAggregatorPublicKey } from "../api/aggregator";
 import {
   BaseError,
   decodeEventLog,
+  encodeFunctionData,
   formatUnits,
   getAddress,
   parseUnits,
 } from "viem";
 import { erc20Abi, gatewayAbi } from "../api/abi";
 import { useEffect, useState } from "react";
-
-const GATEWAY_CONTRACT_ADDRESS = process.env
-  .NEXT_PUBLIC_GATEWAY_CONTRACT_ADDRESS as `0x${string}`;
+import {
+  useSendSponsoredTransaction,
+  useSmartAccount,
+  useUserOpWait,
+} from "@biconomy/use-aa";
 
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
-
-const TOKEN_CONTRACT_ADDRESS = "0x7683022d84f726a96c4a6611cd31dbf5409c0ac9";
 
 /**
  * Renders a preview of a transaction with the provided details.
@@ -45,6 +48,7 @@ export const TransactionPreview = ({
   handleBackButtonClick,
   stateProps: {
     formValues,
+    smartTokenBalance,
     fee,
     rate,
     recipientName,
@@ -56,6 +60,9 @@ export const TransactionPreview = ({
 }: TransactionPreviewProps) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
+  const [gatewayAllowance, setGatewayAllowance] = useState<number>(0);
+  const [smartGatewayAllowance, setSmartGatewayAllowance] = useState<number>(0);
+  const [paymasterAllowance, setPaymasterAllowance] = useState<number>(0);
 
   const { amount, token, currency, accountIdentifier, institution, memo } =
     formValues;
@@ -71,13 +78,61 @@ export const TransactionPreview = ({
   };
 
   const account = useAccount();
+  const { smartAccountAddress } = useSmartAccount();
+
+  // User operation hooks
+  const {
+    mutate,
+    data: userOpResponse,
+    error: userOpError,
+    isPending: useropIsPending,
+  } = useSendSponsoredTransaction();
+
+  const {
+    isLoading: waitIsLoading,
+    isSuccess: waitIsSuccess,
+    error: waitError,
+    data: waitData,
+  } = useUserOpWait(userOpResponse);
+
+  const tokenAddress = fetchSupportedTokens(account.chain?.name)?.find(
+    (t) => t.symbol.toUpperCase() === token,
+  )?.address as `0x${string}`;
+
+  const tokenDecimals = fetchSupportedTokens(account.chain?.name)?.find(
+    (t) => t.symbol.toUpperCase() === token,
+  )?.decimals;
 
   // Get allowance given to gateway contract
-  const { data: tokenAllowanceInWei } = useReadContract({
+  const { data: gatewayAllowanceInWei } = useReadContract({
     abi: erc20Abi,
-    address: TOKEN_CONTRACT_ADDRESS,
+    address: tokenAddress,
     functionName: "allowance",
-    args: [account.address!, GATEWAY_CONTRACT_ADDRESS],
+    args: [
+      account.address!,
+      getAddress(getGatewayContractAddress(account.chain?.name)!),
+    ],
+  });
+
+  const { data: smartGatewayAllowanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: tokenAddress,
+    functionName: "allowance",
+    args: [
+      account.address!,
+      getGatewayContractAddress(account.chain?.name) as `0x${string}`,
+    ],
+  });
+
+  // Get allowance given to paymaster contract
+  const { data: paymasterAllowanceInWei } = useReadContract({
+    abi: erc20Abi,
+    address: tokenAddress,
+    functionName: "allowance",
+    args: [
+      getAddress("0x00000f79b7faf42eebadba19acc07cd08af44789"),
+      getGatewayContractAddress(account.chain?.name) as `0x${string}`,
+    ],
   });
 
   const {
@@ -87,51 +142,89 @@ export const TransactionPreview = ({
     writeContractAsync,
   } = useWriteContract();
 
-  // State for token allowance
-  const [tokenAllowance, setTokenAllowance] = useState<number>(0);
-
   // Update token balance when token balance is available
   useEffect(() => {
-    if (tokenAllowanceInWei) {
-      setTokenAllowance(Number(formatUnits(tokenAllowanceInWei, 18)));
+    if (gatewayAllowanceInWei && tokenDecimals) {
+      setGatewayAllowance(
+        Number(formatUnits(gatewayAllowanceInWei, tokenDecimals)),
+      );
     }
+
+    if (smartGatewayAllowanceInWei && tokenDecimals) {
+      setSmartGatewayAllowance(
+        Number(formatUnits(smartGatewayAllowanceInWei, tokenDecimals)),
+      );
+    }
+
+    if (paymasterAllowanceInWei && tokenDecimals) {
+      setPaymasterAllowance(
+        Number(formatUnits(paymasterAllowanceInWei, tokenDecimals)),
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenAllowanceInWei]);
+  }, [
+    gatewayAllowanceInWei,
+    smartGatewayAllowanceInWei,
+    paymasterAllowanceInWei,
+    tokenDecimals,
+  ]);
 
   // Update confirmation state based on transaction status
   useEffect(() => {
-    if (isPending) {
+    if (isPending || useropIsPending || waitIsLoading) {
       setIsConfirming(true);
     }
 
-    if (errorMessage) {
+    if (errorMessage || userOpError || waitError) {
       setIsConfirming(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPending, errorMessage]);
+  }, [
+    isPending,
+    errorMessage,
+    useropIsPending,
+    userOpError,
+    waitIsLoading,
+    waitError,
+  ]);
 
   // Watch for token Approval event
   useWatchContractEvent({
-    address: TOKEN_CONTRACT_ADDRESS,
+    address: tokenAddress,
     abi: erc20Abi,
     eventName: "Approval",
     args: {
       owner: account.address,
-      spender: getAddress(GATEWAY_CONTRACT_ADDRESS),
+      spender: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     },
     async onLogs(logs: any) {
-      await createOrder();
+      const decodedLog = decodeEventLog({
+        abi: erc20Abi,
+        eventName: "Approval",
+        data: logs[0].data,
+        topics: logs[0].topics,
+      });
+
+      console.log(decodedLog);
+
+      if (
+        decodedLog.args.value == parseUnits(amount.toString(), tokenDecimals!)
+      ) {
+        await createOrder();
+      }
     },
+    poll: true,
   });
 
   // Watch for OrderCreated event
   useWatchContractEvent({
-    address: GATEWAY_CONTRACT_ADDRESS,
+    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     abi: gatewayAbi,
     eventName: "OrderCreated",
     args: {
       sender: account.address,
-      token: getAddress(TOKEN_CONTRACT_ADDRESS),
+      token: tokenAddress,
     },
     onLogs(logs: any) {
       const decodedLog = decodeEventLog({
@@ -140,77 +233,151 @@ export const TransactionPreview = ({
         data: logs[0].data,
         topics: logs[0].topics,
       });
+      console.log(decodedLog.args.orderId);
+      console.log(decodedLog.args.orderId as `0x${string}`);
       setOrderId(decodedLog.args.orderId);
       setTransactionStatus("pending");
     },
+    poll: true,
   });
+
+  const prepareCreateOrderParams = async () => {
+    // Prepare recipient data
+    const recipient = {
+      accountIdentifier: formValues.accountIdentifier,
+      accountName: recipientName,
+      institution: formValues.institution,
+      providerId: PROVIDER_ID,
+      memo: formValues.memo,
+    };
+
+    // Fetch aggregator public key
+    const publicKey = await fetchAggregatorPublicKey();
+    const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
+
+    // Prepare transaction parameters
+    const params = {
+      token: tokenAddress,
+      amount: parseUnits(amount.toString(), tokenDecimals!),
+      rate: parseUnits(rate.toString(), 0),
+      senderFeeRecipient: getAddress(
+        "0x0000000000000000000000000000000000000000",
+      ),
+      senderFee: BigInt(0),
+      refundAddress: account.address,
+      messageHash: encryptedRecipient,
+    };
+
+    return params;
+  };
 
   const createOrder = async () => {
     try {
-      // Prepare recipient data
-      const recipient = {
-        accountIdentifier: formValues.accountIdentifier,
-        accountName: "Chibuotu Amadi",
-        institution: formValues.institution,
-        providerId: PROVIDER_ID,
-        memo: formValues.memo,
-      };
-
-      // Fetch aggregator public key
-      const publicKey = await fetchAggregatorPublicKey();
-      const encryptedRecipient = publicKeyEncrypt(recipient, publicKey.data);
-
-      // Prepare transaction parameters
-      const params = {
-        token: getAddress("0x7683022d84F726a96c4A6611cD31DBf5409c0Ac9"),
-        amount: parseUnits(amount.toString(), 18),
-        rate: parseUnits(rate.toString(), 0),
-        senderFeeRecipient: getAddress(
-          "0x0000000000000000000000000000000000000000",
-        ),
-        senderFee: BigInt(0),
-        refundAddress: account.address,
-        messageHash: encryptedRecipient,
-      };
-
+      const params = await prepareCreateOrderParams();
       setCreatedAt(new Date().toISOString());
 
-      // // Create order
-      await writeContractAsync({
-        abi: gatewayAbi,
-        address: GATEWAY_CONTRACT_ADDRESS,
-        functionName: "createOrder",
-        args: [
-          params.token,
-          params.amount,
-          params.rate,
-          params.senderFeeRecipient,
-          params.senderFee,
-          params.refundAddress!,
-          params.messageHash,
-        ],
-      });
+      if (smartTokenBalance >= amount) {
+        // Create order with sponsored user operation
+        let transactions = [
+          {
+            to: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
+            data: encodeFunctionData({
+              abi: gatewayAbi,
+              functionName: "createOrder",
+              args: [
+                params.token,
+                params.amount,
+                params.rate,
+                params.senderFeeRecipient,
+                params.senderFee,
+                params.refundAddress!,
+                params.messageHash,
+              ],
+            }),
+          },
+        ];
+
+        if (smartGatewayAllowance < amount) {
+          // Approve gateway contract to spend token
+          transactions.push({
+            to: tokenAddress,
+            data: encodeFunctionData({
+              abi: erc20Abi,
+              functionName: "approve",
+              args: [
+                getGatewayContractAddress(account.chain?.name) as `0x${string}`,
+                parseUnits(amount.toString(), tokenDecimals!),
+              ],
+            }),
+          });
+        }
+
+        if (paymasterAllowance < amount) {
+          // Approve paymaster contract to spend token
+          transactions.push({
+            to: tokenAddress,
+            data: encodeFunctionData({
+              abi: erc20Abi,
+              functionName: "approve",
+              args: [
+                getAddress("0x00000f79b7faf42eebadba19acc07cd08af44789"),
+                parseUnits(amount.toString(), tokenDecimals!),
+              ],
+            }),
+          });
+        }
+
+        mutate({ transactions });
+      } else {
+        // Create order
+        await writeContractAsync({
+          abi: gatewayAbi,
+          address: getGatewayContractAddress(
+            account.chain?.name,
+          ) as `0x${string}`,
+          functionName: "createOrder",
+          args: [
+            params.token,
+            params.amount,
+            params.rate,
+            params.senderFeeRecipient,
+            params.senderFee,
+            params.refundAddress!,
+            params.messageHash,
+          ],
+        });
+      }
     } catch (e: any) {
       if (error) {
         setErrorMessage((error as BaseError).shortMessage || error!.message);
       } else {
         setErrorMessage((e as BaseError).shortMessage);
       }
+      setIsConfirming(false);
     }
   };
 
   const handlePaymentConfirmation = async () => {
     try {
-      // Approve gateway contract to spend token
-      if (tokenAllowance < amount) {
-        await writeContractAsync({
-          address: TOKEN_CONTRACT_ADDRESS,
-          abi: erc20Abi,
-          functionName: "approve",
-          args: [GATEWAY_CONTRACT_ADDRESS, parseUnits(amount.toString(), 18)],
-        });
-      } else {
+      setIsConfirming(true);
+
+      if (smartTokenBalance >= amount) {
         await createOrder();
+      } else {
+        // Approve gateway contract to spend token
+        if (gatewayAllowance < amount) {
+          await writeContractAsync({
+            address: tokenAddress,
+            abi: erc20Abi,
+            functionName: "approve",
+            args: [
+              getAddress(getGatewayContractAddress(account.chain?.name)!),
+              parseUnits(amount.toString(), tokenDecimals!),
+            ],
+          });
+        } else {
+          await createOrder();
+        }
       }
     } catch (e: any) {
       if (error) {
@@ -218,6 +385,7 @@ export const TransactionPreview = ({
       } else {
         setErrorMessage((e as BaseError).shortMessage);
       }
+      setIsConfirming(false);
     }
   };
 
@@ -225,7 +393,7 @@ export const TransactionPreview = ({
     <div className="grid gap-6 py-10 text-sm">
       <div className="grid gap-4">
         <h2 className="text-xl font-medium text-neutral-900 dark:text-white/80">
-          Review transaction
+          Review transaction {smartAccountAddress}
         </h2>
         <p className="text-gray-500 dark:text-white/50">
           Verify transaction details before you send
