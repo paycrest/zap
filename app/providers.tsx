@@ -20,13 +20,15 @@ const config = getDefaultConfig({
   ssr: true,
 });
 
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
-            initialChain={base}
+            initialChain={environment === "mainnet" ? base : baseSepolia}
             theme={lightTheme({
               borderRadius: "large",
               accentColor: "#3384F7",

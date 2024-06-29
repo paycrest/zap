@@ -332,7 +332,7 @@ export const TransactionForm = ({
                             10 &&
                           !errors.accountIdentifier &&
                           isValid && (
-                            <InputError message="Invalid account identifier" />
+                            <InputError message="Could not resolve account details" />
                           )}
                       </>
                     )}
@@ -400,9 +400,9 @@ export const TransactionForm = ({
         {account.isConnected ? "Review Info" : "Connect wallet to continue"}
       </button>
 
-      {/* Rate, Fee and Amount calculations */}
+      {/* Rate and fee */}
       <AnimatePresence>
-        {rate > 0 && Number(amount) > 0 && (
+        {rate > 0 && Number(amount) > 0 && account.isConnected && (
           <AnimatedComponent
             variant={slideInOut}
             className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5"
