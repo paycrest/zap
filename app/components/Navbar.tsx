@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -8,6 +9,7 @@ import { ThemeSwitch } from "./ThemeSwitch";
 import { WalletButtons } from "./WalletButtons";
 
 export const Navbar = () => {
+  const account = useAccount();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -40,7 +42,7 @@ export const Navbar = () => {
 
         <div className="flex flex-1 items-center justify-end gap-3 text-sm">
           <WalletButtons />
-          <div className="hidden lg:block">
+          <div className={`${account.isConnected ? "" : "hidden lg:block"}`}>
             <ThemeSwitch />
           </div>
         </div>
