@@ -29,6 +29,7 @@ import {
 } from "viem";
 import { erc20Abi, gatewayAbi } from "../api/abi";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   useSendSponsoredTransaction,
   useSmartAccount,
@@ -59,6 +60,7 @@ export const TransactionPreview = ({
   },
 }: TransactionPreviewProps) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorCount, setErrorCount] = useState(0); // Used to trigger toast
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
   const [gatewayAllowance, setGatewayAllowance] = useState<number>(0);
   const [smartGatewayAllowance, setSmartGatewayAllowance] = useState<number>(0);
@@ -385,9 +387,16 @@ export const TransactionPreview = ({
       } else {
         setErrorMessage((e as BaseError).shortMessage);
       }
+      setErrorCount((prevCount) => prevCount + 1);
       setIsConfirming(false);
     }
   };
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+  }, [errorCount, errorMessage]);
 
   return (
     <div className="grid gap-6 py-10 text-sm">
