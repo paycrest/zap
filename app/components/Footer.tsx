@@ -1,11 +1,14 @@
+"use client";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface SocialLinkProps {
   href: string;
   imagePath: string;
   alt: string;
-  title?: string;
+  title: string;
 }
 
 const SocialLink = ({ href, imagePath, alt, title }: SocialLinkProps) => {
@@ -16,7 +19,7 @@ const SocialLink = ({ href, imagePath, alt, title }: SocialLinkProps) => {
   );
 };
 
-const socials = [
+const socialsDark = [
   {
     href: "https://farcaster.io",
     imagePath: "/farcaster-icon.svg",
@@ -37,7 +40,38 @@ const socials = [
   },
 ];
 
+const socialsLight = [
+  {
+    href: "https://farcaster.io",
+    imagePath: "/farcaster-icon-dark.svg",
+    alt: "Farcaster icon",
+    title: "Farcaster",
+  },
+  {
+    href: "https://github.com/paycrest",
+    imagePath: "/github-icon-dark.svg",
+    alt: "GitHub icon",
+    title: "GitHub",
+  },
+  {
+    href: "https://x.com/paycrest",
+    imagePath: "/x-icon-dark.svg",
+    alt: "X icon",
+    title: "X",
+  },
+];
+
 export const Footer = () => {
+  const { resolvedTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  const socials = resolvedTheme === "dark" ? socialsDark : socialsLight;
+
   return (
     <footer className="mt-8 flex w-full items-center justify-between border-t border-dashed border-gray-200 pb-6 pt-4 dark:border-white/10">
       <p className="text-xs font-medium">
