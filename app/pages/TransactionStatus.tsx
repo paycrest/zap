@@ -34,6 +34,7 @@ export default function TransactionStatus({
   recipientName,
   orderId,
   createdAt,
+  createdHash,
   clearForm,
   clearTransactionStatus,
   setTransactionStatus,
@@ -42,6 +43,7 @@ export default function TransactionStatus({
   const { resolvedTheme } = useTheme();
   const account = useAccount();
   const [settledAt, setSettledAt] = useState<string>("");
+  const [settledHash, setSettledHash] = useState<string>("");
 
   const { watch } = formMethods;
 
@@ -57,18 +59,21 @@ export default function TransactionStatus({
     //   orderId: orderId as `0x${string}`,
     // },
     onLogs(logs: any) {
-      const decodedLog = decodeEventLog({
-        abi: gatewayAbi,
-        eventName: "OrderSettled",
-        data: logs[0].data,
-        topics: logs[0].topics,
-      });
-
-      console.log(decodedLog);
-
-      if (decodedLog.args.settlePercent == BigInt("100000")) {
-        setTransactionStatus("settled");
-        setSettledAt(new Date().toISOString());
+      for (const log of logs) {
+        const decodedLog = decodeEventLog({
+          abi: gatewayAbi,
+          eventName: "OrderSettled",
+          data: log.data,
+          topics: log.topics,
+        });
+  
+        console.log(decodedLog);
+  
+        if (decodedLog.args.settlePercent == BigInt("100000")) {
+          setTransactionStatus("settled");
+          setSettledHash(log.transactionHash);
+          setSettledAt(new Date().toISOString());
+        }
       }
     },
   });
@@ -274,11 +279,11 @@ export default function TransactionStatus({
               </div>
               <div className="flex items-center justify-between gap-1">
                 <p className="flex-1">Created</p>
-                <p className="flex-1">{formatTimeAgo(createdAt)}</p>
+                <p className="flex-1">{formatTimeAgo(createdAt)} (<a href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`} className="text-blue-600 dark:text-blue-500 hover:underline">receipt</a>)</p>
               </div>
               <div className="flex items-center justify-between gap-1">
-                <p className="flex-1">Settled (<a href="#">receipt</a>)</p>
-                <p className="flex-1">{formatTimeAgo(settledAt)} (<a href="#">receipt</a>)</p>
+                <p className="flex-1">Settled</p>
+                <p className="flex-1">{formatTimeAgo(settledAt)} (<a href={`${account.chain?.blockExplorers?.default.url}/tx/${settledHash}`} className="text-blue-600 dark:text-blue-500 hover:underline">receipt</a>)</p>
               </div>
             </AnimatedComponent>
           )}

@@ -55,6 +55,7 @@ export const TransactionPreview = ({
     recipientName,
     institutions: supportedInstitutions,
     setCreatedAt,
+    setCreatedHash,
     setOrderId,
     setTransactionStatus,
   },
@@ -172,7 +173,7 @@ export const TransactionPreview = ({
     tokenDecimals,
   ]);
 
-  // Update confirmation state based on transaction status
+  // Update confirmation state and hash based on transaction status
   useEffect(() => {
     if (isPending || useropIsPending || waitIsLoading) {
       setIsConfirming(true);
@@ -180,6 +181,10 @@ export const TransactionPreview = ({
 
     if (errorMessage || userOpError || waitError) {
       setIsConfirming(false);
+    }
+
+    if (hash || waitIsSuccess) {
+      setCreatedHash(hash || waitData?.receipt?.transactionHash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -189,6 +194,8 @@ export const TransactionPreview = ({
     userOpError,
     waitIsLoading,
     waitError,
+    hash,
+    waitIsSuccess,
   ]);
 
   // Watch for token Approval event
@@ -402,7 +409,7 @@ export const TransactionPreview = ({
     <div className="grid gap-6 py-10 text-sm">
       <div className="grid gap-4">
         <h2 className="text-xl font-medium text-neutral-900 dark:text-white/80">
-          Review transaction {smartAccountAddress}
+          Review transaction
         </h2>
         <p className="text-gray-500 dark:text-white/50">
           Verify transaction details before you send

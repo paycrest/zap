@@ -57,6 +57,7 @@ export type TransactionStatusProps = {
   recipientName: string;
   orderId: string;
   createdAt: string;
+  createdHash: string;
   clearForm: () => void;
   clearTransactionStatus: () => void;
   setTransactionStatus: (
@@ -124,6 +125,7 @@ export type StateProps = {
   selectedNetwork: string;
   handleNetworkChange: (network: string) => void;
   setCreatedAt: (createdAt: string) => void;
+  setCreatedHash: (createdHash: string) => void;
   setOrderId: (orderId: string) => void;
   setTransactionStatus: (
     status:

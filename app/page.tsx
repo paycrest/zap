@@ -105,6 +105,7 @@ export default function Home() {
     | "refunded"
   >("idle");
   const [createdAt, setCreatedAt] = useState<string>("");
+  const [createdHash, setCreatedHash] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
 
   /**
@@ -147,6 +148,7 @@ export default function Home() {
     handleTabChange,
     selectedNetwork,
     setCreatedAt,
+    setCreatedHash,
     setOrderId,
     handleNetworkChange,
     setTransactionStatus,
@@ -283,6 +285,7 @@ export default function Home() {
               formMethods={formMethods}
               transactionStatus={transactionStatus}
               createdAt={createdAt}
+              createdHash={createdHash}
               orderId={orderId}
               recipientName={stateProps.recipientName}
               clearForm={() => setFormValues(INITIAL_FORM_STATE)}
