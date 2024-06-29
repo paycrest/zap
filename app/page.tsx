@@ -233,7 +233,7 @@ export default function Home() {
 
       <AnimatePresence mode="wait">
         {transactionStatus !== "idle" ? (
-          <AnimatedPage key="transaction-status">
+          <AnimatedPage componentKey="transaction-status">
             <TransactionStatus
               formMethods={formMethods}
               transactionStatus={transactionStatus}
@@ -252,7 +252,7 @@ export default function Home() {
             {Object.values(formValues).every(
               (value) => value === "" || value === 0,
             ) ? (
-              <AnimatedPage key="transaction-form">
+              <AnimatedPage componentKey="transaction-form">
                 <TransactionForm
                   onSubmit={onSubmit}
                   formMethods={formMethods}
@@ -260,7 +260,7 @@ export default function Home() {
                 />
               </AnimatedPage>
             ) : (
-              <AnimatedPage key="transaction-preview">
+              <AnimatedPage componentKey="transaction-preview">
                 <TransactionPreview
                   handleBackButtonClick={() =>
                     setFormValues(INITIAL_FORM_STATE)

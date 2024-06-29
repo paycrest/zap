@@ -17,12 +17,12 @@ const pageTransition = {
 };
 
 // Animated wrapper component
-export const AnimatedPage: React.FC<{ children: ReactNode; key: string }> = ({
-  children,
-  key,
-}) => (
+export const AnimatedPage: React.FC<{
+  children: ReactNode;
+  componentKey: string;
+}> = ({ children, componentKey }) => (
   <motion.div
-    key={key}
+    key={componentKey}
     initial="initial"
     animate="in"
     exit="out"
