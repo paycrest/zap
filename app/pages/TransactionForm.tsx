@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { PiCaretDown } from "react-icons/pi";
+import { PiCaretDown, PiCheckCircle } from "react-icons/pi";
 import { FaRegHourglass } from "react-icons/fa6";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 
@@ -93,18 +93,19 @@ export const TransactionForm = ({
     token = watch("token");
 
   // Array of objects for rendering rate and fee information
-  const renderedInfo = [
-    {
-      key: "rate",
-      label: "Rate",
-      value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/DAI`,
-    },
-    {
-      key: "fee",
-      label: "Fee",
-      value: `${fee} ${token}`,
-    },
-  ];
+  const rateInfo = {
+    key: "rate",
+    label: "Rate",
+    value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/DAI`,
+  };
+
+  const feeInfo = {
+    key: "fee",
+    label: "Fee",
+    value: `${fee} ${token}`,
+  };
+
+  const renderedInfo = [rateInfo, feeInfo];
 
   // Array of available networks
   const networks = ["base", "arbitrum", "polygon"];
@@ -310,17 +311,32 @@ export const TransactionForm = ({
                 )}
 
                 <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
-                  {isFetchingRecipientName ? (
-                    <ImSpinner2 className="animate-spin" />
-                  ) : (
-                    <>
-                      {recipientName && <p>{recipientName}</p>}
-                      {recipientName == "" &&
-                        watch("accountIdentifier")?.toString().length == 10 && !errors.accountIdentifier && isValid && (
-                          <InputError message="Invalid account identifier" />
+                  <AnimatePresence mode="wait">
+                    {isFetchingRecipientName ? (
+                      <AnimatedFeedbackItem>
+                        <ImSpinner2 className="animate-spin" />
+                        <p className="text-xs">Getting recipient name...</p>
+                      </AnimatedFeedbackItem>
+                    ) : (
+                      <>
+                        {recipientName && (
+                          <AnimatedFeedbackItem>
+                            <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+                            <p className="capitalize text-gray-700 dark:text-white/80">
+                              {recipientName.toLocaleLowerCase()}
+                            </p>
+                          </AnimatedFeedbackItem>
                         )}
-                    </>
-                  )}
+                        {recipientName == "" &&
+                          watch("accountIdentifier")?.toString().length ===
+                            10 &&
+                          !errors.accountIdentifier &&
+                          isValid && (
+                            <InputError message="Invalid account identifier" />
+                          )}
+                      </>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
 
@@ -376,7 +392,9 @@ export const TransactionForm = ({
       {/* Submit button */}
       <button
         type="submit"
-        disabled={!isValid || !isDirty || !account.isConnected || recipientName == ""}
+        disabled={
+          !isValid || !isDirty || !account.isConnected || recipientName == ""
+        }
         className={primaryBtnClasses}
       >
         {account.isConnected ? "Review Info" : "Connect wallet to continue"}
@@ -415,3 +433,12 @@ export const TransactionForm = ({
     </form>
   );
 };
+
+const AnimatedFeedbackItem = ({ children }: { children: React.ReactNode }) => (
+  <AnimatedComponent
+    variant={slideInOut}
+    className="flex flex-1 items-center gap-1"
+  >
+    {children}
+  </AnimatedComponent>
+);
