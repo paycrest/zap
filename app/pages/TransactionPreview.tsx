@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { TbInfoSquareRounded } from "react-icons/tb";
+import { TbCircleDashed, TbInfoSquareRounded } from "react-icons/tb";
 
 import { TransactionPreviewProps } from "../types";
 import {
@@ -444,6 +444,37 @@ export const TransactionPreview = ({
         </p>
       </div>
 
+      <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
+
+      {/* Confirm and Approve */}
+      <p className="text-gray-500 dark:text-white/50">
+        To confirm order, you&apos;ll be required to approve these two
+        permissions from your wallet
+      </p>
+
+      <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
+        <p>
+          {/* replace 1 with 2 when the approve state is set to complete */}
+          <span>1</span> of 2
+        </p>
+        <div className="flex gap-4">
+          <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+            <TbCircleDashed className="text-lg" />
+            {/*
+              when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
+            */}
+            <p className="pr-1">Gateway order</p>
+          </div>
+          <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+            <TbCircleDashed className="text-lg" />
+            {/*
+              when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
+            */}
+            <p className="pr-1">Order function</p>
+          </div>
+        </div>
+      </div>
+
       {/* CTAs */}
       <div className="flex gap-6">
         <button
@@ -462,8 +493,6 @@ export const TransactionPreview = ({
           {isConfirming ? "Confirming..." : "Confirm payment"}
         </button>
       </div>
-
-      <div>{errorMessage && <p>{errorMessage}</p>}</div>
     </div>
   );
 };
