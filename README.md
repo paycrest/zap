@@ -36,7 +36,13 @@ Zap streamlines the conversion process through a simple flow:
 4. **Provider Node(s):** Executes the conversion on the blockchain.
 5. **Recipient:** The fiat currency is sent to the recipient's account.
 
-For more details, visit our [Warpcast channel](https://warpcast.com/~/channel/paycrest).
+For more details, visit [paycrest.io](https://paycrest.io).
+
+### Zap is built on Paycrest Protocol
+
+| Before      | Now |
+| ----------- | ----------- |
+| ![image](https://github.com/paycrest/zap/assets/87664239/73548ada-bde5-41f5-8af6-0f9f943c763f) | ![image](https://github.com/paycrest/zap/assets/87664239/495e166f-54cf-4951-9cdd-92b9357e8608) |
 
 ## ✨ Features
 
