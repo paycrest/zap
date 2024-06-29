@@ -16,7 +16,7 @@ export const NetworkButton = ({
     className={`relative flex items-center justify-center gap-2 rounded-full px-3 py-2.5 ${selectedNetwork === network ? "border border-blue-500" : "border border-gray-300 dark:border-white/20"} disabled:cursor-not-allowed disabled:opacity-70`}
     onClick={() => handleNetworkChange(network)}
   >
-    <Image src={logo} width={18} height={18} alt={alt} />
+    <Image src={logo} width={0} height={0} alt={alt} className="h-auto w-4" />
     <p>
       {
         {

@@ -27,15 +27,16 @@ export const Navbar = () => {
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Zap by Paycrest</span>
             <Image
-              className="h-7 w-auto"
+              className="h-auto w-12"
               src={
                 mounted && resolvedTheme === "dark"
                   ? "/zap-logo-dark-theme.svg"
                   : "/zap-logo-light-theme.svg"
               }
               alt=""
-              width={48}
-              height={48}
+              width={0}
+              height={0}
+              priority
             />
           </Link>
         </div>
