@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { FormData, InstitutionProps, StateProps } from "./types";
-import { fetchSupportedInstitutions, fetchRate } from "./api/aggregator";
+import {
+  fetchSupportedInstitutions,
+  fetchRate,
+  fetchAccountName,
+} from "./api/aggregator";
 import {
   AnimatedPage,
   Preloader,
@@ -37,10 +41,12 @@ export default function Home() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
   const [isFetchingRate, setIsFetchingRate] = useState(false);
+  const [isFetchingRecipientName, setIsFetchingRecipientName] = useState(false);
 
   const [protocolFeePercent, setProtocolFeePercent] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
   const [rate, setRate] = useState<number>(0);
+  const [recipientName, setRecipientName] = useState<string>("");
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
@@ -50,7 +56,7 @@ export default function Home() {
   // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch } = formMethods;
-  const { currency, amount, token } = watch();
+  const { currency, amount, token, accountIdentifier, institution } = watch();
 
   // Custom hooks for account and contract interactions
   const { data: protocolFeeDetails } = useReadContract({
@@ -70,6 +76,7 @@ export default function Home() {
     | "refunded"
   >("idle");
   const [createdAt, setCreatedAt] = useState<string>("");
+  const [orderId, setOrderId] = useState<string>("");
 
   /**
    * Handles form submission.
@@ -101,12 +108,15 @@ export default function Home() {
     fee,
     rate,
     isFetchingRate,
+    recipientName,
+    isFetchingRecipientName,
     institutions,
     isFetchingInstitutions,
     selectedTab,
     handleTabChange,
     selectedNetwork,
     setCreatedAt,
+    setOrderId,
     handleNetworkChange,
     setTransactionStatus,
   };
@@ -118,15 +128,52 @@ export default function Home() {
 
       setIsFetchingInstitutions(true);
 
-      const institutions = await fetchSupportedInstitutions(currency);
-      setInstitutions(institutions);
-
-      setIsFetchingInstitutions(false);
+      try {
+        const institutions = await fetchSupportedInstitutions(currency);
+        setInstitutions(institutions);
+        setIsFetchingInstitutions(false);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     getInstitutions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
+
+  // Fetch recipient name based on institution and account identifier
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    const getRecipientName = async () => {
+      if (!accountIdentifier || !institution) return;
+
+      setIsFetchingRecipientName(true);
+
+      try {
+        const accountName = await fetchAccountName({
+          institution,
+          accountIdentifier,
+        });
+        setRecipientName(accountName);
+        setIsFetchingRecipientName(false);
+      } catch (error) {
+        setRecipientName("");
+        setIsFetchingRecipientName(false);
+      }
+    };
+
+    const debounceFetchRecipientName = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(getRecipientName, 1000);
+    };
+
+    debounceFetchRecipientName();
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountIdentifier]);
 
   // Fetch rate based on currency, amount, and token
   useEffect(() => {
@@ -134,13 +181,17 @@ export default function Home() {
     const getRate = async () => {
       if (!currency || !amount || !token) return;
       setIsFetchingRate(true);
-      const rate = await fetchRate({
-        token: "USDT",
-        amount: amount,
-        currency: currency,
-      });
-      setRate(rate.data);
-      setIsFetchingRate(false);
+      try {
+        const rate = await fetchRate({
+          token: "USDT",
+          amount: amount,
+          currency: currency,
+        });
+        setRate(rate.data);
+        setIsFetchingRate(false);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     const debounceFetchRate = () => {
@@ -187,10 +238,13 @@ export default function Home() {
               formMethods={formMethods}
               transactionStatus={transactionStatus}
               createdAt={createdAt}
+              orderId={orderId}
+              recipientName={stateProps.recipientName}
               clearForm={() => setFormValues(INITIAL_FORM_STATE)}
               clearTransactionStatus={() => {
                 setTransactionStatus("idle");
               }}
+              setTransactionStatus={setTransactionStatus}
             />
           </AnimatedPage>
         ) : (

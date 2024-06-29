@@ -12,11 +12,18 @@ import {
   fadeInOut,
   slideInOut,
 } from "../components";
+import { useWatchContractEvent } from "wagmi";
+import { gatewayAbi } from "../api/abi";
+import { decodeEventLog } from "viem";
+
+const GATEWAY_CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_GATEWAY_CONTRACT_ADDRESS as `0x${string}`;
 
 /**
  * Renders the transaction status component.
  *
  * @param transactionStatus - The status of the transaction.
+ * @param recipientName - The name of the recipient.
  * @param errorMessage - The error message, if any.
  * @param createdAt - The creation date of the transaction.
  * @param clearForm - Function to clear the form.
@@ -25,9 +32,12 @@ import {
  */
 export default function TransactionStatus({
   transactionStatus,
+  recipientName,
+  orderId,
   createdAt,
   clearForm,
   clearTransactionStatus,
+  setTransactionStatus,
   formMethods,
 }: TransactionStatusProps) {
   const { resolvedTheme } = useTheme();
@@ -35,8 +45,44 @@ export default function TransactionStatus({
   const { watch } = formMethods;
 
   const token = watch("token"),
-    recipientName = watch("recipientName"),
     amount = watch("amount");
+
+  // Watch for OrderSettled event
+  useWatchContractEvent({
+    address: GATEWAY_CONTRACT_ADDRESS,
+    abi: gatewayAbi,
+    eventName: "OrderSettled",
+    args: {
+      orderId: orderId as `0x${string}`,
+    },
+    onLogs(logs: any) {
+      const decodedLog = decodeEventLog({
+        abi: gatewayAbi,
+        eventName: "OrderSettled",
+        data: logs[0].data,
+        topics: logs[0].topics,
+      });
+
+      console.log(decodedLog);
+
+      if (decodedLog.args.settlePercent == BigInt("100000")) {
+        setTransactionStatus("settled");
+      }
+    },
+  });
+
+  // Watch for OrderRefunded event
+  useWatchContractEvent({
+    address: GATEWAY_CONTRACT_ADDRESS,
+    abi: gatewayAbi,
+    eventName: "OrderRefunded",
+    args: {
+      orderId: orderId as `0x${string}`,
+    },
+    onLogs(logs: any) {
+      setTransactionStatus("refunded");
+    },
+  });
 
   /**
    * Handles the back button click event.
@@ -177,7 +223,7 @@ export default function TransactionStatus({
           {transactionStatus === "pending"
             ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
             : transactionStatus === "refunded"
-              ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful. Please try again later or contact support for assistance.`
+              ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful and your crypto has been refunded. Please try again.`
               : `Your payment of ${amount} ${token} to ${recipientName} has been completed successfully`}
         </AnimatedComponent>
 

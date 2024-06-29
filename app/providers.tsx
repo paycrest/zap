@@ -16,7 +16,7 @@ const queryClient = new QueryClient();
 const config = getDefaultConfig({
   appName: "Zap by Paycrest",
   projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
-  chains: [base, baseSepolia],
+  chains: [baseSepolia, base],
   ssr: true,
 });
 

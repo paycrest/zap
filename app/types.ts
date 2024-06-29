@@ -54,9 +54,21 @@ export type TransactionStatusProps = {
     | "validated"
     | "settled"
     | "refunded";
+  recipientName: string;
+  orderId: string;
   createdAt: string;
   clearForm: () => void;
   clearTransactionStatus: () => void;
+  setTransactionStatus: (
+    status:
+      | "idle"
+      | "pending"
+      | "processing"
+      | "fulfilled"
+      | "validated"
+      | "settled"
+      | "refunded",
+  ) => void;
   formMethods: FormMethods;
 };
 
@@ -70,6 +82,11 @@ export type SelectFieldProps = {
   isLoading?: boolean;
   value?: string | number | undefined;
   defaultValue?: string;
+};
+
+export type VerifyAccountPayload = {
+  institution: string;
+  accountIdentifier: string;
 };
 
 export type RatePayload = {
@@ -95,6 +112,8 @@ export type StateProps = {
   fee: number;
   rate: number;
   isFetchingRate: boolean;
+  recipientName: string;
+  isFetchingRecipientName: boolean;
   institutions: InstitutionProps[];
   isFetchingInstitutions: boolean;
   selectedTab: string;
@@ -102,7 +121,17 @@ export type StateProps = {
   selectedNetwork: string;
   handleNetworkChange: (network: string) => void;
   setCreatedAt: (createdAt: string) => void;
-  setTransactionStatus: (status: "idle" | "pending" | "processing" | "fulfilled" | "validated" | "settled" | "refunded") => void;
+  setOrderId: (orderId: string) => void;
+  setTransactionStatus: (
+    status:
+      | "idle"
+      | "pending"
+      | "processing"
+      | "fulfilled"
+      | "validated"
+      | "settled"
+      | "refunded",
+  ) => void;
 };
 
 export type NetworkButtonProps = {

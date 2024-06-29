@@ -22,6 +22,7 @@ import {
 } from "../components";
 import { formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
+import { ImSpinner2 } from "react-icons/im";
 
 const tokens = [
   { value: "DAI", label: "DAI" },
@@ -54,6 +55,8 @@ export const TransactionForm = ({
     fee,
     rate,
     isFetchingRate,
+    recipientName,
+    isFetchingRecipientName,
     selectedNetwork,
     handleNetworkChange,
     selectedTab,
@@ -290,7 +293,7 @@ export const TransactionForm = ({
                       },
                       pattern: {
                         value: /\d{10}/,
-                        message: "Invalid account number",
+                        message: "Invalid account identifier",
                       },
                     })}
                     className={inputClasses}
@@ -305,12 +308,20 @@ export const TransactionForm = ({
                 {errors.accountIdentifier && (
                   <InputError message={errors.accountIdentifier.message} />
                 )}
-                {!errors.accountIdentifier && (
-                  <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
-                    <AiOutlineQuestionCircle />
-                    <p>Usually 10 digits.</p>
-                  </div>
-                )}
+
+                <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
+                  {isFetchingRecipientName ? (
+                    <ImSpinner2 className="animate-spin" />
+                  ) : (
+                    <>
+                      {recipientName && <p>{recipientName}</p>}
+                      {recipientName == "" &&
+                        watch("accountIdentifier")?.toString().length == 10 && !errors.accountIdentifier && isValid && (
+                          <InputError message="Invalid account identifier" />
+                        )}
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Hidden field for recipient name */}
@@ -365,7 +376,7 @@ export const TransactionForm = ({
       {/* Submit button */}
       <button
         type="submit"
-        disabled={!isValid || !isDirty || !account.isConnected}
+        disabled={!isValid || !isDirty || !account.isConnected || recipientName == ""}
         className={primaryBtnClasses}
       >
         {account.isConnected ? "Review Info" : "Connect wallet to continue"}

@@ -1,11 +1,12 @@
 import { useCallback } from "react";
-import { useConnect } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 import { secondaryBtnClasses } from "./Styles";
 
 export const WalletButtons = () => {
-  const { connectors, connect, data } = useConnect();
+  const { connectors, connect } = useConnect();
+  const account = useAccount();
 
   const createWallet = useCallback(() => {
     const coinbaseWalletConnector = connectors.find(
@@ -19,19 +20,24 @@ export const WalletButtons = () => {
   return (
     <>
       <ConnectButton
-        accountStatus={"address"}
+        accountStatus={{
+          smallScreen: "avatar",
+          largeScreen: "full",
+        }}
         chainStatus={"none"}
         label={"Connect"}
         showBalance={false}
       />
 
-      <button
-        type="button"
-        className={secondaryBtnClasses}
-        onClick={createWallet}
-      >
-        Create wallet
-      </button>
+      {!account.isConnected && (
+        <button
+          type="button"
+          className={secondaryBtnClasses}
+          onClick={createWallet}
+        >
+          Create wallet
+        </button>
+      )}
     </>
   );
 };

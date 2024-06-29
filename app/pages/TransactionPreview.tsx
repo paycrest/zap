@@ -27,7 +27,11 @@ import {
 import { erc20Abi, gatewayAbi } from "../api/abi";
 import { useEffect, useState } from "react";
 
-const GATEWAY_CONTRACT_ADDRESS = "0x847dfdaa218f9137229cf8424378871a1da8f625";
+const GATEWAY_CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_GATEWAY_CONTRACT_ADDRESS as `0x${string}`;
+
+const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
+
 const TOKEN_CONTRACT_ADDRESS = "0x7683022d84f726a96c4a6611cd31dbf5409c0ac9";
 
 /**
@@ -43,41 +47,18 @@ export const TransactionPreview = ({
     formValues,
     fee,
     rate,
+    recipientName,
     institutions: supportedInstitutions,
     setCreatedAt,
+    setOrderId,
     setTransactionStatus,
   },
 }: TransactionPreviewProps) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
-  const {
-    data: hash,
-    error,
-    isPending,
-    writeContractAsync,
-  } = useWriteContract();
 
-  // Update token balance when token balance is available
-  useEffect(() => {
-    if (isPending) {
-      setIsConfirming(true);
-    }
-
-    if (errorMessage) {
-      setIsConfirming(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPending, errorMessage]);
-
-  const {
-    amount,
-    token,
-    currency,
-    accountIdentifier,
-    institution,
-    recipientName,
-    memo,
-  } = formValues;
+  const { amount, token, currency, accountIdentifier, institution, memo } =
+    formValues;
 
   // Rendered transaction information
   const renderedInfo = {
@@ -99,6 +80,13 @@ export const TransactionPreview = ({
     args: [account.address!, GATEWAY_CONTRACT_ADDRESS],
   });
 
+  const {
+    data: hash,
+    error,
+    isPending,
+    writeContractAsync,
+  } = useWriteContract();
+
   // State for token allowance
   const [tokenAllowance, setTokenAllowance] = useState<number>(0);
 
@@ -110,17 +98,28 @@ export const TransactionPreview = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAllowanceInWei]);
 
+  // Update confirmation state based on transaction status
+  useEffect(() => {
+    if (isPending) {
+      setIsConfirming(true);
+    }
+
+    if (errorMessage) {
+      setIsConfirming(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, errorMessage]);
+
   // Watch for token Approval event
   useWatchContractEvent({
     address: TOKEN_CONTRACT_ADDRESS,
     abi: erc20Abi,
+    eventName: "Approval",
     args: {
       owner: account.address,
       spender: getAddress(GATEWAY_CONTRACT_ADDRESS),
     },
-    eventName: "Approval",
     async onLogs(logs: any) {
-      console.log("New approval logs!", logs);
       await createOrder();
     },
   });
@@ -141,8 +140,7 @@ export const TransactionPreview = ({
         data: logs[0].data,
         topics: logs[0].topics,
       });
-      console.log("orderId", decodedLog.args.orderId);
-      setIsConfirming(false);
+      setOrderId(decodedLog.args.orderId);
       setTransactionStatus("pending");
     },
   });
@@ -154,7 +152,7 @@ export const TransactionPreview = ({
         accountIdentifier: formValues.accountIdentifier,
         accountName: "Chibuotu Amadi",
         institution: formValues.institution,
-        providerId: "RKVeHPBP",
+        providerId: PROVIDER_ID,
         memo: formValues.memo,
       };
 
@@ -203,8 +201,8 @@ export const TransactionPreview = ({
 
   const handlePaymentConfirmation = async () => {
     try {
+      // Approve gateway contract to spend token
       if (tokenAllowance < amount) {
-        // Approve gateway contract to spend token
         await writeContractAsync({
           address: TOKEN_CONTRACT_ADDRESS,
           abi: erc20Abi,
@@ -212,7 +210,7 @@ export const TransactionPreview = ({
           args: [GATEWAY_CONTRACT_ADDRESS, parseUnits(amount.toString(), 18)],
         });
       } else {
-        createOrder();
+        await createOrder();
       }
     } catch (e: any) {
       if (error) {
@@ -288,10 +286,7 @@ export const TransactionPreview = ({
         </button>
       </div>
 
-      <div>
-        {errorMessage && <p>{errorMessage}</p>}
-        {hash && <p>{hash}</p>}
-      </div>
+      <div>{errorMessage && <p>{errorMessage}</p>}</div>
     </div>
   );
 };

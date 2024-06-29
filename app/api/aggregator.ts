@@ -4,9 +4,11 @@ import {
   RateResponse,
   InstitutionProps,
   PubkeyResponse,
+  VerifyAccountPayload,
 } from "../types";
 
-const API_URL = "http://localhost:8000/v1";
+const AGGREGATOR_URL = process.env.NEXT_PUBLIC_AGGREGATOR_URL;
+const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
 export const fetchRate = async ({
   token,
@@ -15,7 +17,7 @@ export const fetchRate = async ({
 }: RatePayload): Promise<RateResponse> => {
   try {
     const response = await axios.get(
-      `${API_URL}/rates/${token}/${amount}/${currency}?provider_id=RKVeHPBP`,
+      `${AGGREGATOR_URL}/rates/${token}/${amount}/${currency}?provider_id=${PROVIDER_ID}`,
     );
     return response.data;
   } catch (error) {
@@ -28,7 +30,9 @@ export const fetchSupportedInstitutions = async (
   currency: string,
 ): Promise<InstitutionProps[]> => {
   try {
-    const response = await axios.get(`${API_URL}/institutions/${currency}`);
+    const response = await axios.get(
+      `${AGGREGATOR_URL}/institutions/${currency}`,
+    );
     return response.data.data;
   } catch (error) {
     console.error("Error fetching supported institutions:", error);
@@ -38,10 +42,23 @@ export const fetchSupportedInstitutions = async (
 
 export const fetchAggregatorPublicKey = async (): Promise<PubkeyResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/pubkey`);
+    const response = await axios.get(`${AGGREGATOR_URL}/pubkey`);
     return response.data;
   } catch (error) {
     console.error("Error fetching aggregator public key:", error);
+    throw error;
+  }
+};
+
+export const fetchAccountName = async (payload: VerifyAccountPayload): Promise<string> => {
+  try {
+    const response = await axios.post(
+      `${AGGREGATOR_URL}/verify-account`,
+      payload,
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching supported institutions:", error);
     throw error;
   }
 };
