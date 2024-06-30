@@ -12,6 +12,13 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 
+if (
+  !process.env.NEXT_PUBLIC_PAYMASTER_API_KEY ||
+  !process.env.NEXT_PUBLIC_BUNDLER_URL
+) {
+  throw new Error("Missing env var");
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   const config = getDefaultConfig({
     appName: "Zap by Paycrest",

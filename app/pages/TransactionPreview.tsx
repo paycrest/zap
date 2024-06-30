@@ -35,6 +35,7 @@ import {
   useSmartAccount,
   useUserOpWait,
 } from "@biconomy/use-aa";
+import { PaymasterMode } from "@biconomy/account";
 
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
@@ -81,7 +82,6 @@ export const TransactionPreview = ({
   };
 
   const account = useAccount();
-  const { smartAccountAddress } = useSmartAccount();
 
   // User operation hooks
   const {
@@ -113,7 +113,7 @@ export const TransactionPreview = ({
     functionName: "allowance",
     args: [
       account.address!,
-      getAddress(getGatewayContractAddress(account.chain?.name)!),
+      getGatewayContractAddress(account.chain?.name) as `0x${string}`,
     ],
   });
 
@@ -183,7 +183,7 @@ export const TransactionPreview = ({
       setIsConfirming(false);
     }
 
-    if (hash || waitIsSuccess) {
+    if (hash || waitData?.success === "true") {
       setCreatedHash(hash || waitData?.receipt?.transactionHash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +195,7 @@ export const TransactionPreview = ({
     waitIsLoading,
     waitError,
     hash,
-    waitIsSuccess,
+    waitData,
   ]);
 
   // Watch for token Approval event
@@ -236,15 +236,6 @@ export const TransactionPreview = ({
       token: tokenAddress,
     },
     onLogs(logs: any) {
-      const decodedLog = decodeEventLog({
-        abi: gatewayAbi,
-        eventName: "OrderCreated",
-        data: logs[0].data,
-        topics: logs[0].topics,
-      });
-      console.log(decodedLog.args.orderId);
-      console.log(decodedLog.args.orderId as `0x${string}`);
-      setOrderId(decodedLog.args.orderId);
       setTransactionStatus("pending");
     },
     poll: true,
@@ -285,7 +276,7 @@ export const TransactionPreview = ({
       const params = await prepareCreateOrderParams();
       setCreatedAt(new Date().toISOString());
 
-      if (smartTokenBalance >= amount) {
+      if (smartTokenBalance == amount) {
         // Create order with sponsored user operation
         let transactions = [
           {
@@ -370,7 +361,7 @@ export const TransactionPreview = ({
     try {
       setIsConfirming(true);
 
-      if (smartTokenBalance >= amount) {
+      if (smartTokenBalance == amount) {
         await createOrder();
       } else {
         // Approve gateway contract to spend token
