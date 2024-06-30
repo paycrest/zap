@@ -10,6 +10,7 @@ export { WalletButtons } from "./WalletButtons";
 export {
   AnimatedPage,
   AnimatedComponent,
+  slideInDown,
   slideInOut,
   scaleInOut,
   fadeInOut,

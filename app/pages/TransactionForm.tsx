@@ -15,12 +15,15 @@ import {
   fadeInOut,
   inputClasses,
   primaryBtnClasses,
+  slideInDown,
   slideInOut,
 } from "../components";
 import { fetchSupportedTokens, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
 import { ImSpinner2 } from "react-icons/im";
 import { useSmartAccount } from "@biconomy/use-aa";
+import Image from "next/image";
+import { BiSolidPlusCircle } from "react-icons/bi";
 
 const currencies = [
   { value: "NGN", label: "Nigerian Naira (NGN)" },
@@ -100,7 +103,13 @@ export const TransactionForm = ({
       className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
-      {smartAccountAddress == "0x" ? "" : smartAccountAddress}
+      {account.isConnected && token !== "" && (
+        <div className="text-xs opacity-50">
+          <p>Smart wallet address:</p>
+          <code>{smartAccountAddress == "0x" ? "" : smartAccountAddress}</code>
+        </div>
+      )}
+
       {/* Networks */}
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />
@@ -129,85 +138,132 @@ export const TransactionForm = ({
           </button>
         </Tooltip>
       </div>
-      <div className="flex items-start gap-4">
-        {/* Token */}
-        <div className="grid flex-1 gap-2">
-          <SelectField
-            id="token"
-            label="Token"
-            options={
-              fetchSupportedTokens(account.chain?.name)?.map((token) => ({
-                value: token.symbol,
-                label: token.symbol,
-              })) ?? []
-            }
-            validation={{
-              required: { value: true, message: "Token is required" },
-              disabled: !account.isConnected,
-            }}
-            errors={errors}
-            register={register}
-            value={watch("token")}
-            title={
-              account.isConnected
-                ? "Select token to send"
-                : "Connect wallet to select token"
-            }
-          />
 
-          {/* Display token balance if account is connected */}
-          {account.status === "connected" && (
-            <p className="text-gray-500 dark:text-white/50">
-              Bal: {tokenBalance} {token}
-              <br />
-              Smart Bal: {smartTokenBalance} {token}
-            </p>
-          )}
-        </div>
-
-        {/* Amount */}
-        <div className="grid flex-1 gap-2">
-          <label htmlFor="amount" className="font-medium">
-            Amount <span className="text-rose-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id="amount"
-              type="number"
-              step="0.01"
-              {...register("amount", {
-                required: { value: true, message: "Amount is required" },
-                disabled: !account.isConnected || token === "",
-                min: {
-                  value: 0.01,
-                  message: `Minimum amount is 0.01 ${token}`,
-                },
-                max: {
-                  value: 500,
-                  message: `Max. amount is 500 ${token}`,
-                },
-                pattern: {
-                  value: /^\d+(\.\d{1,2})?$/,
-                  message: "Invalid amount",
-                },
-              })}
-              className={`${inputClasses} pl-4 pr-14`}
-              placeholder="0.00"
+      <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
+        <div className="flex items-start gap-4">
+          {/* Token */}
+          <div className="grid flex-1 gap-2">
+            <SelectField
+              id="token"
+              label="Token"
+              options={
+                fetchSupportedTokens(account.chain?.name)?.map((token) => ({
+                  value: token.symbol,
+                  label: token.symbol,
+                })) ?? []
+              }
+              validation={{
+                required: { value: true, message: "Token is required" },
+                disabled: !account.isConnected,
+              }}
+              errors={errors}
+              register={register}
+              value={watch("token")}
               title={
-                token === ""
-                  ? "Select token to enable amount field"
-                  : !account.isConnected
-                    ? "Connect wallet to enable amount field"
-                    : "Enter amount to send"
+                account.isConnected
+                  ? "Select token to send"
+                  : "Connect wallet to select token"
               }
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-              {watch("token")}
-            </div>
           </div>
-          {errors.amount && <InputError message={errors.amount.message} />}
+
+          {/* Amount */}
+          <div className="grid flex-1 gap-2">
+            <label htmlFor="amount" className="font-medium">
+              Amount <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                id="amount"
+                type="number"
+                step="0.01"
+                {...register("amount", {
+                  required: { value: true, message: "Amount is required" },
+                  disabled: !account.isConnected || token === "",
+                  min: {
+                    value: 0.01,
+                    message: `Minimum amount is 0.01 ${token}`,
+                  },
+                  max: {
+                    value: 500,
+                    message: `Max. amount is 500 ${token}`,
+                  },
+                  pattern: {
+                    value: /^\d+(\.\d{1,2})?$/,
+                    message: "Invalid amount",
+                  },
+                })}
+                className={`${inputClasses} pl-4 pr-14`}
+                placeholder="0.00"
+                title={
+                  token === ""
+                    ? "Select token to enable amount field"
+                    : !account.isConnected
+                      ? "Connect wallet to enable amount field"
+                      : "Enter amount to send"
+                }
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                {watch("token")}
+              </div>
+            </div>
+            {errors.amount && <InputError message={errors.amount.message} />}
+          </div>
         </div>
+
+        <AnimatePresence mode="wait">
+          {account.status === "connected" && token !== "" && (
+            <AnimatedComponent
+              variant={slideInDown}
+              className="flex items-start justify-between rounded-2xl border border-gray-200 dark:border-white/10"
+            >
+              <div className="grid flex-1 gap-3 p-4">
+                <div className="flex items-center gap-1">
+                  <p className="text-gray-500 text-white/50">Smart Wallet</p>
+                  <Tooltip message="Fund your smart wallet">
+                    <button type="button" aria-label="Fund smart wallet">
+                      <BiSolidPlusCircle className="text-lg text-blue-600 dark:text-blue-500" />
+                    </button>
+                  </Tooltip>
+                </div>
+                <div className="flex items-center gap-1">
+                  {token && (
+                    <Image
+                      src={`/${String(token)?.toLowerCase()}-logo.svg`}
+                      alt={`${token} logo`}
+                      width={14}
+                      height={14}
+                    />
+                  )}
+                  <p>
+                    {smartTokenBalance} {token}
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10"></div>
+
+              <div className="grid flex-1 gap-3 p-4">
+                <p className="text-gray-500 text-white/50">Your wallet</p>
+                <div className="flex items-center gap-1">
+                  {token && (
+                    <Image
+                      src={`/${String(token)?.toLowerCase()}-logo.svg`}
+                      alt={`${token} logo`}
+                      width={14}
+                      height={14}
+                    />
+                  )}
+                  <p>
+                    {tokenBalance} {token}
+                  </p>
+                </div>
+              </div>
+            </AnimatedComponent>
+          )}
+        </AnimatePresence>
       </div>
+
       <div>
         <h3 className="pb-2 font-medium">
           Recipient details <span className="text-rose-500">*</span>
@@ -422,7 +478,7 @@ export const TransactionForm = ({
 
 const AnimatedFeedbackItem = ({ children }: { children: React.ReactNode }) => (
   <AnimatedComponent
-    variant={slideInOut}
+    variant={slideInDown}
     className="flex flex-1 items-center gap-1"
   >
     {children}

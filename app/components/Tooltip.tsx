@@ -20,7 +20,7 @@ export const Tooltip = ({ message, children }: TooltipProps) => {
       </span>
 
       <div
-        className={`absolute bottom-12 flex flex-col items-center font-normal transition-opacity duration-300 ease-in-out group-hover:flex ${
+        className={`absolute bottom-6 flex flex-col items-center font-normal transition-opacity duration-300 ease-in-out group-hover:flex ${
           show
             ? "pointer-events-auto flex opacity-100"
             : "pointer-events-none hidden opacity-0"

@@ -45,6 +45,12 @@ export const slideInOut = {
   exit: { opacity: 0, y: -20 },
 };
 
+export const slideInDown = {
+  initial: { opacity: 0, y: -20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
+
 export const scaleInOut = {
   initial: { scale: 0 },
   animate: { scale: 1 },
