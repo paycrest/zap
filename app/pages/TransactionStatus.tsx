@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { PiCheckCircle, PiSpinnerBold, PiXCircle } from "react-icons/pi";
+import { PiCheckCircle, PiSpinnerBold } from "react-icons/pi";
 
 import { calculateDuration, getGatewayContractAddress } from "../utils";
 import { TransactionStatusProps } from "../types";
@@ -17,6 +17,7 @@ import {
 import { useAccount, useWatchContractEvent } from "wagmi";
 import { gatewayAbi } from "../api/abi";
 import { decodeEventLog } from "viem";
+import { HiOutlineReceiptRefund } from "react-icons/hi2";
 
 /**
  * Renders the transaction status component.
@@ -140,18 +141,24 @@ export default function TransactionStatus({
           }}
           key="refunded"
         >
-          <PiXCircle className="text-4xl text-rose-500" />
+          <HiOutlineReceiptRefund className="text-4xl text-rose-500" />
         </AnimatedComponent>
       ) : (
         <AnimatedComponent
           variant={fadeInOut}
           key="pending"
-          className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 dark:bg-white/10"
+          className={`flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 dark:bg-white/10 ${
+            transactionStatus === "pending"
+              ? "text-orange-400"
+              : transactionStatus === "processing"
+                ? "text-yellow-400"
+                : transactionStatus === "validated"
+                  ? "text-sky-500"
+                  : ""
+          }`}
         >
-          <PiSpinnerBold className="animate-spin text-yellow-700 dark:text-yellow-400" />
-          <p className="text-yellow-900 dark:text-yellow-400">
-            {transactionStatus}
-          </p>
+          <PiSpinnerBold className="animate-spin" />
+          <p>{transactionStatus}</p>
         </AnimatedComponent>
       )}
     </AnimatePresence>
