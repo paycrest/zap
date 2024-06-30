@@ -68,6 +68,9 @@ export const TransactionPreview = ({
   const [smartGatewayAllowance, setSmartGatewayAllowance] = useState<number>(0);
   const [paymasterAllowance, setPaymasterAllowance] = useState<number>(0);
 
+  const [isGatewayApproved, setIsGatewayApproved] = useState<boolean>(false);
+  const [isOrderCreated, setIsOrderCreated] = useState<boolean>(false);
+
   const { amount, token, currency, accountIdentifier, institution, memo } =
     formValues;
 
@@ -328,6 +331,7 @@ export const TransactionPreview = ({
         }
 
         mutate({ transactions });
+        setIsOrderCreated(true);
       } else {
         // Create order
         await writeContractAsync({
@@ -346,6 +350,8 @@ export const TransactionPreview = ({
             params.messageHash,
           ],
         });
+
+        setIsOrderCreated(true);
       }
     } catch (e: any) {
       if (error) {
@@ -375,6 +381,8 @@ export const TransactionPreview = ({
               parseUnits(amount.toString(), tokenDecimals!),
             ],
           });
+
+          setIsGatewayApproved(true);
         } else {
           await createOrder();
         }
@@ -445,33 +453,37 @@ export const TransactionPreview = ({
       <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
 
       {/* Confirm and Approve */}
-      <p className="text-gray-500 dark:text-white/50">
-        To confirm order, you&apos;ll be required to approve these two
-        permissions from your wallet
-      </p>
-
-      <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
-        <p>
-          {/* replace 1 with 2 when the approve state is set to complete */}
-          <span>1</span> of 2
+      {(gatewayAllowance >= amount || smartGatewayAllowance >= amount) && (
+        <p className="text-gray-500 dark:text-white/50">
+          To confirm order, you&apos;ll be required to approve these two
+          permissions from your wallet
         </p>
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
-            <TbCircleDashed className="text-lg" />
-            {/*
+      )}
+
+      {(gatewayAllowance >= amount || smartGatewayAllowance >= amount) && (
+        <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
+          <p>
+            {/* replace 1 with 2 when the approve state is set to complete */}
+            <span>1</span> of 2
+          </p>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+              <TbCircleDashed className="text-lg" />
+              {/*
               when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
             */}
-            <p className="pr-1">Gateway order</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
-            <TbCircleDashed className="text-lg" />
-            {/*
+              <p className="pr-1">Approve Gateway</p>
+            </div>
+            <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
+              <TbCircleDashed className="text-lg" />
+              {/*
               when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
             */}
-            <p className="pr-1">Order function</p>
+              <p className="pr-1">Create Order</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* CTAs */}
       <div className="flex gap-6">
