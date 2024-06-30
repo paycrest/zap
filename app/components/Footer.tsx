@@ -1,7 +1,6 @@
 "use client";
-import { useTheme } from "next-themes";
 import Image from "next/image";
-import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 interface SocialLinkProps {
@@ -13,9 +12,9 @@ interface SocialLinkProps {
 
 const SocialLink = ({ href, imagePath, alt, title }: SocialLinkProps) => {
   return (
-    <Link href={href} title={title}>
+    <a href={href} title={title} target="_blank" rel="noopener noreferrer">
       <Image src={imagePath} alt={alt} width={20} height={20} />
-    </Link>
+    </a>
   );
 };
 
@@ -75,10 +74,17 @@ export const Footer = () => {
   return (
     <footer className="mt-8 flex w-full items-center justify-between border-t border-dashed border-gray-200 pb-6 pt-4 dark:border-white/10">
       <p className="text-xs font-medium">
-        <span className="text-gray-500 dark:text-white/80">
+        <span className="text-gray-500 dark:text-white/50">
           &copy; 2024 Powered by
         </span>{" "}
-        <span className="text-neutral-900 dark:text-white/50">Paycrest</span>
+        <a
+          href="https://paycrest.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-neutral-900 hover:underline dark:text-white/80"
+        >
+          Paycrest
+        </a>
       </p>
       <div className="flex items-center justify-center gap-2">
         {socials.map((social, index) => (
