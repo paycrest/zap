@@ -1,12 +1,15 @@
 "use client";
+import Image from "next/image";
 import { useAccount } from "wagmi";
-import { AnimatePresence, motion } from "framer-motion";
-
-import { PiCaretDown, PiCheckCircle } from "react-icons/pi";
+import { ImSpinner2 } from "react-icons/im";
 import { FaRegHourglass } from "react-icons/fa6";
+import { useSmartAccount } from "@biconomy/use-aa";
+import { AnimatePresence, motion } from "framer-motion";
+import { PiCaretDown, PiCheckCircle } from "react-icons/pi";
 
 import {
   AnimatedComponent,
+  FundWalletModal,
   InputError,
   NetworkButton,
   SelectField,
@@ -20,10 +23,6 @@ import {
 } from "../components";
 import { fetchSupportedTokens, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
-import { ImSpinner2 } from "react-icons/im";
-import { useSmartAccount } from "@biconomy/use-aa";
-import Image from "next/image";
-import { BiSolidPlusCircle } from "react-icons/bi";
 
 const currencies = [
   { value: "NGN", label: "Nigerian Naira (NGN)" },
@@ -158,6 +157,7 @@ export const TransactionForm = ({
               errors={errors}
               register={register}
               value={watch("token")}
+              defaultValue="DAI"
               title={
                 account.isConnected
                   ? "Select token to send"
@@ -210,6 +210,7 @@ export const TransactionForm = ({
           </div>
         </div>
 
+        {/* Wallet and Smart Wallet Balance */}
         <AnimatePresence mode="wait">
           {account.status === "connected" && token !== "" && (
             <AnimatedComponent
@@ -221,11 +222,7 @@ export const TransactionForm = ({
                   <p className="text-gray-500 dark:text-white/50">
                     Smart Wallet
                   </p>
-                  <Tooltip message="Fund your smart wallet">
-                    <button type="button" aria-label="Fund smart wallet">
-                      <BiSolidPlusCircle className="text-lg text-blue-600 dark:text-blue-500" />
-                    </button>
-                  </Tooltip>
+                  <FundWalletModal address={smartAccountAddress} />
                 </div>
                 <div className="flex items-center gap-1">
                   {token && (
@@ -265,6 +262,7 @@ export const TransactionForm = ({
         </AnimatePresence>
       </div>
 
+      {/* Recipient Details */}
       <div>
         <h3 className="pb-2 font-medium">
           Recipient details <span className="text-rose-500">*</span>

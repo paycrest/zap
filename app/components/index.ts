@@ -22,6 +22,7 @@ export { TransactionPreview } from "../pages/TransactionPreview";
 
 export { TabButton } from "./TabButton";
 export { NetworkButton } from "./NetworkButton";
+export { FundWalletModal } from "./FundWalletModal";
 
 export { InputError } from "./InputError";
 export { SelectField } from "./SelectField";
