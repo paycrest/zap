@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { PiCheckCircle, PiSpinnerBold } from "react-icons/pi";
 
-import { calculateDuration, getGatewayContractAddress } from "../utils";
+import { calculateDuration } from "../utils";
 import { TransactionStatusProps } from "../types";
 import {
   AnimatedComponent,
@@ -14,10 +14,9 @@ import {
   fadeInOut,
   slideInOut,
 } from "../components";
-import { useAccount, useWatchContractEvent } from "wagmi";
-import { gatewayAbi } from "../api/abi";
-import { decodeEventLog } from "viem";
+import { useAccount } from "wagmi";
 import { HiOutlineReceiptRefund } from "react-icons/hi2";
+import { fetchOrderStatus } from "../api/aggregator";
 
 /**
  * Renders the transaction status component.
@@ -35,7 +34,6 @@ export default function TransactionStatus({
   recipientName,
   orderId,
   createdAt,
-  createdHash,
   clearForm,
   clearTransactionStatus,
   setTransactionStatus,
@@ -43,54 +41,64 @@ export default function TransactionStatus({
 }: TransactionStatusProps) {
   const { resolvedTheme } = useTheme();
   const account = useAccount();
-  const [settledAt, setSettledAt] = useState<string>("");
-  const [settledHash, setSettledHash] = useState<string>("");
+  const [completedAt, setCompletedAt] = useState<string>("");
+  const [createdHash, setCreatedHash] = useState<string>("");
 
   const { watch } = formMethods;
 
   const token = watch("token"),
     amount = watch("amount");
 
-  // Watch for OrderSettled event
-  useWatchContractEvent({
-    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-    abi: gatewayAbi,
-    eventName: "OrderSettled",
-    // args: {
-    //   orderId: orderId as `0x${string}`,
-    // },
-    onLogs(logs: any) {
-      for (const log of logs) {
-        const decodedLog = decodeEventLog({
-          abi: gatewayAbi,
-          eventName: "OrderSettled",
-          data: log.data,
-          topics: log.topics,
-        });
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
 
-        console.log(decodedLog);
+    if (!orderId || ["validated", "settled"].includes(transactionStatus))
+      return;
 
-        if (decodedLog.args.settlePercent == BigInt("100000")) {
-          setTransactionStatus("settled");
-          setSettledHash(log.transactionHash);
-          setSettledAt(new Date().toISOString());
+    const getOrderStatus = async () => {
+      try {
+        const orderStatus = await fetchOrderStatus(orderId);
+
+        if (orderStatus.data.status != "pending") {
+          if (["validated", "settled"].includes(transactionStatus)) {
+            // If order is completed, we can stop polling
+            clearInterval(intervalId);
+          }
+
+          setTransactionStatus(
+            orderStatus.data.status as
+              | "processing"
+              | "fulfilled"
+              | "validated"
+              | "settled"
+              | "refunded",
+          );
+
+          setCompletedAt(orderStatus.data.updatedAt);
+
+          if (orderStatus.data.status == "processing") {
+            const createdReceipt = orderStatus.data.txReceipts.find(
+              (txReceipt) => txReceipt.status == "pending",
+            );
+            setCreatedHash(createdReceipt?.txHash!);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching order status:", error);
       }
-    },
-  });
+    };
 
-  // Watch for OrderRefunded event
-  useWatchContractEvent({
-    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-    abi: gatewayAbi,
-    eventName: "OrderRefunded",
-    args: {
-      orderId: orderId as `0x${string}`,
-    },
-    onLogs(logs: any) {
-      setTransactionStatus("refunded");
-    },
-  });
+    // Initial call
+    getOrderStatus();
+
+    // Set up polling
+    intervalId = setInterval(getOrderStatus, 2000);
+
+    // Cleanup function
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [orderId, transactionStatus]);
 
   /**
    * Handles the back button click event.
@@ -110,7 +118,9 @@ export default function TransactionStatus({
    * @returns The image source.
    */
   const getImageSrc = () => {
-    const base = transactionStatus === "pending" ? "/stepper" : "/stepper-long";
+    const base = !["validated", "settled"].includes(transactionStatus)
+      ? "/stepper"
+      : "/stepper-long";
     const themeSuffix = resolvedTheme === "dark" ? "-dark.svg" : ".svg";
     return base + themeSuffix;
   };
@@ -121,7 +131,7 @@ export default function TransactionStatus({
    */
   const StatusIndicator = () => (
     <AnimatePresence mode="wait">
-      {transactionStatus === "settled" ? (
+      {["validated", "settled"].includes(transactionStatus) ? (
         <AnimatedComponent variant={scaleInOut} key="settled">
           <Image
             src="/checkmark.svg"
@@ -152,7 +162,7 @@ export default function TransactionStatus({
               ? "text-orange-400"
               : transactionStatus === "processing"
                 ? "text-yellow-400"
-                : transactionStatus === "validated"
+                : transactionStatus === "fulfilled"
                   ? "text-sky-500"
                   : ""
           }`}
@@ -216,7 +226,7 @@ export default function TransactionStatus({
           delay={0.2}
           className="text-xl font-medium text-neutral-900 dark:text-white"
         >
-          {transactionStatus === "pending"
+          {!["validated", "settled"].includes(transactionStatus)
             ? "Processing payment..."
             : transactionStatus === "refunded"
               ? "Payment refunded"
@@ -224,7 +234,7 @@ export default function TransactionStatus({
         </AnimatedComponent>
 
         {/* Pending Transaction Separator */}
-        {transactionStatus === "pending" && (
+        {!["validated", "settled"].includes(transactionStatus) && (
           <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
         )}
 
@@ -234,7 +244,7 @@ export default function TransactionStatus({
           delay={0.4}
           className="leading-normal text-gray-500 dark:text-white/50"
         >
-          {transactionStatus === "pending"
+          {!["validated", "settled"].includes(transactionStatus)
             ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
             : transactionStatus === "refunded"
               ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful and your crypto has been refunded. Please try again.`
@@ -243,7 +253,7 @@ export default function TransactionStatus({
 
         {/* Back Button */}
         <AnimatePresence>
-          {transactionStatus !== "pending" && (
+          {["validated", "settled", "refunded"].includes(transactionStatus) && (
             <>
               <AnimatedComponent
                 variant={slideInOut}
@@ -266,7 +276,7 @@ export default function TransactionStatus({
 
         {/* Payment Details */}
         <AnimatePresence>
-          {transactionStatus === "settled" && (
+          {["validated", "settled"].includes(transactionStatus) && (
             <AnimatedComponent
               variant={{
                 ...fadeInOut,
@@ -281,36 +291,26 @@ export default function TransactionStatus({
                 <p className="flex-1">Status</p>
                 <div className="flex flex-1 items-center gap-1">
                   <PiCheckCircle className="text-green-700 dark:text-green-500" />
-                  <p className="text-green-900 dark:text-green-500">Settled</p>
+                  <p className="text-green-900 dark:text-green-500">
+                    Completed
+                  </p>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-1">
-                <p className="flex-1">Duration</p>
+                <p className="flex-1">Time spent</p>
                 <p className="flex-1">
-                  {calculateDuration(createdAt, settledAt)}
+                  {calculateDuration(createdAt, completedAt)}
                 </p>
               </div>
               <div className="flex items-center justify-between gap-1">
-                <p className="flex-1">Created</p>
+                <p className="flex-1">Receipt</p>
                 <p className="flex-1">
                   <a
                     href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`}
                     className="text-blue-600 hover:underline dark:text-blue-500"
                     target="_blank"
                   >
-                    Transaction Hash
-                  </a>
-                </p>
-              </div>
-              <div className="flex items-center justify-between gap-1">
-                <p className="flex-1">Settled</p>
-                <p className="flex-1">
-                  <a
-                    href={`${account.chain?.blockExplorers?.default.url}/tx/${settledHash}`}
-                    className="text-blue-600 hover:underline dark:text-blue-500"
-                    target="_blank"
-                  >
-                    Transaction Hash
+                    View in explorer
                   </a>
                 </p>
               </div>

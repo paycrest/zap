@@ -15,8 +15,8 @@ import { primaryBtnClasses, secondaryBtnClasses } from "../components";
 import {
   useAccount,
   useWriteContract,
-  useWatchContractEvent,
   useReadContract,
+  usePublicClient,
 } from "wagmi";
 import { fetchAggregatorPublicKey } from "../api/aggregator";
 import {
@@ -30,13 +30,8 @@ import {
 import { erc20Abi, gatewayAbi } from "../api/abi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  useSendSponsoredTransaction,
-  useSmartAccount,
-  useUserOpWait,
-} from "@biconomy/use-aa";
-import { PaymasterMode } from "@biconomy/account";
-import { PiCheckCircle, PiCheckCircleFill } from "react-icons/pi";
+import { useSendSponsoredTransaction, useUserOpWait } from "@biconomy/use-aa";
+import { PiCheckCircleFill } from "react-icons/pi";
 
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
@@ -45,19 +40,17 @@ const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
  *
  * @param handleBackButtonClick - Function to handle the back button click event.
  * @param handlePaymentConfirmation - Function to handle the payment confirmation button click event.
- * @param stateProps - Object containing the form values, fee, rate, and supported institutions.
+ * @param stateProps - Object containing the form values, rate, and supported institutions.
  */
 export const TransactionPreview = ({
   handleBackButtonClick,
   stateProps: {
     formValues,
     smartTokenBalance,
-    fee,
     rate,
     recipientName,
     institutions: supportedInstitutions,
     setCreatedAt,
-    setCreatedHash,
     setOrderId,
     setTransactionStatus,
   },
@@ -71,6 +64,10 @@ export const TransactionPreview = ({
 
   const [isGatewayApproved, setIsGatewayApproved] = useState<boolean>(false);
   const [isOrderCreated, setIsOrderCreated] = useState<boolean>(false);
+  const [isApprovalLogsFetched, setIsApprovalLogsFetched] =
+    useState<boolean>(false);
+  const [isOrderCreatedLogsFetched, setIsOrderCreatedLogsFetched] =
+    useState<boolean>(false);
 
   const { amount, token, currency, accountIdentifier, institution, memo } =
     formValues;
@@ -78,7 +75,6 @@ export const TransactionPreview = ({
   // Rendered transaction information
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amount)} ${token}`,
-    fee: `${fee} ${token}`,
     totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
     recipient: recipientName,
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
@@ -86,6 +82,7 @@ export const TransactionPreview = ({
   };
 
   const account = useAccount();
+  const client = usePublicClient();
 
   // User operation hooks
   const {
@@ -187,9 +184,6 @@ export const TransactionPreview = ({
       setIsConfirming(false);
     }
 
-    if (hash || waitData?.success === "true") {
-      setCreatedHash(hash || waitData?.receipt?.transactionHash);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isPending,
@@ -199,49 +193,121 @@ export const TransactionPreview = ({
     waitIsLoading,
     waitError,
     hash,
-    waitData,
   ]);
 
-  // Watch for token Approval event
-  useWatchContractEvent({
-    address: tokenAddress,
-    abi: erc20Abi,
-    eventName: "Approval",
-    args: {
-      owner: account.address,
-      spender: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-    },
-    async onLogs(logs: any) {
-      const decodedLog = decodeEventLog({
-        abi: erc20Abi,
-        eventName: "Approval",
-        data: logs[0].data,
-        topics: logs[0].topics,
-      });
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
 
-      if (
-        decodedLog.args.value == parseUnits(amount.toString(), tokenDecimals!)
-      ) {
-        await createOrder();
+    if (!client || isApprovalLogsFetched || !isConfirming) return;
+
+    const getApprovalLogs = async () => {
+      try {
+        const toBlock = await client.getBlockNumber();
+        const logs = await client.getContractEvents({
+          address: tokenAddress,
+          abi: erc20Abi,
+          eventName: "Approval",
+          args: {
+            owner: account.address,
+            spender: getGatewayContractAddress(
+              account.chain?.name,
+            ) as `0x${string}`,
+          },
+          fromBlock: toBlock - BigInt(10),
+          toBlock: toBlock,
+        });
+
+        if (logs.length > 0) {
+          const decodedLog = decodeEventLog({
+            abi: erc20Abi,
+            eventName: "Approval",
+            data: logs[0].data,
+            topics: logs[0].topics,
+          });
+
+          if (
+            decodedLog.args.value ==
+            parseUnits(amount.toString(), tokenDecimals!)
+          ) {
+            clearInterval(intervalId);
+            setIsApprovalLogsFetched(true);
+            await createOrder();
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching Approval logs:", error);
       }
-    },
-    poll: true,
-  });
+    };
 
-  // Watch for OrderCreated event
-  useWatchContractEvent({
-    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-    abi: gatewayAbi,
-    eventName: "OrderCreated",
-    args: {
-      sender: account.address,
-      token: tokenAddress,
-    },
-    onLogs(logs: any) {
-      setTransactionStatus("pending");
-    },
-    poll: true,
-  });
+    // Initial call
+    getApprovalLogs();
+
+    // Set up polling
+    intervalId = setInterval(getApprovalLogs, 2000);
+
+    // Cleanup function
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [client, isApprovalLogsFetched, isConfirming]);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (
+      !client ||
+      isOrderCreatedLogsFetched ||
+      !isConfirming
+    )
+      return;
+
+    const getOrderCreatedLogs = async () => {
+      try {
+        const toBlock = await client.getBlockNumber();
+        const logs = await client.getContractEvents({
+          address: getGatewayContractAddress(
+            account.chain?.name,
+          ) as `0x${string}`,
+          abi: gatewayAbi,
+          eventName: "OrderCreated",
+          args: {
+            sender: account.address,
+            token: tokenAddress,
+          },
+          fromBlock: toBlock - BigInt(10),
+          toBlock: toBlock,
+        });
+
+        if (logs.length > 0) {
+          const decodedLog = decodeEventLog({
+            abi: gatewayAbi,
+            eventName: "OrderCreated",
+            data: logs[0].data,
+            topics: logs[0].topics,
+          });
+
+          setIsOrderCreatedLogsFetched(true);
+          clearInterval(intervalId);
+          setOrderId(decodedLog.args.orderId);
+          setCreatedAt(new Date().toISOString());
+          setTransactionStatus("pending");
+        }
+      } catch (error) {
+        console.error("Error fetching OrderCreated logs:", error);
+      }
+    };
+
+    // Initial call
+    getOrderCreatedLogs();
+
+    // Set up polling
+    intervalId = setInterval(getOrderCreatedLogs, 2000);
+
+    // Cleanup function
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [client, isOrderCreatedLogsFetched, isConfirming]);
 
   const prepareCreateOrderParams = async () => {
     // Prepare recipient data
@@ -444,8 +510,8 @@ export const TransactionPreview = ({
       <div className="flex gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-white/50">
         <TbInfoSquareRounded className="w-8 text-xl" />
         <p>
-          Ensure the details above is correct. Failed transaction due to wrong
-          details will attract a refund fee
+          Ensure the details above are correct. Failed transaction due to wrong
+          details may attract a refund fee
         </p>
       </div>
 

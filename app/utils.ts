@@ -69,15 +69,15 @@ export function publicKeyEncrypt(data: any, publicKeyPEM: string): string {
 /**
  * Calculates the duration between two dates and returns a human-readable string.
  * @param createdAt - Start date in ISO string format
- * @param settledAt - End date in ISO string format
+ * @param completedAt - End date in ISO string format
  * @returns A string representing the duration in seconds, minutes, or hours
  */
 export const calculateDuration = (
   createdAt: string,
-  settledAt: string,
+  completedAt: string,
 ): string => {
   const start = new Date(createdAt);
-  const end = new Date(settledAt);
+  const end = new Date(completedAt);
 
   // Check if the dates are valid
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {

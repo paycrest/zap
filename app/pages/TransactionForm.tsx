@@ -49,7 +49,6 @@ export const TransactionForm = ({
   const {
     tokenBalance,
     smartTokenBalance,
-    fee,
     rate,
     isFetchingRate,
     recipientName,
@@ -87,9 +86,9 @@ export const TransactionForm = ({
   };
 
   const feeInfo = {
-    key: "fee",
-    label: "Fee",
-    value: `${fee} ${token}`,
+    key: "eta",
+    label: "Funds available in",
+    value: `15s`,
   };
 
   const renderedInfo = [rateInfo, feeInfo];

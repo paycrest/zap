@@ -7,7 +7,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![Viem](https://img.shields.io/badge/Viem-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white) ![Wagmi](https://img.shields.io/badge/Wagmi-FF4088?style=for-the-badge&logo=wagmi&logoColor=white) ![RainbowKit](https://img.shields.io/badge/RainbowKit-FF4088?style=for-the-badge&logo=rainbowkit&logoColor=white)
 
-Zap by Paycrest is a decentralized application (dApp) developed for the [OnChain Hackathon](https://onchain-summer.devfolio.co/). Our goal is to simplify the conversion of cryptocurrency to fiat currency. Leveraging modern web technologies, we aim to provide a seamless and efficient user experience. 
+Zap by Paycrest is a dApp developed for the [Onchain Summer Buildathon](https://onchain-summer.devfolio.co/). Our goal is to simplify the conversion of cryptocurrency to local currency by leveraging a decentralized liquidity protocol, we aim to provide a seamless and efficient user experience. 
 
 Check out our live demo at [zap.paycrest.io](https://zap.paycrest.io).
 
@@ -30,11 +30,9 @@ Then, visit [http://localhost:3000](http://localhost:3000) to start converting c
 
 Zap streamlines the conversion process through a simple flow:
 
-1. **Zap:** Users initiate the conversion using the Zap interface.
-2. **Gateway Smart Contract:** The request is processed through a smart contract.
-3. **Aggregator:** Optimizes the conversion route for efficiency.
-4. **Provider Node(s):** Executes the conversion on the blockchain.
-5. **Recipient:** The fiat currency is sent to the recipient's account.
+1. **Create Order:** User creates an order on the [Gateway Smart Contract](https://github.com/paycrest/contracts)(escrow) through the Zap interface.
+2. **Aggregate:** Paycrest Protocol Aggregator indexes the order and assigns it to one or more [Provision Nodes](https://github.com/paycrest/provider) run by liquidity providers.
+3. **Fulfill:** The provisioning node automatically disburses funds to the recipient's local bank account or mobile money wallet via connections to payment service providers (PSP).
 
 For more details, visit [paycrest.io](https://paycrest.io).
 
@@ -44,29 +42,19 @@ For more details, visit [paycrest.io](https://paycrest.io).
 | ----------- | ----------- |
 | ![image](https://github.com/paycrest/zap/assets/87664239/73548ada-bde5-41f5-8af6-0f9f943c763f) | ![image](https://github.com/paycrest/zap/assets/87664239/495e166f-54cf-4951-9cdd-92b9357e8608) |
 
-## ✨ Features
-
-- **Easy Conversion:** Convert crypto to fiat easily.
-- **Security:** Advanced security to protect your transactions.
-- **Accessibility:** Use on any device, anywhere.
 
 ## 🛠️ Technologies Used
 
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Viem](https://viem.sh/)
-- [Wagmi](https://wagmi.sh/)
-- [RainbowKit](https://www.rainbowkit.com/)
+- [Shield3](https://shield3.com/) for OFAC compliance
+- [Biconomy](https://biconomy.io/) for gasless transactions
 
 ## ⚠️ Disclaimer Notice
 
-This application is for demo use only. Any transactions conducted within this app are for illustrative purposes and use simulated data. While the app records real transactions, it is not connected to any actual financial institutions or cryptocurrency networks.
+This application is for demo use only. Any transactions conducted within this app are for illustrative purposes.
 
 Therefore:
 
-- The exchange rates and conversion values displayed are for demonstration purposes and may not reflect real-world market conditions.
-- Any financial decisions made based on information from this app are at your own risk.
-- This application should not be used for making real financial transactions.
+While the app records real transactions, please exercise caution and do not use this app as is in a production environment. Use at your own risk. The developers are not responsible for any issues or damages that may arise from the use of this app.
 
 ## 📄 License
 

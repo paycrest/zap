@@ -47,17 +47,14 @@ export const Disclaimer = () => {
             </h2>
             <p className="text-sm leading-normal text-neutral-900 dark:text-white/80">
               This application is for demo use only. Any transactions conducted
-              within this app are for illustrative purposes and use simulated
-              data. While the app records real transactions, it is not connected
-              to any actual financial institutions or cryptocurrency networks.
+              within this app are for illustrative purposes.
             </p>
             <p className="text-sm leading-normal text-neutral-900 dark:text-white/80">
               Therefore: <br />
-              The exchange rates and conversion values displayed are for
-              demonstration purposes and may not reflect real-world market
-              conditions. Any financial decisions made based on information from
-              this app are at your own risk. This application should not be used
-              for making real financial transactions.
+              While the app records real transactions, please exercise caution and
+              do not use this app as is in a production environment.
+              Use at your own risk. The developers are not responsible for any issues
+              or damages that may arise from the use of this app.
             </p>
 
             <div className="flex items-center justify-between">

@@ -46,7 +46,6 @@ export default function Home() {
   const [isFetchingRecipientName, setIsFetchingRecipientName] = useState(false);
 
   const [protocolFeePercent, setProtocolFeePercent] = useState<number>(0);
-  const [fee, setFee] = useState<number>(0);
   const [rate, setRate] = useState<number>(0);
   const [recipientName, setRecipientName] = useState<string>("");
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
@@ -105,7 +104,6 @@ export default function Home() {
     | "refunded"
   >("idle");
   const [createdAt, setCreatedAt] = useState<string>("");
-  const [createdHash, setCreatedHash] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
 
   /**
@@ -129,7 +127,6 @@ export default function Home() {
     formValues,
     tokenBalance,
     smartTokenBalance,
-    fee,
     rate,
     isFetchingRate,
     recipientName,
@@ -140,7 +137,6 @@ export default function Home() {
     handleTabChange,
     selectedNetwork,
     setCreatedAt,
-    setCreatedHash,
     setOrderId,
     handleNetworkChange,
     setTransactionStatus,
@@ -200,6 +196,14 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountIdentifier]);
 
+  // Reset transaction status and form values when account status changes
+  useEffect(() => {
+    if (account.status !== "connected" && account.status !== "connecting") {
+      setTransactionStatus("idle");
+      setFormValues(INITIAL_FORM_STATE);
+    }
+  }, [account.status]);
+
   // Fetch rate based on currency, amount, and token
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -231,21 +235,6 @@ export default function Home() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency, amount, token]);
-
-  // Calculate fee based on protocol fee details and amount
-  useEffect(() => {
-    setProtocolFeePercent(
-      Number(protocolFeeDetails?.[0]!) / Number(protocolFeeDetails?.[1]!),
-    );
-
-    setFee(
-      parseFloat(
-        Number(protocolFeePercent * Number(amount))
-          .toFixed(5)
-          .toString(),
-      ),
-    );
-  }, [protocolFeeDetails, amount, protocolFeePercent]);
 
   // Update token balance when token balance is available
   useEffect(() => {
@@ -284,7 +273,6 @@ export default function Home() {
               formMethods={formMethods}
               transactionStatus={transactionStatus}
               createdAt={createdAt}
-              createdHash={createdHash}
               orderId={orderId}
               recipientName={stateProps.recipientName}
               clearForm={() => setFormValues(INITIAL_FORM_STATE)}

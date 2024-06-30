@@ -57,7 +57,6 @@ export type TransactionStatusProps = {
   recipientName: string;
   orderId: string;
   createdAt: string;
-  createdHash: string;
   clearForm: () => void;
   clearTransactionStatus: () => void;
   setTransactionStatus: (
@@ -109,11 +108,42 @@ export type PubkeyResponse = {
   message: string;
 };
 
+type OrderStatusData = {
+  orderId: string;
+  amount: string;
+  token: string;
+  network: string;
+  settlePercent: string;
+  status: string;
+  txHash: string;
+  settlements: Settlement[];
+  txReceipts: TxReceipt[];
+  updatedAt: string;
+};
+
+type Settlement = {
+  splitOrderId: string;
+  amount: string;
+  rate: string;
+  orderPercent: string;
+};
+
+type TxReceipt = {
+  status: string;
+  txHash: string;
+  timestamp: string;
+};
+
+export type OrderStatusResponse = {
+  status: string;
+  message: string;
+  data: OrderStatusData;
+};
+
 export type StateProps = {
   formValues: FormData;
   tokenBalance: number;
   smartTokenBalance: number;
-  fee: number;
   rate: number;
   isFetchingRate: boolean;
   recipientName: string;
@@ -125,7 +155,6 @@ export type StateProps = {
   selectedNetwork: string;
   handleNetworkChange: (network: string) => void;
   setCreatedAt: (createdAt: string) => void;
-  setCreatedHash: (createdHash: string) => void;
   setOrderId: (orderId: string) => void;
   setTransactionStatus: (
     status:
