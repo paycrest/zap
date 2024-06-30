@@ -12,6 +12,7 @@ import {
   SelectField,
   TabButton,
   Tooltip,
+  fadeInOut,
   inputClasses,
   primaryBtnClasses,
   slideInOut,
@@ -231,9 +232,7 @@ export const TransactionForm = ({
           {selectedTab === "bank-transfer" && (
             <motion.div
               key="bank-transfer"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              {...fadeInOut}
               transition={{ duration: 0.3 }}
               className="grid gap-4"
             >
@@ -338,13 +337,6 @@ export const TransactionForm = ({
                 </div>
               </div>
 
-              {/* Hidden field for recipient name */}
-              <input
-                type="hidden"
-                {...register("recipientName")}
-                value="John Doe"
-              />
-
               {/* Memo */}
               <div className="grid gap-2">
                 <label htmlFor="memo" className="font-medium">
@@ -374,9 +366,7 @@ export const TransactionForm = ({
           {selectedTab === "mobile-money" && (
             <motion.div
               key="mobile-money"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              {...fadeInOut}
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-5 dark:border-white/10"
             >
