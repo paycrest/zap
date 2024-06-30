@@ -30,7 +30,7 @@ Then, visit [http://localhost:3000](http://localhost:3000) to start converting c
 
 Zap streamlines the conversion process through a simple flow:
 
-1. **Create Order:** User creates an order on the [Gateway Smart Contract](https://github.com/paycrest/contracts)(escrow) through the Zap interface.
+1. **Create Order:** User creates an order on the [Gateway Smart Contract](https://github.com/paycrest/contracts) (escrow) through the Zap interface.
 2. **Aggregate:** Paycrest Protocol Aggregator indexes the order and assigns it to one or more [Provision Nodes](https://github.com/paycrest/provider) run by liquidity providers.
 3. **Fulfill:** The provisioning node automatically disburses funds to the recipient's local bank account or mobile money wallet via connections to payment service providers (PSP).
 
