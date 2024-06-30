@@ -26,7 +26,7 @@ export const Tooltip = ({ message, children }: TooltipProps) => {
             : "pointer-events-none hidden opacity-0"
         }`}
       >
-        <span className="relative z-10 w-52 max-w-full break-words rounded-xl bg-gray-600 p-3 px-4 text-xs text-white shadow-lg">
+        <span className="relative z-10 w-52 max-w-full break-words rounded-xl bg-gray-600 p-3 px-4 text-center text-xs text-white shadow-lg">
           {message}
         </span>
         <div className="-mt-2 h-3 w-3 rotate-45 bg-gray-600" />

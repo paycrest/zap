@@ -219,7 +219,9 @@ export const TransactionForm = ({
             >
               <div className="grid flex-1 gap-3 p-4">
                 <div className="flex items-center gap-1">
-                  <p className="text-gray-500 text-white/50">Smart Wallet</p>
+                  <p className="text-gray-500 dark:text-white/50">
+                    Smart Wallet
+                  </p>
                   <Tooltip message="Fund your smart wallet">
                     <button type="button" aria-label="Fund smart wallet">
                       <BiSolidPlusCircle className="text-lg text-blue-600 dark:text-blue-500" />
@@ -244,7 +246,7 @@ export const TransactionForm = ({
               <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10"></div>
 
               <div className="grid flex-1 gap-3 p-4">
-                <p className="text-gray-500 text-white/50">Your wallet</p>
+                <p className="text-gray-500 dark:text-white/50">Your wallet</p>
                 <div className="flex items-center gap-1">
                   {token && (
                     <Image
