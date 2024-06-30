@@ -36,7 +36,7 @@ import {
   useUserOpWait,
 } from "@biconomy/use-aa";
 import { PaymasterMode } from "@biconomy/account";
-import { PiCheckCircle } from "react-icons/pi";
+import { PiCheckCircle, PiCheckCircleFill } from "react-icons/pi";
 
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
@@ -468,7 +468,7 @@ export const TransactionPreview = ({
           <div className="flex gap-4">
             <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
               {isGatewayApproved ? (
-                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+                <PiCheckCircleFill className="text-lg text-green-700 dark:text-green-500" />
               ) : (
                 <TbCircleDashed className="text-lg" />
               )}
@@ -476,9 +476,13 @@ export const TransactionPreview = ({
             </div>
             <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
               {isOrderCreated ? (
-                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+                <PiCheckCircleFill className="text-lg text-green-700 dark:text-green-500" />
               ) : (
-                <TbCircleDashed className="text-lg" />
+                <TbCircleDashed
+                  className={`text-lg ${
+                    isGatewayApproved ? "animate-spin" : ""
+                  }`}
+                />
               )}
               <p className="pr-1">Create Order</p>
             </div>
