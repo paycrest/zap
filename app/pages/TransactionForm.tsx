@@ -101,13 +101,6 @@ export const TransactionForm = ({
       className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
-      {account.isConnected && token !== "" && (
-        <div className="text-xs opacity-50">
-          <p>Smart wallet address:</p>
-          <code>{smartAccountAddress == "0x" ? "" : smartAccountAddress}</code>
-        </div>
-      )}
-
       {/* Networks */}
       <div className="flex items-center justify-between gap-3 font-medium">
         <input type="hidden" {...register("network")} value={selectedNetwork} />

@@ -13,9 +13,10 @@ import {
 
 import { Tooltip } from "./Tooltip";
 import { primaryBtnClasses } from "./Styles";
+import { shortenAddress } from "../utils";
 
 export const FundWalletModal = ({ address }: { address: string }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
 
   function closeModal() {
@@ -46,7 +47,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
         </button>
       </Tooltip>
 
-      <Transition appear show={isOpen} as={Fragment}>
+      <Transition show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <TransitionChild
             as={Fragment}
@@ -89,8 +90,8 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                     <div className="flex justify-between">
                       <p>Wallet</p>
                       <div className="flex gap-1">
-                        <p className="max-w-36 truncate font-semibold text-neutral-900 dark:text-white">
-                          {address}
+                        <p className="font-semibold text-neutral-900 dark:text-white">
+                          {shortenAddress(address, 6)}
                         </p>
                         <button
                           type="button"
