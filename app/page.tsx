@@ -11,6 +11,7 @@ import {
 } from "./api/aggregator";
 import {
   AnimatedPage,
+  Disclaimer,
   Preloader,
   TransactionForm,
   TransactionPreview,
@@ -85,7 +86,6 @@ export default function Home() {
     functionName: "balanceOf",
     args: [account.address!],
   });
-
 
   // Custom hooks for account and contract interactions
   const { data: protocolFeeDetails } = useReadContract({
@@ -273,6 +273,8 @@ export default function Home() {
   return (
     <>
       <Preloader isLoading={isPageLoading} />
+
+      <Disclaimer />
 
       <AnimatePresence mode="wait">
         {transactionStatus !== "idle" ? (
