@@ -36,6 +36,7 @@ import {
   useUserOpWait,
 } from "@biconomy/use-aa";
 import { PaymasterMode } from "@biconomy/account";
+import { PiCheckCircle } from "react-icons/pi";
 
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
@@ -464,21 +465,23 @@ export const TransactionPreview = ({
         <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
           <p>
             {/* replace 1 with 2 when the approve state is set to complete */}
-            <span>1</span> of 2
+            <span>{isGatewayApproved ? 2 : 1}</span> of 2
           </p>
           <div className="flex gap-4">
             <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
-              <TbCircleDashed className="text-lg" />
-              {/*
-              when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
-            */}
+              {isGatewayApproved ? (
+                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+              ) : (
+                <TbCircleDashed className="text-lg" />
+              )}
               <p className="pr-1">Approve Gateway</p>
             </div>
             <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
-              <TbCircleDashed className="text-lg" />
-              {/*
-              when complete, replace with <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" /> 
-            */}
+              {isOrderCreated ? (
+                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+              ) : (
+                <TbCircleDashed className="text-lg" />
+              )}
               <p className="pr-1">Create Order</p>
             </div>
           </div>
