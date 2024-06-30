@@ -58,7 +58,7 @@ While the app records real transactions, please exercise caution and do not use 
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Affero General Public License v3.0](LICENSE).
 
 <!--
 
