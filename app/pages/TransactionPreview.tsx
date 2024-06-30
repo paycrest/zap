@@ -219,8 +219,6 @@ export const TransactionPreview = ({
         topics: logs[0].topics,
       });
 
-      console.log(decodedLog);
-
       if (
         decodedLog.args.value == parseUnits(amount.toString(), tokenDecimals!)
       ) {

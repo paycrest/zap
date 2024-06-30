@@ -154,12 +154,6 @@ export default function Home() {
     setTransactionStatus,
   };
 
-  useEffect(() => {
-    if (account.isDisconnected) {
-      setFormValues(INITIAL_FORM_STATE);
-    }
-  }, [account.isDisconnected])
-
   // Fetch supported institutions based on currency
   useEffect(() => {
     const getInstitutions = async () => {
