@@ -1,9 +1,11 @@
 "use client";
+import { formatUnits } from "viem";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import { useSmartAccount } from "@biconomy/use-aa";
+import { useAccount, useReadContract } from "wagmi";
 
-import { FormData, InstitutionProps, StateProps } from "./types";
 import {
   fetchSupportedInstitutions,
   fetchRate,
@@ -16,12 +18,10 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import { useAccount, useReadContract } from "wagmi";
 import { erc20Abi, gatewayAbi } from "./api/abi";
 import TransactionStatus from "./pages/TransactionStatus";
+import { FormData, InstitutionProps, StateProps } from "./types";
 import { fetchSupportedTokens, getGatewayContractAddress } from "./utils";
-import { useSmartAccount } from "@biconomy/use-aa";
-import { formatUnits } from "viem";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -107,14 +107,6 @@ export default function Home() {
   const [createdAt, setCreatedAt] = useState<string>("");
   const [createdHash, setCreatedHash] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
-
-  /**
-   * Handles form submission.
-   * @param data - The form data.
-   */
-  const onSubmit = (data: FormData) => {
-    setFormValues(data);
-  };
 
   /**
    * Handles network change.
@@ -267,6 +259,13 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBalanceInWei, smartTokenBalanceInWei]);
 
+  useEffect(() => {
+    if (account.status !== "connected" && account.status !== "connecting") {
+      setTransactionStatus("idle");
+      setFormValues(INITIAL_FORM_STATE);
+    }
+  }, [account.status]);
+
   // Set page loading state to false after initial render
   useEffect(() => {
     setIsPageLoading(false);
@@ -302,7 +301,7 @@ export default function Home() {
             ) ? (
               <AnimatedPage componentKey="transaction-form">
                 <TransactionForm
-                  onSubmit={onSubmit}
+                  onSubmit={(data: FormData) => setFormValues(data)}
                   formMethods={formMethods}
                   stateProps={stateProps}
                 />
