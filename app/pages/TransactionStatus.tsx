@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { PiCheckCircle, PiSpinnerBold, PiXCircle } from "react-icons/pi";
 
-import { formatTimeAgo, getGatewayContractAddress } from "../utils";
+import { calculateDuration, getGatewayContractAddress } from "../utils";
 import { TransactionStatusProps } from "../types";
 import {
   AnimatedComponent,
@@ -66,9 +66,9 @@ export default function TransactionStatus({
           data: log.data,
           topics: log.topics,
         });
-  
+
         console.log(decodedLog);
-  
+
         if (decodedLog.args.settlePercent == BigInt("100000")) {
           setTransactionStatus("settled");
           setSettledHash(log.transactionHash);
@@ -278,12 +278,34 @@ export default function TransactionStatus({
                 </div>
               </div>
               <div className="flex items-center justify-between gap-1">
+                <p className="flex-1">Duration</p>
+                <p className="flex-1">
+                  {calculateDuration(createdAt, settledAt)}
+                </p>
+              </div>
+              <div className="flex items-center justify-between gap-1">
                 <p className="flex-1">Created</p>
-                <p className="flex-1">{formatTimeAgo(createdAt)} (<a href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`} className="text-blue-600 dark:text-blue-500 hover:underline">receipt</a>)</p>
+                <p className="flex-1">
+                  <a
+                    href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`}
+                    className="text-blue-600 hover:underline dark:text-blue-500"
+                    target="_blank"
+                  >
+                    Transaction Hash
+                  </a>
+                </p>
               </div>
               <div className="flex items-center justify-between gap-1">
                 <p className="flex-1">Settled</p>
-                <p className="flex-1">{formatTimeAgo(settledAt)} (<a href={`${account.chain?.blockExplorers?.default.url}/tx/${settledHash}`} className="text-blue-600 dark:text-blue-500 hover:underline">receipt</a>)</p>
+                <p className="flex-1">
+                  <a
+                    href={`${account.chain?.blockExplorers?.default.url}/tx/${settledHash}`}
+                    className="text-blue-600 hover:underline dark:text-blue-500"
+                    target="_blank"
+                  >
+                    Transaction Hash
+                  </a>
+                </p>
               </div>
             </AnimatedComponent>
           )}

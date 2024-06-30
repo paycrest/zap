@@ -67,42 +67,38 @@ export function publicKeyEncrypt(data: any, publicKeyPEM: string): string {
 }
 
 /**
- * Converts an ISO 8601 date string to a human-readable "time ago" format.
- *
- * @param {string} isoString - The ISO 8601 date string to convert.
- * @returns {string} A human-readable string representing the time elapsed since the given date.
+ * Calculates the duration between two dates and returns a human-readable string.
+ * @param createdAt - Start date in ISO string format
+ * @param settledAt - End date in ISO string format
+ * @returns A string representing the duration in seconds, minutes, or hours
  */
-export function formatTimeAgo(isoString: string): string {
-  const now = new Date();
-  const past = new Date(isoString);
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+export const calculateDuration = (
+  createdAt: string,
+  settledAt: string,
+): string => {
+  const start = new Date(createdAt);
+  const end = new Date(settledAt);
 
-  type TimeUnit = {
-    name: string;
-    value: number;
-  };
-
-  const units: TimeUnit[] = [
-    { name: "year", value: 60 * 60 * 24 * 365 },
-    { name: "month", value: 60 * 60 * 24 * 30 },
-    { name: "day", value: 60 * 60 * 24 },
-    { name: "hour", value: 60 * 60 },
-    { name: "minute", value: 60 },
-    { name: "second", value: 1 },
-  ];
-
-  for (const unit of units) {
-    const elapsed = Math.floor(diffInSeconds / unit.value);
-    if (elapsed >= 1) {
-      if (unit.name === "year" && elapsed > 2) {
-        return "a long time ago";
-      }
-      return `${elapsed} ${unit.name}${elapsed > 1 ? "s" : ""} ago`;
-    }
+  // Check if the dates are valid
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    return "Invalid Date";
   }
 
-  return "just now";
-}
+  const durationMs = end.getTime() - start.getTime();
+  const durationSec = Math.floor(durationMs / 1000);
+
+  if (durationSec < 60) {
+    return `${durationSec} second${durationSec !== 1 ? "s" : ""}`;
+  }
+
+  const durationMin = Math.floor(durationSec / 60);
+  if (durationMin < 60) {
+    return `${durationMin} minute${durationMin !== 1 ? "s" : ""}`;
+  }
+
+  const durationHours = Math.floor(durationMin / 60);
+  return `${durationHours} hour${durationHours !== 1 ? "s" : ""}`;
+};
 
 /**
  * Fetches the supported tokens for the specified network.
