@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSmartAccount } from "@biconomy/use-aa";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useSwitchChain } from "wagmi";
+import { watchChainId } from "@wagmi/core";
 
 import {
   fetchSupportedInstitutions,
@@ -18,10 +19,12 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import { erc20Abi, gatewayAbi } from "./api/abi";
+import { erc20Abi } from "./api/abi";
 import TransactionStatus from "./pages/TransactionStatus";
 import { FormData, InstitutionProps, StateProps } from "./types";
-import { fetchSupportedTokens, getGatewayContractAddress } from "./utils";
+import { fetchSupportedTokens } from "./utils";
+import { config } from "./providers";
+import { toast } from "react-toastify";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -45,7 +48,6 @@ export default function Home() {
   const [isFetchingRate, setIsFetchingRate] = useState(false);
   const [isFetchingRecipientName, setIsFetchingRecipientName] = useState(false);
 
-  const [protocolFeePercent, setProtocolFeePercent] = useState<number>(0);
   const [rate, setRate] = useState<number>(0);
   const [recipientName, setRecipientName] = useState<string>("");
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
@@ -86,13 +88,6 @@ export default function Home() {
     args: [account.address!],
   });
 
-  // Custom hooks for account and contract interactions
-  const { data: protocolFeeDetails } = useReadContract({
-    abi: gatewayAbi,
-    address: getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-    functionName: "getFeeDetails",
-  });
-
   // Transaction status and error handling
   const [transactionStatus, setTransactionStatus] = useState<
     | "idle"
@@ -105,6 +100,8 @@ export default function Home() {
   >("idle");
   const [createdAt, setCreatedAt] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
+
+  const { switchChain } = useSwitchChain();
 
   /**
    * Handles network change.
@@ -202,7 +199,23 @@ export default function Home() {
       setTransactionStatus("idle");
       setFormValues(INITIAL_FORM_STATE);
     }
-  }, [account.status]);
+
+    if (account.status == "connected" && account.chainId) {
+      if (
+        process.env.NEXT_PUBLIC_ENVIRONMENT == "testnet" &&
+        account.chainId == 8453
+      ) {
+        switchChain({ chainId: 84532 });
+        toast.error("Kindly switch to Base Sepolia to continue.");
+      } else if (
+        process.env.NEXT_PUBLIC_ENVIRONMENT == "mainnet" &&
+        account.chainId == 84532
+      ) {
+        switchChain({ chainId: 8453 });
+        toast.error("Kindly switch to Base Mainnet to continue.");
+      }
+    }
+  }, [account.status, account.chainId]);
 
   // Fetch rate based on currency, amount, and token
   useEffect(() => {
@@ -247,13 +260,6 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBalanceInWei, smartTokenBalanceInWei]);
-
-  useEffect(() => {
-    if (account.status !== "connected" && account.status !== "connecting") {
-      setTransactionStatus("idle");
-      setFormValues(INITIAL_FORM_STATE);
-    }
-  }, [account.status]);
 
   // Set page loading state to false after initial render
   useEffect(() => {

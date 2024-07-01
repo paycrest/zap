@@ -19,13 +19,14 @@ if (
   throw new Error("Missing env var");
 }
 
+export const config = getDefaultConfig({
+  appName: "Zap by Paycrest",
+  projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
+  chains: [baseSepolia, base],
+  ssr: true,
+});
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const config = getDefaultConfig({
-    appName: "Zap by Paycrest",
-    projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
-    chains: [baseSepolia, base],
-    ssr: true,
-  });
 
   const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 

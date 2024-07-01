@@ -109,24 +109,32 @@ export const calculateDuration = (
 export function fetchSupportedTokens(
   network: string = "",
 ): Token[] | undefined {
-  return {
-    Base: [
-      {
-        name: "USD Coin",
-        symbol: "USDC",
-        decimals: 18,
-        address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
-      },
-    ],
-    "Base Sepolia": [
-      {
-        name: "Dai",
-        symbol: "DAI",
-        decimals: 18,
-        address: "0x7683022d84f726a96c4a6611cd31dbf5409c0ac9",
-      },
-    ],
-  }[network];
+  let tokens: { [key: string]: Token[] };
+
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT == "mainnet") {
+    tokens = {
+      Base: [
+        {
+          name: "USD Coin",
+          symbol: "USDC",
+          decimals: 6,
+          address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        },
+      ],
+    };
+  } else {
+    tokens = {
+      "Base Sepolia": [
+        {
+          name: "Dai",
+          symbol: "DAI",
+          decimals: 18,
+          address: "0x7683022d84f726a96c4a6611cd31dbf5409c0ac9",
+        },
+      ],
+    };
+  }
+  return tokens[network];
 }
 
 /**
