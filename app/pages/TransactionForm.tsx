@@ -228,7 +228,7 @@ export const TransactionForm = ({
                     />
                   )}
                   <p>
-                    {smartTokenBalance} {token}
+                    {Math.round(smartTokenBalance * 100) / 100} {token}
                   </p>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export const TransactionForm = ({
                     />
                   )}
                   <p>
-                    {tokenBalance} {token}
+                    {Math.round(tokenBalance * 100) / 100} {token}
                   </p>
                 </div>
               </div>

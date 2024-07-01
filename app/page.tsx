@@ -249,14 +249,18 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency, amount, token]);
 
+  const tokenDecimals = fetchSupportedTokens(account.chain?.name)?.find(
+    (t) => t.symbol.toUpperCase() === token,
+  )?.decimals;
+
   // Update token balance when token balance is available
   useEffect(() => {
-    if (tokenBalanceInWei) {
-      setTokenBalance(Number(formatUnits(tokenBalanceInWei, 18)));
+    if (tokenBalanceInWei && tokenDecimals) {
+      setTokenBalance(Number(formatUnits(tokenBalanceInWei, tokenDecimals)));
     }
 
-    if (smartTokenBalanceInWei) {
-      setSmartTokenBalance(Number(formatUnits(smartTokenBalanceInWei, 18)));
+    if (smartTokenBalanceInWei && tokenDecimals) {
+      setSmartTokenBalance(Number(formatUnits(smartTokenBalanceInWei, tokenDecimals)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBalanceInWei, smartTokenBalanceInWei]);
