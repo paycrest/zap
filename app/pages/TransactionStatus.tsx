@@ -188,7 +188,7 @@ export default function TransactionStatus({
             className="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5"
           >
             <Image
-              src={`${token}-logo.svg`}
+              src={`/${String(token)?.toLowerCase()}-logo.svg`}
               alt={`${token} logo`}
               width={14}
               height={14}
