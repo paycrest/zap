@@ -344,7 +344,7 @@ export const TransactionPreview = ({
       const params = await prepareCreateOrderParams();
       setCreatedAt(new Date().toISOString());
 
-      if (smartTokenBalance == amount) {
+      if (smartTokenBalance >= amount) {
         // Create order with sponsored user operation
         let transactions = [
           {
@@ -432,7 +432,7 @@ export const TransactionPreview = ({
     try {
       setIsConfirming(true);
 
-      if (smartTokenBalance == amount) {
+      if (smartTokenBalance >= amount) {
         await createOrder();
       } else {
         // Approve gateway contract to spend token
@@ -518,14 +518,14 @@ export const TransactionPreview = ({
       <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
 
       {/* Confirm and Approve */}
-      {(gatewayAllowance < amount || smartTokenBalance == amount) && (
+      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
         <p className="text-gray-500 dark:text-white/50">
           To confirm order, you&apos;ll be required to approve these two
           permissions from your wallet
         </p>
       )}
 
-      {(gatewayAllowance < amount || smartTokenBalance == amount) && (
+      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
         <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
           <p>
             {/* replace 1 with 2 when the approve state is set to complete */}
