@@ -23,6 +23,7 @@ import {
 } from "../components";
 import { fetchSupportedTokens, formatCurrency } from "../utils";
 import { InstitutionProps, TransactionFormProps } from "../types";
+import { HiOutlineInformationCircle } from "react-icons/hi";
 
 const currencies = [
   { value: "NGN", label: "Nigerian Naira (NGN)" },
@@ -235,7 +236,9 @@ export const TransactionForm = ({
               <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10"></div>
 
               <div className="grid flex-1 gap-3 p-4">
-                <p className="text-gray-500 dark:text-white/50">{account.connector.name}</p>
+                <p className="text-gray-500 dark:text-white/50">
+                  {account.connector.name}
+                </p>
                 <div className="flex items-center gap-1">
                   {token && (
                     <Image
@@ -257,9 +260,14 @@ export const TransactionForm = ({
 
       {/* Recipient Details */}
       <div>
-        <h3 className="pb-2 font-medium">
-          Recipient details <span className="text-rose-500">*</span>
-        </h3>
+        <div className="flex items-center gap-1 pb-2">
+          <h3 className="font-medium">
+            Recipient details <span className="text-rose-500">*</span>
+          </h3>
+          <Tooltip message="Recipient details will be encrypted onchain.">
+            <HiOutlineInformationCircle className="cursor-pointer text-gray-400 hover:text-gray-500" />
+          </Tooltip>
+        </div>
 
         <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
           {/* Tabs */}

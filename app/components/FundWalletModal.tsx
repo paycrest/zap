@@ -37,7 +37,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
 
   return (
     <>
-      <Tooltip message="Fund your smart wallet">
+      <Tooltip message="Fund your smart wallet for gasless transactions">
         <button
           type="button"
           onClick={openModal}
