@@ -151,7 +151,7 @@ export function getGatewayContractAddress(
   network: string = "",
 ): string | undefined {
   return {
-    Base: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+    Base: "0x30f6a8457f8e42371e204a9c103f2bd42341dd0f",
     "Base Sepolia": "0x847dfdaa218f9137229cf8424378871a1da8f625",
   }[network];
 }

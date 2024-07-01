@@ -235,7 +235,7 @@ export const TransactionForm = ({
               <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10"></div>
 
               <div className="grid flex-1 gap-3 p-4">
-                <p className="text-gray-500 dark:text-white/50">Your wallet</p>
+                <p className="text-gray-500 dark:text-white/50">{account.connector.name}</p>
                 <div className="flex items-center gap-1">
                   {token && (
                     <Image
