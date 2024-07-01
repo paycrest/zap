@@ -75,7 +75,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                 <DialogPanel className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all dark:bg-neutral-800">
                   <DialogTitle
                     as="h3"
-                    className="border-b border-gray-200 bg-gray-200 px-6 py-4 text-lg font-semibold leading-6 text-neutral-900 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    className="border-b border-gray-200 bg-gray-50 px-6 py-4 text-lg font-semibold leading-6 text-neutral-900 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   >
                     Fund smart wallet
                   </DialogTitle>
@@ -83,7 +83,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                   <div className="grid gap-4 px-6 py-4 text-sm text-gray-500 dark:text-white/50">
                     <p>Send tokens to this wallet via base network</p>
 
-                    <div className="grid h-64 w-full place-content-center rounded-2xl border border-gray-200 bg-gray-200 dark:border-white/10 dark:bg-white/10">
+                    <div className="grid h-64 w-full place-content-center rounded-2xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-neutral-800">
                       <QRCode value={address} size={150} />
                     </div>
 
@@ -121,7 +121,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                     </div>
                   </div>
 
-                  <div className="flex justify-end border-t border-gray-200 bg-gray-200 px-6 py-4 dark:border-white/10 dark:bg-white/10">
+                  <div className="flex justify-end border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-white/10 dark:bg-white/5">
                     <button
                       type="button"
                       className={primaryBtnClasses}
