@@ -1,4 +1,4 @@
-# Zap ![image](https://github.com/paycrest/zap/assets/87664239/152fa090-fea7-4553-ba98-1fd3bf9cb4b9)
+# Waitlist • Zap ![image](https://github.com/paycrest/zap/assets/87664239/152fa090-fea7-4553-ba98-1fd3bf9cb4b9)
 
 ![Shield3](https://img.shields.io/badge/Shield3-0c0c0c?style=for-the-badge&logo=shield3&logoColor=white) ![Biconomy](https://img.shields.io/badge/Biconomy-ff4e17?style=for-the-badge&logo=biconomy&logoColor=white) ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-0f172a?style=for-the-badge&logo=tailwind-css&logoColor=white) ![Viem](https://img.shields.io/badge/Viem-232225?style=for-the-badge&logo=vue.js&logoColor=white) ![Wagmi](https://img.shields.io/badge/Wagmi-1b1b1f?style=for-the-badge&logo=wagmi&logoColor=white) ![RainbowKit](https://img.shields.io/badge/RainbowKit-6e66ee?style=for-the-badge&logo=rainbowkit&logoColor=white)
 
@@ -8,7 +8,7 @@ Check out our live demo at [zap.paycrest.io](https://zap.paycrest.io).
 
 ## 🚀 Running Locally
 
-To run Zap locally, follow these steps:
+To run Zap Waitlist locally, follow these steps:
 
 ```bash
 git clone https://github.com/paycrest/zap.git
@@ -17,9 +17,7 @@ npm install
 npm run dev
 ```
 
-Don't forget to fill in the necessary variables in the `.env.local` file according to the template provided in [`.env.example`](.env.example).
-
-Then, visit [http://localhost:3000](http://localhost:3000) to start converting crypto to fiat.
+Then, visit [http://localhost:3000](http://localhost:3000) to view the waitlist page.
 
 ## 📚 How It Works
 
@@ -37,7 +35,6 @@ For more details, visit [paycrest.io](https://paycrest.io).
 | ----------- | ----------- |
 | ![image](https://github.com/paycrest/zap/assets/87664239/73548ada-bde5-41f5-8af6-0f9f943c763f) | ![image](https://github.com/paycrest/zap/assets/87664239/495e166f-54cf-4951-9cdd-92b9357e8608) |
 
-
 ## 🛠️ Technologies Used
 
 - [Shield3](https://shield3.com/) for OFAC compliance
@@ -54,11 +51,3 @@ While the app records real transactions, please exercise caution and do not use 
 ## 📄 License
 
 This project is licensed under the [Affero General Public License v3.0](LICENSE).
-
-<!--
-
-![dark-mode-logo](https://github.com/paycrest/zap/assets/87664239/b325a355-2d9e-4e22-96be-0a7cb77722c8)
-
-![light-mode-logo](https://github.com/paycrest/zap/assets/87664239/73e4f426-5da9-4e4e-aab2-b7f995fea8f1)
-
--->

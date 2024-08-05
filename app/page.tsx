@@ -1,322 +1,175 @@
 "use client";
-import { formatUnits } from "viem";
-import { useForm } from "react-hook-form";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import { useSmartAccount } from "@biconomy/use-aa";
-import { useAccount, useReadContract, useSwitchChain } from "wagmi";
-import { watchChainId } from "@wagmi/core";
+import { useTheme } from "next-themes";
 
 import {
-  fetchSupportedInstitutions,
-  fetchRate,
-  fetchAccountName,
-} from "./api/aggregator";
+  BaseIcon,
+  BNBIcon,
+  SolanaIcon,
+  TronIcon,
+  ZapIcon,
+} from "./components/ImageAssets";
 import {
+  AnimatedComponent,
   AnimatedPage,
-  Disclaimer,
+  fadeInOut,
+  Footer,
+  Navbar,
   Preloader,
-  TransactionForm,
-  TransactionPreview,
+  scaleInOut,
+  slideInOut,
+  WaitlistForm,
 } from "./components";
-import { erc20Abi } from "./api/abi";
-import TransactionStatus from "./pages/TransactionStatus";
-import { FormData, InstitutionProps, StateProps } from "./types";
-import { fetchSupportedTokens } from "./utils";
-import { config } from "./providers";
-import { toast } from "react-toastify";
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 
-const INITIAL_FORM_STATE: FormData = {
-  network: "",
-  token: "",
-  amount: 0,
-  currency: "",
-  institution: "",
-  accountIdentifier: "",
-  recipientName: "",
-  memo: "",
-};
+const NetworkIcon = ({
+  Icon,
+  index,
+}: {
+  Icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  index: number;
+}) => (
+  <Icon
+    className={`size-7 border-2 border-white bg-white transition dark:bg-neutral-900 dark:border-neutral-900 rounded-full ${index > 0 ? "-ml-2" : ""}`}
+  />
+);
 
-/**
- * Represents the Home component.
- * This component handles the logic and rendering of the home page.
- */
 export default function Home() {
-  // State variables
+  const { resolvedTheme } = useTheme();
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
-  const [isFetchingRate, setIsFetchingRate] = useState(false);
-  const [isFetchingRecipientName, setIsFetchingRecipientName] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [rate, setRate] = useState<number>(0);
-  const [recipientName, setRecipientName] = useState<string>("");
-  const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
-  const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
+  const networks = [
+    { name: "BNB", Icon: BNBIcon },
+    { name: "Base", Icon: BaseIcon },
+    { name: "Tron", Icon: TronIcon },
+    { name: "Solana", Icon: SolanaIcon },
+  ];
 
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
-  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
-
-  // Form methods and watch
-  const formMethods = useForm<FormData>({ mode: "onChange" });
-  const { watch } = formMethods;
-  const { currency, amount, token, accountIdentifier, institution } = watch();
-
-  // Get account information using custom hook
-  const account = useAccount();
-  const { smartAccountAddress } = useSmartAccount();
-
-  // State for tokens
-  const [smartTokenBalance, setSmartTokenBalance] = useState<number>(0);
-  const [tokenBalance, setTokenBalance] = useState<number>(0);
-
-  // Get token balances using custom hook and Ethereum contract interaction
-  const { data: smartTokenBalanceInWei } = useReadContract({
-    abi: erc20Abi,
-    address: fetchSupportedTokens(account.chain?.name)?.find(
-      (t) => t.symbol.toUpperCase() === token,
-    )?.address as `0x${string}`,
-    functionName: "balanceOf",
-    args: [smartAccountAddress!],
-  });
-
-  const { data: tokenBalanceInWei } = useReadContract({
-    abi: erc20Abi,
-    address: fetchSupportedTokens(account.chain?.name)?.find(
-      (t) => t.symbol.toUpperCase() === token,
-    )?.address as `0x${string}`,
-    functionName: "balanceOf",
-    args: [account.address!],
-  });
-
-  // Transaction status and error handling
-  const [transactionStatus, setTransactionStatus] = useState<
-    | "idle"
-    | "pending"
-    | "processing"
-    | "fulfilled"
-    | "validated"
-    | "settled"
-    | "refunded"
-  >("idle");
-  const [createdAt, setCreatedAt] = useState<string>("");
-  const [orderId, setOrderId] = useState<string>("");
-
-  const { switchChain } = useSwitchChain();
-
-  /**
-   * Handles network change.
-   * @param network - The selected network.
-   */
-  const handleNetworkChange = (network: string) => {
-    setSelectedNetwork(network);
-  };
-
-  /**
-   * Handles tab change.
-   * @param tab - The selected tab.
-   */
-  const handleTabChange = (tab: string) => {
-    setSelectedTab(tab);
-  };
-
-  // State props for child components
-  const stateProps: StateProps = {
-    formValues,
-    tokenBalance,
-    smartTokenBalance,
-    rate,
-    isFetchingRate,
-    recipientName,
-    isFetchingRecipientName,
-    institutions,
-    isFetchingInstitutions,
-    selectedTab,
-    handleTabChange,
-    selectedNetwork,
-    setCreatedAt,
-    setOrderId,
-    handleNetworkChange,
-    setTransactionStatus,
-  };
-
-  // Fetch supported institutions based on currency
-  useEffect(() => {
-    const getInstitutions = async () => {
-      if (!currency) return;
-
-      setIsFetchingInstitutions(true);
-
-      try {
-        const institutions = await fetchSupportedInstitutions(currency);
-        setInstitutions(institutions);
-        setIsFetchingInstitutions(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getInstitutions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency]);
-
-  // Fetch recipient name based on institution and account identifier
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    const getRecipientName = async () => {
-      if (!accountIdentifier || !institution) return;
-
-      setIsFetchingRecipientName(true);
-
-      try {
-        const accountName = await fetchAccountName({
-          institution,
-          accountIdentifier,
-        });
-        setRecipientName(accountName);
-        setIsFetchingRecipientName(false);
-      } catch (error) {
-        setRecipientName("");
-        setIsFetchingRecipientName(false);
-      }
-    };
-
-    const debounceFetchRecipientName = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(getRecipientName, 1000);
-    };
-
-    debounceFetchRecipientName();
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountIdentifier]);
-
-  // Reset transaction status and form values when account status changes
-  useEffect(() => {
-    if (account.status !== "connected" && account.status !== "connecting") {
-      setTransactionStatus("idle");
-      setFormValues(INITIAL_FORM_STATE);
-    }
-
-    if (account.status == "connected" && account.chainId) {
-      if (
-        process.env.NEXT_PUBLIC_ENVIRONMENT == "testnet" &&
-        account.chainId == 8453
-      ) {
-        switchChain({ chainId: 84532 });
-        toast.error("Kindly switch to Base Sepolia to continue.");
-      } else if (
-        process.env.NEXT_PUBLIC_ENVIRONMENT == "mainnet" &&
-        account.chainId == 84532
-      ) {
-        switchChain({ chainId: 8453 });
-        toast.error("Kindly switch to Base Mainnet to continue.");
-      }
-    }
-  }, [account.status, account.chainId]);
-
-  // Fetch rate based on currency, amount, and token
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    const getRate = async () => {
-      if (!currency || !amount || !token) return;
-      setIsFetchingRate(true);
-      try {
-        const rate = await fetchRate({
-          token: "USDT",
-          amount: amount,
-          currency: currency,
-        });
-        setRate(rate.data);
-        setIsFetchingRate(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const debounceFetchRate = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(getRate, 1000);
-    };
-
-    debounceFetchRate();
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency, amount, token]);
-
-  const tokenDecimals = fetchSupportedTokens(account.chain?.name)?.find(
-    (t) => t.symbol.toUpperCase() === token,
-  )?.decimals;
-
-  // Update token balance when token balance is available
-  useEffect(() => {
-    if (tokenBalanceInWei && tokenDecimals) {
-      setTokenBalance(Number(formatUnits(tokenBalanceInWei, tokenDecimals)));
-    }
-
-    if (smartTokenBalanceInWei && tokenDecimals) {
-      setSmartTokenBalance(Number(formatUnits(smartTokenBalanceInWei, tokenDecimals)));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenBalanceInWei, smartTokenBalanceInWei]);
-
-  // Set page loading state to false after initial render
   useEffect(() => {
     setIsPageLoading(false);
   }, []);
 
   return (
-    <>
+    <AnimatedPage componentKey="home">
       <Preloader isLoading={isPageLoading} />
 
-      <Disclaimer />
+      <div className="w-full transition-colors bg-white dark:bg-neutral-900">
+        <div className="max-w-screen-2xl mx-auto px-4 lg:pl-16 lg:pr-0 flex justify-between gap-10">
+          <div className="relative flex max-w-md mx-auto lg:mx-0 flex-col gap-20 min-h-screen flex-1">
+            <Navbar />
 
-      <AnimatePresence mode="wait">
-        {transactionStatus !== "idle" ? (
-          <AnimatedPage componentKey="transaction-status">
-            <TransactionStatus
-              formMethods={formMethods}
-              transactionStatus={transactionStatus}
-              createdAt={createdAt}
-              orderId={orderId}
-              recipientName={stateProps.recipientName}
-              clearForm={() => setFormValues(INITIAL_FORM_STATE)}
-              clearTransactionStatus={() => {
-                setTransactionStatus("idle");
-              }}
-              setTransactionStatus={setTransactionStatus}
+            <main className="w-full flex-grow space-y-4">
+              <AnimatedComponent variant={slideInOut} delay={0.4}>
+                <h1 className="text-3xl font-semibold leading-normal text-neutral-900 dark:text-white">
+                  So{" "}
+                  <span className="text-sky-500 font-extrabold font-playfair-display">
+                    fast
+                  </span>{" "}
+                  they ask "How's that even possible?"
+                  <ZapIcon className="size-6 inline-block align-middle" />
+                </h1>
+              </AnimatedComponent>
+
+              <AnimatedComponent variant={fadeInOut} delay={0.6}>
+                <p className="leading-normal text-neutral-900 dark:text-white/80 font-light">
+                  Convert your crypto to fiat at lightening speed. <br />
+                  Transfer them seamlessly to any bank account or mobile wallet.
+                </p>
+              </AnimatedComponent>
+
+              <AnimatedComponent variant={scaleInOut} delay={0.8}>
+                <WaitlistForm />
+              </AnimatedComponent>
+
+              <AnimatedComponent variant={fadeInOut} delay={1}>
+                <div className="text-neutral-900 dark:text-white/80 font-light">
+                  Supports
+                  <div className="inline-flex align-middle mx-2">
+                    {networks.map(({ name, Icon }, index) => (
+                      <NetworkIcon key={name} Icon={Icon} index={index} />
+                    ))}
+                  </div>
+                  networks
+                </div>
+              </AnimatedComponent>
+
+              <AnimatedComponent variant={fadeInOut} delay={1.2}>
+                <div className="flex items-center gap-3.5">
+                  <button type="button" onClick={() => setIsModalOpen(true)}>
+                    <div className="sr-only">Watch how Zap works</div>
+                    <Image
+                      src="/video-icon.svg"
+                      alt="Video Icon"
+                      width={24}
+                      height={24}
+                      className="hover:shadow-md transition shadow-neutral-900 dark:shadow-white/20 rounded-md"
+                    />
+                  </button>
+
+                  <p className="text-neutral-900 dark:text-white/80 font-light">
+                    See how it works
+                  </p>
+
+                  <Dialog
+                    open={isModalOpen}
+                    as="div"
+                    className="relative z-10 focus:outline-none"
+                    onClose={() => setIsModalOpen(false)}
+                  >
+                    <DialogBackdrop
+                      transition
+                      className="fixed inset-0 bg-black/30 backdrop-blur-sm duration-300 ease-out data-[closed]:opacity-0"
+                    />
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                      <div className="flex min-h-full items-center justify-center p-4">
+                        <DialogPanel
+                          transition
+                          className="w-full max-w-3xl p-4 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                        >
+                          <div className="relative pt-[56.25%]">
+                            <iframe
+                              src="https://player.vimeo.com/video/995054247?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                              allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                              title="Zap Demo"
+                              allowTransparency
+                              allowFullScreen
+                              className="absolute inset-0 w-full h-full rounded-2xl"
+                            />
+                          </div>
+                          <script src="https://player.vimeo.com/api/player.js" />
+                        </DialogPanel>
+                      </div>
+                    </div>
+                  </Dialog>
+                </div>
+              </AnimatedComponent>
+            </main>
+
+            <Footer />
+          </div>
+
+          <AnimatedComponent
+            variant={fadeInOut}
+            delay={0.4}
+            className="relative w-full max-w-xl h-screen flex-1 hidden lg:block"
+          >
+            <Image
+              src={
+                !isPageLoading && resolvedTheme === "dark"
+                  ? "/transaction-illustration-dark.png"
+                  : "/transaction-illustration-light.png"
+              }
+              alt="Transaction Illustration"
+              className="h-full w-full object-top object-contain"
+              width={600}
+              height={600}
             />
-          </AnimatedPage>
-        ) : (
-          <>
-            {Object.values(formValues).every(
-              (value) => value === "" || value === 0,
-            ) ? (
-              <AnimatedPage componentKey="transaction-form">
-                <TransactionForm
-                  onSubmit={(data: FormData) => setFormValues(data)}
-                  formMethods={formMethods}
-                  stateProps={stateProps}
-                />
-              </AnimatedPage>
-            ) : (
-              <AnimatedPage componentKey="transaction-preview">
-                <TransactionPreview
-                  handleBackButtonClick={() =>
-                    setFormValues(INITIAL_FORM_STATE)
-                  }
-                  stateProps={stateProps}
-                />
-              </AnimatedPage>
-            )}
-          </>
-        )}
-      </AnimatePresence>
-    </>
+          </AnimatedComponent>
+        </div>
+      </div>
+    </AnimatedPage>
   );
 }

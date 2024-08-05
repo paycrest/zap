@@ -1,14 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 
+  Custom fonts
+*/
+.font-playfair-display {
+  font-family: 'Playfair Display', serif;
+}
+
+html {
+  font-family: var(--font-inter);
+}
+
+h1 {
+  font-family: var(--font-roboto-mono);
+}
+
+/* 
+  Default styles reset
+*/
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
@@ -19,6 +39,9 @@ select {
   appearance: none;
 }
 
+/* 
+  Loader animation
+*/
 .loader {
   width: 48px;
   height: 48px;
@@ -27,7 +50,7 @@ select {
 }
 
 .loader:before {
-  content: "";
+  content: '';
   width: 48px;
   height: 5px;
   background: #0066f550;
@@ -39,7 +62,7 @@ select {
 }
 
 .loader:after {
-  content: "";
+  content: '';
   width: 100%;
   height: 100%;
   background: #0065f5;

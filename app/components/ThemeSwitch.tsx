@@ -1,28 +1,14 @@
-"use client";
-
 import { useTheme } from "next-themes";
-import { useState, useEffect, ReactElement } from "react";
-
 import { FiSun, FiMoon } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-type IconButtonProps = {
-  icon: ReactElement;
-  onClick: () => void;
-  isActive: boolean;
+const iconAnimation = {
+  initial: { y: 20, opacity: 0 },
+  animate: { y: 0, opacity: 1 },
+  exit: { y: -20, opacity: 0 },
+  transition: { duration: 0.2 },
 };
-
-const IconButton = ({ icon, onClick, isActive }: IconButtonProps) => (
-  <button
-    type="button"
-    className={`flex cursor-pointer items-center justify-center rounded-full border p-1.5 transition-all ${
-      isActive ? "border-gray-300 dark:border-white/20" : "border-transparent"
-    }`}
-    onClick={onClick}
-    title={`Switch to ${isActive ? "dark" : "light"} mode`}
-  >
-    {icon}
-  </button>
-);
 
 export const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
@@ -33,19 +19,23 @@ export const ThemeSwitch = () => {
   if (!mounted) return null;
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-full border border-gray-300 p-1.5 transition-all dark:border-white/20">
-      <IconButton
-        icon={<FiSun className="h-auto w-4 text-gray-400 dark:text-white/50" />}
-        onClick={() => setTheme("light")}
-        isActive={resolvedTheme === "light"}
-      />
-      <IconButton
-        icon={
-          <FiMoon className="h-auto w-4 text-gray-400 dark:text-white/50" />
-        }
-        onClick={() => setTheme("dark")}
-        isActive={resolvedTheme === "dark"}
-      />
-    </div>
+    <button
+      type="button"
+      className="flex cursor-pointer items-center justify-center rounded-full border p-1.5 border-gray-300 dark:border-white/20"
+      onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+      title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
+    >
+      <AnimatePresence mode="wait">
+        {resolvedTheme === "light" ? (
+          <motion.div {...iconAnimation}>
+            <FiSun className="size-4 text-gray-400 dark:text-white/50" />
+          </motion.div>
+        ) : (
+          <motion.div {...iconAnimation}>
+            <FiMoon className="size-4 text-gray-400 dark:text-white/50" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </button>
   );
 };

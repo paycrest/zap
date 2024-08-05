@@ -1,7 +1,6 @@
-"use client";
-import { ReactNode } from "react";
-import { motion } from "framer-motion";
-import { AnimatedComponentProps } from "../types";
+'use client';
+import type { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 // Animation variants and transition
 const pageVariants = {
@@ -11,8 +10,8 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  type: "tween",
-  ease: "anticipate",
+  type: 'tween',
+  ease: 'anticipate',
   duration: 0.5,
 };
 
@@ -23,9 +22,9 @@ export const AnimatedPage: React.FC<{
 }> = ({ children, componentKey }) => (
   <motion.div
     key={componentKey}
-    initial="initial"
-    animate="in"
-    exit="out"
+    initial='initial'
+    animate='in'
+    exit='out'
     variants={pageVariants}
     transition={pageTransition}
   >
@@ -61,14 +60,23 @@ export const scaleInOut = {
 export const AnimatedComponent = ({
   children,
   variant = fadeInOut,
-  className = "",
+  className = '',
   delay = 0,
-}: AnimatedComponentProps) => (
+}: {
+  children: ReactNode;
+  variant?: {
+    initial: { [key: string]: number };
+    animate: { [key: string]: number };
+    exit: { [key: string]: number };
+  };
+  className?: string;
+  delay?: number;
+}) => (
   <motion.div
     variants={variant}
-    initial="initial"
-    animate="animate"
-    exit="exit"
+    initial='initial'
+    animate='animate'
+    exit='exit'
     transition={{ duration: 0.3, delay }}
     className={className}
   >
