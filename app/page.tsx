@@ -104,7 +104,7 @@ export default function Home() {
                       alt="Video Icon"
                       width={24}
                       height={24}
-                      className="hover:shadow-md transition shadow-neutral-900 dark:shadow-white/20 rounded-md"
+                      className="hover:shadow-md transition shadow-neutral-900 dark:shadow-white/20 rounded-md w-6 h-6"
                     />
                   </button>
 
@@ -154,7 +154,7 @@ export default function Home() {
           <AnimatedComponent
             variant={fadeInOut}
             delay={0.4}
-            className="relative w-full max-w-xl h-screen flex-1 hidden lg:block"
+            className="w-full max-w-xl h-screen flex-1 hidden lg:block sticky top-0 right-0"
           >
             <Image
               src={
@@ -166,6 +166,7 @@ export default function Home() {
               className="h-full w-full object-top object-contain"
               width={600}
               height={600}
+              priority
             />
           </AnimatedComponent>
         </div>

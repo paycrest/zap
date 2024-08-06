@@ -11,6 +11,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         position="bottom-right"
         theme="dark"
         stacked
+        draggable
         pauseOnHover
         pauseOnFocusLoss
       />
