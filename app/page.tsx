@@ -96,21 +96,25 @@ export default function Home() {
               </AnimatedComponent>
 
               <AnimatedComponent variant={fadeInOut} delay={1.2}>
-                <div className="flex items-center gap-3.5">
-                  <button type="button" onClick={() => setIsModalOpen(true)}>
-                    <div className="sr-only">Watch how Zap works</div>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-3.5 group"
+                  >
                     <Image
                       src="/video-icon.svg"
                       alt="Video Icon"
                       width={24}
                       height={24}
-                      className="hover:shadow-md transition shadow-neutral-900 dark:shadow-white/20 rounded-md w-6 h-6"
+                      aria-label="Video Icon"
+                      className="transition rounded-md w-6 h-5 inline-block align-middle border border-transparent group-hover:border-gray-300 group-hover:dark:border-white/20"
                     />
-                  </button>
 
-                  <p className="text-neutral-900 dark:text-white/80 font-light">
-                    See how it works
-                  </p>
+                    <p className="text-neutral-900 dark:text-white/80 font-light group-hover:text-neutral-700 dark:group-hover:text-white transition-colors">
+                      See how it works
+                    </p>
+                  </button>
 
                   <Dialog
                     open={isModalOpen}
@@ -120,7 +124,7 @@ export default function Home() {
                   >
                     <DialogBackdrop
                       transition
-                      className="fixed inset-0 bg-black/30 backdrop-blur-sm duration-300 ease-out data-[closed]:opacity-0"
+                      className="fixed inset-0 bg-black/70 backdrop-blur-md duration-300 ease-out data-[closed]:opacity-0"
                     />
 
                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -144,7 +148,7 @@ export default function Home() {
                       </div>
                     </div>
                   </Dialog>
-                </div>
+                </>
               </AnimatedComponent>
             </main>
 

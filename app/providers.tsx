@@ -8,12 +8,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       {children}
 
       <ToastContainer
-        position="bottom-right"
+        position="bottom-left"
         theme="dark"
         stacked
         draggable
         pauseOnHover
         pauseOnFocusLoss
+        bodyClassName="font-sans"
       />
     </ThemeProvider>
   );
