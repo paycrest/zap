@@ -1,16 +1,35 @@
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { InputError } from "./InputError";
+import axios from "axios";
 
 export const WaitlistForm = () => {
   const {
+    watch,
+    reset,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<{ email: string }>({ mode: "onChange" });
 
-  const onSubmit = () => {
-    toast.success("This is still in development... Kindly check back later.");
+  const onSubmit = async () => {
+    const email = watch("email");
+
+    try {
+      const response = await axios.post("/api/waitlist", { email });
+
+      if (response.status === 200) {
+        toast.success("Successfully added to waitlist");
+
+        reset();
+      } else {
+        toast.error("Failed to add to waitlist. Please try again later.");
+      }
+    } catch (error) {
+      toast.error(
+        "Failed to add to waitlist. Please contact support for help.",
+      );
+    }
   };
 
   return (
@@ -40,6 +59,7 @@ export const WaitlistForm = () => {
 
       <button
         type="submit"
+        disabled={isSubmitting}
         className="min-w-fit rounded-full bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-zinc-800 dark:disabled:text-white/50"
       >
         {isSubmitting ? "Submitting..." : "Join waitlist"}
