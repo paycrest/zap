@@ -21,6 +21,7 @@ import {
   slideInOut,
   WaitlistForm,
 } from "./components";
+import { IoIosCloseCircle } from "react-icons/io";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 
 const NetworkIcon = ({
@@ -131,11 +132,20 @@ export default function Home() {
                       <div className="flex min-h-full items-center justify-center p-4">
                         <DialogPanel
                           transition
-                          className="w-full max-w-3xl p-4 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                          className="relative w-full max-w-screen-xl p-4 sm:p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
                         >
+                          <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute -top-8 right-0 z-50"
+                            aria-label="Close Modal"
+                          >
+                            <IoIosCloseCircle className="text-3xl lg:text-5xl dark:text-white/80 text-neutral-900" />
+                          </button>
+
                           <div className="relative pt-[56.25%]">
                             <iframe
-                              src="https://player.vimeo.com/video/995054247?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                              src="https://player.vimeo.com/video/996001927?badge=0&autopause=0&player_id=0&app_id=58479"
                               allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
                               title="Zap Demo"
                               allowTransparency
