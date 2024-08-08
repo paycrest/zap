@@ -23,6 +23,16 @@ import {
 } from "./components";
 import { IoIosCloseCircle } from "react-icons/io";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
+import TextTransition from "react-text-transition";
+
+const textPhrases = ["fast", "quick", "lightning-fast", "rapid"];
+
+const networks = [
+  { name: "BNB", Icon: BNBIcon },
+  { name: "Base", Icon: BaseIcon },
+  { name: "Tron", Icon: TronIcon },
+  { name: "Solana", Icon: SolanaIcon },
+];
 
 const NetworkIcon = ({
   Icon,
@@ -40,13 +50,15 @@ export default function Home() {
   const { resolvedTheme } = useTheme();
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [textIndex, setTextIndex] = useState(0);
 
-  const networks = [
-    { name: "BNB", Icon: BNBIcon },
-    { name: "Base", Icon: BaseIcon },
-    { name: "Tron", Icon: TronIcon },
-    { name: "Solana", Icon: SolanaIcon },
-  ];
+  useEffect(() => {
+    const intervalId = setInterval(
+      () => setTextIndex((textIndex) => textIndex + 1),
+      3000,
+    );
+    return () => clearTimeout(intervalId);
+  }, []);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -65,9 +77,12 @@ export default function Home() {
               <AnimatedComponent variant={slideInOut} delay={0.4}>
                 <h1 className="text-3xl font-semibold leading-normal text-neutral-900 dark:text-white">
                   So{" "}
-                  <span className="text-sky-500 font-extrabold font-playfair-display">
-                    fast
-                  </span>{" "}
+                  <TextTransition
+                    inline
+                    className="text-sky-500 font-extrabold font-playfair-display"
+                  >
+                    {textPhrases[textIndex % textPhrases.length]}
+                  </TextTransition>{" "}
                   they ask "How's that even possible?"
                   <ZapIcon className="size-6 inline-block align-middle" />
                 </h1>
@@ -167,19 +182,19 @@ export default function Home() {
 
           <AnimatedComponent
             variant={fadeInOut}
-            delay={0.4}
+            delay={1.5}
             className="w-full max-w-xl h-screen flex-1 hidden lg:block sticky top-0 right-0"
           >
             <Image
               src={
                 !isPageLoading && resolvedTheme === "dark"
-                  ? "/transaction-illustration-dark.png"
-                  : "/transaction-illustration-light.png"
+                  ? "/transaction-illustration-dark.svg"
+                  : "/transaction-illustration-light.svg"
               }
               alt="Transaction Illustration"
               className="h-full w-full object-top object-contain"
-              width={600}
-              height={600}
+              width={1000}
+              height={1000}
               priority
             />
           </AnimatedComponent>
