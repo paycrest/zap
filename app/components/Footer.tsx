@@ -89,7 +89,7 @@ export const Footer = () => {
             rel="noopener noreferrer"
             className="text-neutral-900 hover:underline dark:text-white/80"
           >
-            Paycrest
+            Paycrest Protocol
           </a>
         </p>
         <div className="flex items-center justify-center gap-2">
