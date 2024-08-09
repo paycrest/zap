@@ -23,7 +23,6 @@ import {
 } from "./components";
 import { IoIosCloseCircle } from "react-icons/io";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
-import TextTransition from "react-text-transition";
 
 const networks = [
   { name: "BNB", Icon: BNBIcon },
