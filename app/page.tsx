@@ -192,7 +192,7 @@ export default function Home() {
                   : "/transaction-illustration-light.svg"
               }
               alt="Transaction Illustration"
-              className="h-full w-full object-top object-contain"
+              className="h-full w-full object-right-top object-contain"
               width={1000}
               height={1000}
               priority

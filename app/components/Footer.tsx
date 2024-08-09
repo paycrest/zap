@@ -11,6 +11,7 @@ import {
   XIconLightTheme,
 } from "./ImageAssets";
 import { AnimatedComponent, slideInOut } from "./AnimatedComponents";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 const socialsDarkTheme = [
   {
@@ -96,6 +97,10 @@ export const Footer = () => {
           {socials.map((social) => (
             <SocialLink key={social.title} {...social} />
           ))}
+
+          <div className="h-3 w-px bg-gray-200 dark:bg-white/20" />
+
+          <ThemeSwitch />
         </div>
       </footer>
     </AnimatedComponent>
