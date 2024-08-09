@@ -25,8 +25,6 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import TextTransition from "react-text-transition";
 
-const textPhrases = ["fast", "quick", "lightning-fast", "rapid"];
-
 const networks = [
   { name: "BNB", Icon: BNBIcon },
   { name: "Base", Icon: BaseIcon },
@@ -77,12 +75,9 @@ export default function Home() {
               <AnimatedComponent variant={slideInOut} delay={0.4}>
                 <h1 className="text-3xl font-semibold leading-normal text-neutral-900 dark:text-white">
                   So{" "}
-                  <TextTransition
-                    inline
-                    className="text-sky-500 font-extrabold font-playfair-display"
-                  >
-                    {textPhrases[textIndex % textPhrases.length]}
-                  </TextTransition>{" "}
+                  <span className="text-sky-500 font-extrabold font-playfair-display">
+                    fast
+                  </span>{" "}
                   they ask "How's that even possible?"
                   <ZapIcon className="size-6 inline-block align-middle" />
                 </h1>

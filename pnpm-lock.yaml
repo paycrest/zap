@@ -38,9 +38,6 @@ importers:
       react-icons:
         specifier: ^5.2.1
         version: 5.2.1(react@18.3.1)
-      react-text-transition:
-        specifier: ^3.1.0
-        version: 3.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-toastify:
         specifier: ^10.0.5
         version: 10.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -272,33 +269,6 @@ packages:
     resolution: {integrity: sha512-O3s9qhPMd6n42x9sKeJ3lhu5V1Tlnzhu6Yk8QOvDuXf7UGuUjXf9mzfHJt1dYzID4l9Fwm8toczBzPM9t0jc8Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-
-  '@react-spring/animated@9.7.4':
-    resolution: {integrity: sha512-7As+8Pty2QlemJ9O5ecsuPKjmO0NKvmVkRR1n6mEotFgWar8FKuQt2xgxz3RTgxcccghpx1YdS1FCdElQNexmQ==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  '@react-spring/core@9.7.4':
-    resolution: {integrity: sha512-GzjA44niEJBFUe9jN3zubRDDDP2E4tBlhNlSIkTChiNf9p4ZQlgXBg50qbXfSXHQPHak/ExYxwhipKVsQ/sUTw==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  '@react-spring/rafz@9.7.4':
-    resolution: {integrity: sha512-mqDI6rW0Ca8IdryOMiXRhMtVGiEGLIO89vIOyFQXRIwwIMX30HLya24g9z4olDvFyeDW3+kibiKwtZnA4xhldA==}
-
-  '@react-spring/shared@9.7.4':
-    resolution: {integrity: sha512-bEPI7cQp94dOtCFSEYpxvLxj0+xQfB5r9Ru1h8OMycsIq7zFZon1G0sHrBLaLQIWeMCllc4tVDYRTLIRv70C8w==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  '@react-spring/types@9.7.4':
-    resolution: {integrity: sha512-iQVztO09ZVfsletMiY+DpT/JRiBntdsdJ4uqk3UJFhrhS8mIC9ZOZbmfGSRs/kdbNPQkVyzucceDicQ/3Mlj9g==}
-
-  '@react-spring/web@9.7.4':
-    resolution: {integrity: sha512-UMvCZp7I5HCVIleSa4BwbNxynqvj+mJjG2m20VO2yPoi2pnCYANy58flvz9v/YcXTAvsmL655FV3pm5fbr6akA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
   '@react-stately/utils@3.10.1':
     resolution: {integrity: sha512-VS/EHRyicef25zDZcM/ClpzYMC5i2YGN6uegOeQawmgfGjb02yaCX0F0zR69Pod9m2Hr3wunTbtpgVXvYbZItg==}
@@ -755,11 +725,6 @@ packages:
     peerDependencies:
       react: '*'
 
-  react-text-transition@3.1.0:
-    resolution: {integrity: sha512-NtXEVAXvSh78+8JAnrVjpbftzD4kPowacv4GB2Nyq9C/8ko6fSm6M/XvKWQLCaZi68i9F28b++Sp8uVThlzLyg==}
-    peerDependencies:
-      react: '>=18.0.0'
-
   react-toastify@10.0.5:
     resolution: {integrity: sha512-mNKt2jBXJg4O7pSdbNUfDdTsK9FIdikfsIE/yUCxbAEXl4HMyJaivrVFcn3Elvt5xvCQYhUZm+hqTIu1UXM3Pw==}
     peerDependencies:
@@ -1076,38 +1041,6 @@ snapshots:
       '@swc/helpers': 0.5.5
       clsx: 2.1.0
       react: 18.3.1
-
-  '@react-spring/animated@9.7.4(react@18.3.1)':
-    dependencies:
-      '@react-spring/shared': 9.7.4(react@18.3.1)
-      '@react-spring/types': 9.7.4
-      react: 18.3.1
-
-  '@react-spring/core@9.7.4(react@18.3.1)':
-    dependencies:
-      '@react-spring/animated': 9.7.4(react@18.3.1)
-      '@react-spring/shared': 9.7.4(react@18.3.1)
-      '@react-spring/types': 9.7.4
-      react: 18.3.1
-
-  '@react-spring/rafz@9.7.4': {}
-
-  '@react-spring/shared@9.7.4(react@18.3.1)':
-    dependencies:
-      '@react-spring/rafz': 9.7.4
-      '@react-spring/types': 9.7.4
-      react: 18.3.1
-
-  '@react-spring/types@9.7.4': {}
-
-  '@react-spring/web@9.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@react-spring/animated': 9.7.4(react@18.3.1)
-      '@react-spring/core': 9.7.4(react@18.3.1)
-      '@react-spring/shared': 9.7.4(react@18.3.1)
-      '@react-spring/types': 9.7.4
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@react-stately/utils@3.10.1(react@18.3.1)':
     dependencies:
@@ -1507,13 +1440,6 @@ snapshots:
   react-icons@5.2.1(react@18.3.1):
     dependencies:
       react: 18.3.1
-
-  react-text-transition@3.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@react-spring/web': 9.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-    transitivePeerDependencies:
-      - react-dom
 
   react-toastify@10.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
