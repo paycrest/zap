@@ -178,8 +178,8 @@ export const TransactionForm = ({
                     message: `Minimum amount is 0.01 ${token}`,
                   },
                   max: {
-                    value: 500,
-                    message: `Max. amount is 500 ${token}`,
+                    value: 2000,
+                    message: `Max. amount is 2000 ${token}`,
                   },
                   pattern: {
                     value: /^\d+(\.\d{1,2})?$/,
