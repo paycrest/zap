@@ -16,7 +16,7 @@ export const Preloader = ({ isLoading }: { isLoading: boolean }) => {
             exit={{ scale: 0 }}
             transition={{ duration: 0.5 }}
             className="loader"
-          ></motion.div>
+          />
         </motion.div>
       )}
     </AnimatePresence>

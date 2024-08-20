@@ -22,7 +22,7 @@ import {
   slideInOut,
 } from "../components";
 import { fetchSupportedTokens, formatCurrency } from "../utils";
-import { InstitutionProps, TransactionFormProps } from "../types";
+import type { InstitutionProps, TransactionFormProps } from "../types";
 import { HiOutlineInformationCircle } from "react-icons/hi";
 
 const currencies = [
@@ -70,9 +70,9 @@ export const TransactionForm = ({
   } = formMethods;
 
   // Get values of currency, amount, and token from form
-  let currency = watch("currency"),
-    amount = watch("amount"),
-    token = watch("token");
+  const currency = watch("currency");
+  const amount = watch("amount");
+  const token = watch("token");
 
   // Get account information using custom hook
   const account = useAccount();
@@ -88,7 +88,7 @@ export const TransactionForm = ({
   const feeInfo = {
     key: "eta",
     label: "Funds available in",
-    value: `15s`,
+    value: "15s",
   };
 
   const renderedInfo = [rateInfo, feeInfo];
@@ -99,7 +99,7 @@ export const TransactionForm = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
+      className="z-50 grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
       {/* Networks */}
@@ -115,7 +115,6 @@ export const TransactionForm = ({
             alt={`${network} logo`}
             selectedNetwork={selectedNetwork}
             handleNetworkChange={handleNetworkChange}
-            disabled={network !== "base"}
           />
         ))}
 
@@ -169,25 +168,25 @@ export const TransactionForm = ({
               <input
                 id="amount"
                 type="number"
-                step="0.01"
+                step="0.0001"
                 {...register("amount", {
                   required: { value: true, message: "Amount is required" },
                   disabled: !account.isConnected || token === "",
                   min: {
-                    value: 0.01,
-                    message: `Minimum amount is 0.01 ${token}`,
+                    value: 0.0001,
+                    message: `Minimum amount is 0.0001 ${token}`,
                   },
                   max: {
                     value: 2000,
                     message: `Max. amount is 2000 ${token}`,
                   },
                   pattern: {
-                    value: /^\d+(\.\d{1,2})?$/,
+                    value: /^\d+(\.\d{1,4})?$/,
                     message: "Invalid amount",
                   },
                 })}
                 className={`${inputClasses} pl-4 pr-14`}
-                placeholder="0.00"
+                placeholder="0.0000"
                 title={
                   token === ""
                     ? "Select token to enable amount field"
@@ -233,7 +232,7 @@ export const TransactionForm = ({
                 </div>
               </div>
 
-              <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10"></div>
+              <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10" />
 
               <div className="grid flex-1 gap-3 p-4">
                 <p className="text-gray-500 dark:text-white/50">
@@ -380,7 +379,7 @@ export const TransactionForm = ({
                             </p>
                           </AnimatedFeedbackItem>
                         )}
-                        {recipientName == "" &&
+                        {recipientName === "" &&
                           watch("accountIdentifier")?.toString().length ===
                             10 &&
                           !errors.accountIdentifier &&
@@ -436,7 +435,7 @@ export const TransactionForm = ({
       <button
         type="submit"
         disabled={
-          !isValid || !isDirty || !account.isConnected || recipientName == ""
+          !isValid || !isDirty || !account.isConnected || recipientName === ""
         }
         className={primaryBtnClasses}
       >

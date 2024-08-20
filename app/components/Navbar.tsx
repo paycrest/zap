@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { useAccount } from "wagmi";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { ThemeSwitch } from "./ThemeSwitch";
 import { WalletButtons } from "./WalletButtons";
+import { PaycrestLogo } from "./ImageAssets";
 
 export const Navbar = () => {
   const account = useAccount();
@@ -18,26 +18,15 @@ export const Navbar = () => {
   if (!mounted) return null;
 
   return (
-    <header className="fixed left-0 top-0 z-10 w-full bg-white/20 backdrop-blur transition-all dark:bg-neutral-900/80">
+    <header className="fixed left-0 top-0 z-20 w-full bg-white transition-all dark:bg-neutral-900">
       <nav
         className="container mx-auto flex items-center justify-between p-4 text-neutral-900 dark:text-white lg:px-8"
         aria-label="Navbar"
       >
         <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5">
-            <span className="sr-only">Zap by Paycrest</span>
-            <Image
-              className="h-auto w-12"
-              src={
-                mounted && resolvedTheme === "dark"
-                  ? "/zap-logo-dark-theme.svg"
-                  : "/zap-logo-light-theme.svg"
-              }
-              alt=""
-              width={0}
-              height={0}
-              priority
-            />
+          <Link href="/" className="flex items-center gap-1">
+            <div className="text-lg font-semibold">noblocks</div>
+            <PaycrestLogo className="size-3" />
           </Link>
         </div>
 
