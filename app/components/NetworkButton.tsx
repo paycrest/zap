@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FaCircleCheck } from "react-icons/fa6";
-import { NetworkButtonProps } from "../types";
+import type { NetworkButtonProps } from "../types";
 
 export const NetworkButton = ({
   network,
@@ -8,7 +8,7 @@ export const NetworkButton = ({
   alt,
   selectedNetwork,
   handleNetworkChange,
-  disabled,
+  disabled = false,
 }: NetworkButtonProps) => (
   <button
     type="button"

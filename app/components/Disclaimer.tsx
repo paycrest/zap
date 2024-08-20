@@ -21,7 +21,9 @@ export const Disclaimer = () => {
   };
 
   const handleClose = () => {
-    toast.error("You must accept the disclaimer to continue.");
+    // go a step back in the browser history
+    window.history.back();
+    toast.error("You must accept the disclaimer to proceed.");
   };
 
   return (
@@ -51,9 +53,9 @@ export const Disclaimer = () => {
             </p>
             <p className="text-sm leading-normal text-neutral-900 dark:text-white/80">
               Therefore: <br />
-              While the app records real transactions, please exercise caution and
-              do not use this app as is in a production environment.
-              Use at your own risk. The developers are not responsible for any issues
+              While the app records real transactions, please exercise caution
+              and do not use this app as is in a production environment. Use at
+              your own risk. The developers are not responsible for any issues
               or damages that may arise from the use of this app.
             </p>
 

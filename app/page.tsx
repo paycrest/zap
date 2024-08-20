@@ -21,7 +21,7 @@ import {
 } from "./components";
 import { erc20Abi } from "./api/abi";
 import TransactionStatus from "./pages/TransactionStatus";
-import { FormData, InstitutionProps, StateProps } from "./types";
+import type { FormData, InstitutionProps, StateProps } from "./types";
 import { fetchSupportedTokens } from "./utils";
 import { config } from "./providers";
 import { toast } from "react-toastify";

@@ -6,7 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import { PiCheckCircle, PiSpinnerBold } from "react-icons/pi";
 
 import { calculateDuration } from "../utils";
-import { TransactionStatusProps } from "../types";
+import type { TransactionStatusProps } from "../types";
 import {
   AnimatedComponent,
   scaleInOut,
@@ -46,8 +46,8 @@ export default function TransactionStatus({
 
   const { watch } = formMethods;
 
-  const token = watch("token"),
-    amount = watch("amount");
+  const token = watch("token");
+  const amount = watch("amount");
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -59,7 +59,7 @@ export default function TransactionStatus({
       try {
         const orderStatus = await fetchOrderStatus(orderId);
 
-        if (orderStatus.data.status != "pending") {
+        if (orderStatus.data.status !== "pending") {
           if (["validated", "settled"].includes(transactionStatus)) {
             // If order is completed, we can stop polling
             clearInterval(intervalId);
@@ -76,9 +76,9 @@ export default function TransactionStatus({
 
           setCompletedAt(orderStatus.data.updatedAt);
 
-          if (orderStatus.data.status == "processing") {
+          if (orderStatus.data.status === "processing") {
             const createdReceipt = orderStatus.data.txReceipts.find(
-              (txReceipt) => txReceipt.status == "pending",
+              (txReceipt) => txReceipt.status === "pending",
             );
             setCreatedHash(createdReceipt?.txHash!);
           }
@@ -217,7 +217,7 @@ export default function TransactionStatus({
       </div>
 
       <div className="flex flex-col items-start gap-4">
-        {/* Status Indicator */}
+        {/* Status Indicator Icon */}
         <StatusIndicator />
 
         {/* Transaction Status */}
@@ -308,7 +308,7 @@ export default function TransactionStatus({
                   <a
                     href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`}
                     className="text-blue-600 hover:underline dark:text-blue-500"
-                    target="_blank"
+                    target="_blank" rel="noreferrer"
                   >
                     View in explorer
                   </a>
