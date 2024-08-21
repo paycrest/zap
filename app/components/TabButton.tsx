@@ -1,4 +1,4 @@
-import { TabButtonProps } from "../types";
+import type { TabButtonProps } from "../types";
 
 export const TabButton = ({
   tab,

@@ -1,5 +1,5 @@
 import JSEncrypt from "jsencrypt";
-import { InstitutionProps, Token } from "./types";
+import type { InstitutionProps, Token } from "./types";
 
 /**
  * Retrieves the institution name based on the provided institution code.
@@ -35,8 +35,8 @@ export function formatNumberWithCommas(num: number): string {
  */
 export const formatCurrency = (
   value: number,
-  currency: string = "NGN",
-  locale: string = "en-NG",
+  currency = "NGN",
+  locale = "en-NG",
 ) => {
   // Create a new instance of Intl.NumberFormat with the 'en-US' locale and currency set to 'NGN'.
   // This object provides methods to format numbers based on the specified locale and options.
@@ -54,7 +54,7 @@ export const formatCurrency = (
  * @param publicKeyPEM - The public key in PEM format.
  * @returns The encrypted data as a base64-encoded string.
  */
-export function publicKeyEncrypt(data: any, publicKeyPEM: string): string {
+export function publicKeyEncrypt(data: unknown, publicKeyPEM: string): string {
   const encrypt = new JSEncrypt();
   encrypt.setPublicKey(publicKeyPEM);
 
@@ -80,7 +80,7 @@ export const calculateDuration = (
   const end = new Date(completedAt);
 
   // Check if the dates are valid
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
     return "Invalid Date";
   }
 
@@ -107,11 +107,11 @@ export const calculateDuration = (
  * @returns An array of supported tokens for the specified network.
  */
 export function fetchSupportedTokens(
-  network: string = "",
+  network = "",
 ): Token[] | undefined {
   let tokens: { [key: string]: Token[] };
 
-  if (process.env.NEXT_PUBLIC_ENVIRONMENT == "mainnet") {
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT === "mainnet") {
     tokens = {
       Base: [
         {
@@ -143,7 +143,7 @@ export function fetchSupportedTokens(
  * @param chars - The number of characters to keep at the beginning and end of the address. Default is 4.
  * @returns The shortened address.
  */
-export function shortenAddress(address: string, chars: number = 4): string {
+export function shortenAddress(address: string, chars = 4): string {
   if (address.length <= 2 * chars) {
     return address;
   }
@@ -156,7 +156,7 @@ export function shortenAddress(address: string, chars: number = 4): string {
  * @returns The contract address for the specified network, or undefined if the network is not found.
  */
 export function getGatewayContractAddress(
-  network: string = "",
+  network = "",
 ): string | undefined {
   return {
     Base: "0x30f6a8457f8e42371e204a9c103f2bd42341dd0f",

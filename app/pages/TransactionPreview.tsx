@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { TbCircleDashed, TbInfoSquareRounded } from "react-icons/tb";
 
-import { TransactionPreviewProps } from "../types";
+import type { TransactionPreviewProps } from "../types";
 import {
   fetchSupportedTokens,
   formatCurrency,
@@ -20,7 +20,7 @@ import {
 } from "wagmi";
 import { fetchAggregatorPublicKey } from "../api/aggregator";
 import {
-  BaseError,
+  type BaseError,
   decodeEventLog,
   encodeFunctionData,
   formatUnits,
@@ -226,7 +226,7 @@ export const TransactionPreview = ({
           });
 
           if (
-            decodedLog.args.value ==
+            decodedLog.args.value ===
             parseUnits(amount.toString(), tokenDecimals!)
           ) {
             clearInterval(intervalId);
