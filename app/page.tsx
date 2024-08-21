@@ -1,17 +1,12 @@
 "use client";
 import { formatUnits } from "viem";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSmartAccount } from "@biconomy/use-aa";
 import { useAccount, useReadContract, useSwitchChain } from "wagmi";
-import { watchChainId } from "@wagmi/core";
 
-import {
-  fetchSupportedInstitutions,
-  fetchRate,
-  fetchAccountName,
-} from "./api/aggregator";
 import {
   AnimatedPage,
   Disclaimer,
@@ -19,12 +14,15 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
+import {
+  fetchRate,
+  fetchAccountName,
+  fetchSupportedInstitutions,
+} from "./api/aggregator";
 import { erc20Abi } from "./api/abi";
+import { fetchSupportedTokens } from "./utils";
 import TransactionStatus from "./pages/TransactionStatus";
 import type { FormData, InstitutionProps, StateProps } from "./types";
-import { fetchSupportedTokens } from "./utils";
-import { config } from "./providers";
-import { toast } from "react-toastify";
 
 const INITIAL_FORM_STATE: FormData = {
   network: "",
@@ -97,7 +95,7 @@ export default function Home() {
     | "validated"
     | "settled"
     | "refunded"
-  >("idle");
+  >("refunded");
   const [createdAt, setCreatedAt] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
 
@@ -191,7 +189,7 @@ export default function Home() {
       clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountIdentifier]);
+  }, [accountIdentifier, institution]);
 
   // Reset transaction status and form values when account status changes
   useEffect(() => {
@@ -200,21 +198,22 @@ export default function Home() {
       setFormValues(INITIAL_FORM_STATE);
     }
 
-    if (account.status == "connected" && account.chainId) {
+    if (account.status === "connected" && account.chainId) {
       if (
-        process.env.NEXT_PUBLIC_ENVIRONMENT == "testnet" &&
-        account.chainId == 8453
+        process.env.NEXT_PUBLIC_ENVIRONMENT === "testnet" &&
+        account.chainId === 8453
       ) {
         switchChain({ chainId: 84532 });
         toast.error("Kindly switch to Base Sepolia to continue.");
       } else if (
-        process.env.NEXT_PUBLIC_ENVIRONMENT == "mainnet" &&
-        account.chainId == 84532
+        process.env.NEXT_PUBLIC_ENVIRONMENT === "mainnet" &&
+        account.chainId === 84532
       ) {
         switchChain({ chainId: 8453 });
         toast.error("Kindly switch to Base Mainnet to continue.");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.status, account.chainId]);
 
   // Fetch rate based on currency, amount, and token
@@ -260,7 +259,9 @@ export default function Home() {
     }
 
     if (smartTokenBalanceInWei && tokenDecimals) {
-      setSmartTokenBalance(Number(formatUnits(smartTokenBalanceInWei, tokenDecimals)));
+      setSmartTokenBalance(
+        Number(formatUnits(smartTokenBalanceInWei, tokenDecimals)),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBalanceInWei, smartTokenBalanceInWei]);

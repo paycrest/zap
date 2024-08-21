@@ -1,7 +1,7 @@
 import { ImSpinner2 } from "react-icons/im";
 import { PiCaretDown } from "react-icons/pi";
 
-import { FormData, SelectFieldProps } from "../types";
+import type { FormData, SelectFieldProps } from "../types";
 import { InputError } from "./InputError";
 
 export const SelectField = ({
