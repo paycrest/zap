@@ -15,8 +15,8 @@ import {
   slideInOut,
 } from "../components";
 import { useAccount } from "wagmi";
-import { HiOutlineReceiptRefund } from "react-icons/hi2";
 import { fetchOrderStatus } from "../api/aggregator";
+import { RiRefund2Line } from "react-icons/ri";
 
 /**
  * Renders the transaction status component.
@@ -118,7 +118,9 @@ export default function TransactionStatus({
    * @returns The image source.
    */
   const getImageSrc = () => {
-    const base = !["validated", "settled"].includes(transactionStatus)
+    const base = !["validated", "settled", "refunded"].includes(
+      transactionStatus,
+    )
       ? "/stepper"
       : "/stepper-long";
     const themeSuffix = resolvedTheme === "dark" ? "-dark.svg" : ".svg";
@@ -151,20 +153,20 @@ export default function TransactionStatus({
           }}
           key="refunded"
         >
-          <HiOutlineReceiptRefund className="text-4xl text-rose-500" />
+          <RiRefund2Line className="text-4xl text-rose-500" />
         </AnimatedComponent>
       ) : (
         <AnimatedComponent
           variant={fadeInOut}
           key="pending"
-          className={`flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 dark:bg-white/10 ${
+          className={`flex items-center gap-1 rounded-full px-2 py-1 dark:bg-white/10 ${
             transactionStatus === "pending"
-              ? "text-orange-400"
+              ? "bg-orange-50 text-orange-400"
               : transactionStatus === "processing"
-                ? "text-yellow-400"
+                ? "bg-yellow-50 text-yellow-400"
                 : transactionStatus === "fulfilled"
-                  ? "text-sky-500"
-                  : ""
+                  ? "bg-sky-50 text-sky-500"
+                  : "bg-gray-50"
           }`}
         >
           <PiSpinnerBold className="animate-spin" />
@@ -226,10 +228,10 @@ export default function TransactionStatus({
           delay={0.2}
           className="text-xl font-medium text-neutral-900 dark:text-white"
         >
-          {!["validated", "settled"].includes(transactionStatus)
-            ? "Processing payment..."
-            : transactionStatus === "refunded"
-              ? "Payment refunded"
+          {transactionStatus === "refunded"
+            ? "Payment refunded"
+            : !["validated", "settled"].includes(transactionStatus)
+              ? "Processing payment..."
               : "Payment completed"}
         </AnimatedComponent>
 
@@ -244,10 +246,10 @@ export default function TransactionStatus({
           delay={0.4}
           className="leading-normal text-gray-500 dark:text-white/50"
         >
-          {!["validated", "settled"].includes(transactionStatus)
-            ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
-            : transactionStatus === "refunded"
-              ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful and your crypto has been refunded. Please try again.`
+          {transactionStatus === "refunded"
+            ? `Your payment of ${amount} ${token} to ${recipientName} was unsuccessful and your crypto has been refunded. Please try again.`
+            : !["validated", "settled"].includes(transactionStatus)
+              ? `Processing payment to ${recipientName}. Hang on, this will only take a few seconds.`
               : `Your payment of ${amount} ${token} to ${recipientName} has been completed successfully`}
         </AnimatedComponent>
 
@@ -308,7 +310,8 @@ export default function TransactionStatus({
                   <a
                     href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`}
                     className="text-blue-600 hover:underline dark:text-blue-500"
-                    target="_blank" rel="noreferrer"
+                    target="_blank"
+                    rel="noreferrer"
                   >
                     View in explorer
                   </a>
