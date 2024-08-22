@@ -12,7 +12,7 @@ import { ToastContainer } from "react-toastify";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Noblocks",
+  title: "Noblocks by Paycrest",
   description: "Crypto-to-fiat payments in a zap.",
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
         <Providers>
           <div className="min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
             <Navbar />
-            <div className="relative mx-auto flex min-h-screen max-w-mobile flex-col items-center px-4 pt-20 transition-all z-10">
+            <div className="relative z-10 mx-auto flex min-h-screen max-w-mobile flex-col items-center px-4 pt-20 transition-all">
               <main className="w-full flex-grow">{children}</main>
               <Footer />
             </div>
