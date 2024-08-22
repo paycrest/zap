@@ -7,10 +7,25 @@ import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { base, baseSepolia } from "wagmi/chains";
 import {
+  connectorsForWallets,
+  darkTheme,
   getDefaultConfig,
-  lightTheme,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
+import {
+  argentWallet,
+  bitgetWallet,
+  braveWallet,
+  bybitWallet,
+  coinbaseWallet,
+  imTokenWallet,
+  ledgerWallet,
+  metaMaskWallet,
+  omniWallet,
+  rainbowWallet,
+  trustWallet,
+  walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 
 if (
   !process.env.NEXT_PUBLIC_PAYMASTER_API_KEY ||
@@ -19,15 +34,47 @@ if (
   throw new Error("Missing env var");
 }
 
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: "Popular",
+      wallets: [
+        metaMaskWallet,
+        trustWallet,
+        walletConnectWallet,
+        rainbowWallet,
+        coinbaseWallet,
+      ],
+    },
+    {
+      groupName: "More",
+      wallets: [
+        bybitWallet,
+        braveWallet,
+        bitgetWallet,
+        ledgerWallet,
+        argentWallet,
+        omniWallet,
+        imTokenWallet,
+      ],
+    },
+  ],
+  {
+    appName: "Noblocks by Paycrest",
+    projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
+  },
+);
+
 export const config = getDefaultConfig({
-  appName: "Zap by Paycrest",
+  appName: "Noblocks by Paycrest",
   projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
   chains: [baseSepolia, base],
   ssr: true,
+  // @ts-ignore
+  connectors,
 });
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-
   const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 
   const biconomyPaymasterApiKey =
@@ -42,7 +89,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
             initialChain={environment === "mainnet" ? base : baseSepolia}
-            theme={lightTheme({
+            theme={darkTheme({
               borderRadius: "large",
               accentColor: "#3384F7",
               fontStack: "Inter" as "system",
