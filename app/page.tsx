@@ -95,7 +95,7 @@ export default function Home() {
     | "validated"
     | "settled"
     | "refunded"
-  >("refunded");
+  >("idle");
   const [createdAt, setCreatedAt] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
 
