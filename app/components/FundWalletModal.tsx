@@ -1,7 +1,7 @@
 "use client";
-import QRCode from "react-qr-code";
 import { BiSolidPlusCircle } from "react-icons/bi";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
 import { HiCheck, HiOutlineDuplicate } from "react-icons/hi";
 import {
   Dialog,
@@ -48,7 +48,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
       </Tooltip>
 
       <Transition show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className="relative z-50" onClose={closeModal}>
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -84,7 +84,19 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                     <p>Send tokens to this wallet via base network</p>
 
                     <div className="grid h-64 w-full place-content-center rounded-2xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-neutral-800">
-                      <QRCode value={address} size={150} />
+                      <QRCode
+                        value={address}
+                        qrStyle="fluid"
+                        eyeRadius={12}
+                        logoWidth={40}
+                        logoHeight={40}
+                        bgColor="#F9FAFB"
+                        style={{
+                          borderRadius: "16px",
+                          border: "1px solid #EBEBEF",
+                          margin: "0 auto",
+                        }}
+                      />
                     </div>
 
                     <div className="flex justify-between">
