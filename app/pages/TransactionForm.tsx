@@ -5,10 +5,11 @@ import { ImSpinner2 } from "react-icons/im";
 import { FaRegHourglass } from "react-icons/fa6";
 import { useSmartAccount } from "@biconomy/use-aa";
 import { AnimatePresence, motion } from "framer-motion";
-import { PiCaretDown, PiCheckCircle } from "react-icons/pi";
+import { PiCheckCircle } from "react-icons/pi";
 
 import {
   AnimatedComponent,
+  NetworksDropdown,
   FundWalletModal,
   InputError,
   NetworkButton,
@@ -26,9 +27,17 @@ import type { InstitutionProps, TransactionFormProps } from "../types";
 import { HiOutlineInformationCircle } from "react-icons/hi";
 
 const currencies = [
-  { value: "NGN", label: "Nigerian Naira (NGN)" },
-  { value: "KES", label: "Kenyan Shilling (KES)", disabled: true },
-  { value: "GHS", label: "Ghanaian Cedi (GHS)", disabled: true },
+  { value: "NGN", label: "\uD83C\uDDF3\uD83C\uDDEC Nigerian Naira (NGN)" },
+  {
+    value: "KES",
+    label: "\uD83C\uDDF0\uD83C\uDDEA Kenyan Shilling (KES)",
+    disabled: true,
+  },
+  {
+    value: "GHS",
+    label: "\uD83C\uDDEC\uD83C\uDDED Ghanaian Cedi (GHS)",
+    disabled: true,
+  },
 ];
 
 /**
@@ -66,7 +75,7 @@ export const TransactionForm = ({
     handleSubmit,
     register,
     watch,
-    formState: { errors, isValid, isDirty, isSubmitting },
+    formState: { errors, isValid, isDirty },
   } = formMethods;
 
   // Get values of currency, amount, and token from form
@@ -82,7 +91,7 @@ export const TransactionForm = ({
   const rateInfo = {
     key: "rate",
     label: "Rate",
-    value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/DAI`,
+    value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/${token}`,
   };
 
   const feeInfo = {
@@ -93,8 +102,27 @@ export const TransactionForm = ({
 
   const renderedInfo = [rateInfo, feeInfo];
 
+  // const handleSelect = (id: string) => {
+  //   console.log(`Selected item with id ${id}`);
+  // };
+
   // Array of available networks
   const networks = ["base", "arbitrum", "polygon"];
+
+  const otherNetworks = [
+    {
+      id: "1",
+      name: "Ethereum",
+      imageUrl: "/ethereum-logo.svg",
+      disabled: true,
+    },
+    {
+      id: "2",
+      name: "Binance",
+      imageUrl: "/binance-logo.svg",
+      disabled: true,
+    },
+  ];
 
   return (
     <form
@@ -115,19 +143,20 @@ export const TransactionForm = ({
             alt={`${network} logo`}
             selectedNetwork={selectedNetwork}
             handleNetworkChange={handleNetworkChange}
+            disabled={network !== "base"}
           />
         ))}
 
         {/* Other network buttons */}
-        <Tooltip message="Other networks (coming soon)">
-          <button
-            type="button"
-            aria-label="Other networks (coming soon)"
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-300 p-2.5 opacity-70 dark:border-white/20"
-          >
-            <PiCaretDown className="text-lg text-gray-400 dark:text-white/50" />
-          </button>
-        </Tooltip>
+        <NetworksDropdown
+          id="person"
+          title="Select Person"
+          data={otherNetworks}
+          hasImage
+          style="bg-purple-800"
+          selectedId="3"
+          // onSelect={handleSelect}
+        />
       </div>
 
       <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
@@ -173,20 +202,20 @@ export const TransactionForm = ({
                   required: { value: true, message: "Amount is required" },
                   disabled: !account.isConnected || token === "",
                   min: {
-                    value: 0.0001,
-                    message: `Minimum amount is 0.0001 ${token}`,
+                    value: 0.5,
+                    message: `Min. amount is 0.5 ${token}`,
                   },
                   max: {
-                    value: 2000,
-                    message: `Max. amount is 2000 ${token}`,
+                    value: 500,
+                    message: `Max. amount is 500 ${token}`,
                   },
                   pattern: {
                     value: /^\d+(\.\d{1,4})?$/,
-                    message: "Invalid amount",
+                    message: "Max. of 4 decimal places",
                   },
                 })}
                 className={`${inputClasses} pl-4 pr-14`}
-                placeholder="0.0000"
+                placeholder="0.5000"
                 title={
                   token === ""
                     ? "Select token to enable amount field"

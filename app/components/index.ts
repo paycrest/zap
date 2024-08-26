@@ -26,5 +26,6 @@ export { FundWalletModal } from "./FundWalletModal";
 
 export { InputError } from "./InputError";
 export { SelectField } from "./SelectField";
+export { NetworksDropdown } from "./NetworksDropdown";
 
 export { inputClasses, primaryBtnClasses, secondaryBtnClasses } from "./Styles";
