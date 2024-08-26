@@ -60,13 +60,13 @@ const connectors = connectorsForWallets(
     },
   ],
   {
-    appName: "Noblocks by Paycrest",
+    appName: "Zap by Paycrest",
     projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
   },
 );
 
 export const config = getDefaultConfig({
-  appName: "Noblocks by Paycrest",
+  appName: "Zap by Paycrest",
   projectId: "1300fc0abe89f84bc8d0ab10368bff6c",
   chains: [baseSepolia, base],
   ssr: true,

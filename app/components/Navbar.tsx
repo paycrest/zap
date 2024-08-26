@@ -25,7 +25,7 @@ export const Navbar = () => {
       >
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center gap-1">
-            <div className="text-lg font-semibold">noblocks</div>
+            <div className="text-lg font-semibold">Zap</div>
             <PaycrestLogo className="size-3" />
           </Link>
         </div>
