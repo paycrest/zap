@@ -12,7 +12,7 @@ import { ToastContainer } from "react-toastify";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Noblocks by Paycrest",
+  title: "Zap by Paycrest",
   description: "Crypto-to-fiat payments in a zap.",
 };
 
