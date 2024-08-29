@@ -1,5 +1,5 @@
 {
-  "name": "@paycrest/zap",
+  "name": "@paycrest/noblocks",
   "version": "0.1.0",
   "author": {
     "name": "Paycrest",
@@ -9,7 +9,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/paycrest/zap"
+    "url": "https://github.com/paycrest/noblocks"
   },
   "description": "Crypto-to-fiat payments in a zap.",
   "private": true,

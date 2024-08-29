@@ -9,7 +9,7 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Zap Waitlist",
+  title: "noblocks Waitlist",
   description: "Crypto-to-fiat payments in a zap.",
 };
 
