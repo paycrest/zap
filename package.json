@@ -29,7 +29,7 @@
     "axios": "^1.7.2",
     "framer-motion": "^11.2.12",
     "jsencrypt": "^3.3.2",
-    "next": "^14.2.6",
+    "next": "^14.2.8",
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
