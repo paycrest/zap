@@ -2,6 +2,16 @@ import JSEncrypt from "jsencrypt";
 import type { InstitutionProps, Token } from "./types";
 
 /**
+ * Concatenates and returns a string of class names.
+ *
+ * @param classes - The class names to concatenate.
+ * @returns A string of concatenated class names.
+ */
+export function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+/**
  * Retrieves the institution name based on the provided institution code.
  *
  * @param code - The institution code.
@@ -106,9 +116,7 @@ export const calculateDuration = (
  * @param network - The network name.
  * @returns An array of supported tokens for the specified network.
  */
-export function fetchSupportedTokens(
-  network = "",
-): Token[] | undefined {
+export function fetchSupportedTokens(network = ""): Token[] | undefined {
   let tokens: { [key: string]: Token[] };
 
   if (process.env.NEXT_PUBLIC_ENVIRONMENT === "mainnet") {
@@ -155,9 +163,7 @@ export function shortenAddress(address: string, chars = 4): string {
  * @param network - The network for which to retrieve the contract address.
  * @returns The contract address for the specified network, or undefined if the network is not found.
  */
-export function getGatewayContractAddress(
-  network = "",
-): string | undefined {
+export function getGatewayContractAddress(network = ""): string | undefined {
   return {
     Base: "0x30f6a8457f8e42371e204a9c103f2bd42341dd0f",
     "Base Sepolia": "0x847dfdaa218f9137229cf8424378871a1da8f625",

@@ -1,5 +1,4 @@
 "use client";
-import { BiSolidPlusCircle } from "react-icons/bi";
 import { Fragment, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { HiCheck, HiOutlineDuplicate } from "react-icons/hi";
@@ -11,7 +10,6 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 
-import { Tooltip } from "./Tooltip";
 import { primaryBtnClasses } from "./Styles";
 import { shortenAddress } from "../utils";
 
@@ -37,15 +35,14 @@ export const FundWalletModal = ({ address }: { address: string }) => {
 
   return (
     <>
-      <Tooltip message="Fund your smart wallet for gasless transactions">
-        <button
-          type="button"
-          onClick={openModal}
-          aria-label="Fund smart wallet"
-        >
-          <BiSolidPlusCircle className="text-lg text-blue-600 dark:text-blue-500" />
-        </button>
-      </Tooltip>
+      <button
+        type="button"
+        onClick={openModal}
+        aria-label="Fund smart wallet"
+        className="font-semibold text-blue-600 dark:text-blue-500"
+      >
+        Fund
+      </button>
 
       <Transition show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={closeModal}>
@@ -72,7 +69,7 @@ export const FundWalletModal = ({ address }: { address: string }) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <DialogPanel className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all dark:bg-neutral-800">
+                <DialogPanel className="z-50 w-full max-w-sm transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all dark:bg-neutral-800">
                   <DialogTitle
                     as="h3"
                     className="border-b border-gray-200 bg-gray-50 px-6 py-4 text-lg font-semibold leading-6 text-neutral-900 dark:border-white/10 dark:bg-white/5 dark:text-white"

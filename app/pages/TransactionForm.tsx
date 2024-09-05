@@ -130,35 +130,6 @@ export const TransactionForm = ({
       className="z-50 grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
       noValidate
     >
-      {/* Networks */}
-      <div className="flex items-center justify-between gap-3 font-medium">
-        <input type="hidden" {...register("network")} value={selectedNetwork} />
-
-        {/* Render network buttons */}
-        {networks.map((network) => (
-          <NetworkButton
-            key={network}
-            network={network}
-            logo={`/${network}-logo.svg`}
-            alt={`${network} logo`}
-            selectedNetwork={selectedNetwork}
-            handleNetworkChange={handleNetworkChange}
-            disabled={network !== "base"}
-          />
-        ))}
-
-        {/* Other network buttons */}
-        <NetworksDropdown
-          id="person"
-          title="Select Person"
-          data={otherNetworks}
-          hasImage
-          style="bg-purple-800"
-          selectedId="3"
-          // onSelect={handleSelect}
-        />
-      </div>
-
       <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
         <div className="flex items-start gap-4">
           {/* Token */}
