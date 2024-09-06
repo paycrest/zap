@@ -14,7 +14,6 @@ interface DropdownItem {
 }
 
 interface DropdownProps {
-  id: string;
   selectedId?: string;
   onSelect?: (id: string) => void;
 }
@@ -46,11 +45,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export const NetworksDropdown = ({
-  id,
-  selectedId,
-  onSelect,
-}: DropdownProps) => {
+export const NetworksDropdown = ({ selectedId, onSelect }: DropdownProps) => {
   const data = networks as DropdownItem[];
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<DropdownItem | undefined>(
@@ -81,7 +76,7 @@ export const NetworksDropdown = ({
   return (
     <div ref={dropdownRef} className="relative">
       <button
-        id={id}
+        id="networks-dropdown"
         aria-label="Toggle dropdown"
         aria-haspopup="true"
         aria-expanded={isOpen}
@@ -123,7 +118,11 @@ export const NetworksDropdown = ({
           aria-label="Dropdown menu"
           className="absolute right-0 z-10 mt-4 max-h-52 min-w-40 max-w-full overflow-y-auto rounded-xl bg-gray-50 shadow-xl dark:bg-neutral-800"
         >
-          <ul role="menu" aria-labelledby={id} aria-orientation="vertical">
+          <ul
+            role="menu"
+            aria-labelledby="networks-dropdown"
+            aria-orientation="vertical"
+          >
             {data?.map((item) => (
               <li
                 key={item.id}
