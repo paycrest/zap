@@ -77,7 +77,6 @@ export const Navbar = () => {
               <WalletDetails />
 
               <NetworksDropdown
-                id="person"
                 selectedId="1"
                 // onSelect={handleSelect}
               />
