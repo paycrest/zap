@@ -4,12 +4,13 @@ export { Preloader } from "./Preloader";
 export { LogoOutlineBg } from "./LogoOutlineBg";
 
 export { Disclaimer } from "./Disclaimer";
-
 export { ThemeSwitch } from "./ThemeSwitch";
 export { WalletDetails } from "./WalletDetails";
+
 export {
   AnimatedPage,
   AnimatedComponent,
+  AnimatedFeedbackItem,
   slideInDown,
   slideInOut,
   scaleInOut,
@@ -18,15 +19,13 @@ export {
 } from "./AnimatedComponents";
 
 export { Tooltip } from "./Tooltip";
+export { FundWalletModal } from "./FundWalletModal";
+
 export { TransactionForm } from "../pages/TransactionForm";
 export { TransactionPreview } from "../pages/TransactionPreview";
 
-export { TabButton } from "./TabButton";
-export { NetworkButton } from "./NetworkButton";
-export { FundWalletModal } from "./FundWalletModal";
-
 export { InputError } from "./InputError";
-export { SelectField } from "./SelectField";
+export { FormDropdown } from "./FormDropdown";
 export { NetworksDropdown } from "./NetworksDropdown";
-
+export { RecipientDetailsForm } from "./RecipientDetailsForm";
 export { inputClasses, primaryBtnClasses, secondaryBtnClasses } from "./Styles";

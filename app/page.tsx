@@ -27,12 +27,19 @@ import type { FormData, InstitutionProps, StateProps } from "./types";
 const INITIAL_FORM_STATE: FormData = {
   network: "",
   token: "",
-  amount: 0,
   currency: "",
   institution: "",
   accountIdentifier: "",
   recipientName: "",
   memo: "",
+  amountSent: 0,
+  amountReceived: 0,
+};
+
+const STEPS = {
+  FORM: "form",
+  PREVIEW: "preview",
+  STATUS: "status",
 };
 
 /**
@@ -44,20 +51,32 @@ export default function Home() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
   const [isFetchingRate, setIsFetchingRate] = useState(false);
-  const [isFetchingRecipientName, setIsFetchingRecipientName] = useState(false);
 
   const [rate, setRate] = useState<number>(0);
-  const [recipientName, setRecipientName] = useState<string>("");
   const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
   const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
   const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
+  const [currentStep, setCurrentStep] = useState(STEPS.FORM);
+  const [formData, setFormData] = useState({});
+
+  const [transactionStatus, setTransactionStatus] = useState<
+    | "idle"
+    | "pending"
+    | "processing"
+    | "fulfilled"
+    | "validated"
+    | "settled"
+    | "refunded"
+  >("idle");
+  const [createdAt, setCreatedAt] = useState<string>("");
+  const [orderId, setOrderId] = useState<string>("");
 
   // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
-  const { watch } = formMethods;
-  const { currency, amount, token, accountIdentifier, institution } = watch();
+  const { watch, setValue, control } = formMethods;
+  const { currency, token, accountIdentifier, institution } = watch();
 
   // Get account information using custom hook
   const account = useAccount();
@@ -86,19 +105,6 @@ export default function Home() {
     args: [account.address!],
   });
 
-  // Transaction status and error handling
-  const [transactionStatus, setTransactionStatus] = useState<
-    | "idle"
-    | "pending"
-    | "processing"
-    | "fulfilled"
-    | "validated"
-    | "settled"
-    | "refunded"
-  >("idle");
-  const [createdAt, setCreatedAt] = useState<string>("");
-  const [orderId, setOrderId] = useState<string>("");
-
   const { switchChain } = useSwitchChain();
 
   /**
@@ -124,8 +130,7 @@ export default function Home() {
     smartTokenBalance,
     rate,
     isFetchingRate,
-    recipientName,
-    isFetchingRecipientName,
+    recipientName: "",
     institutions,
     isFetchingInstitutions,
     selectedTab,
@@ -137,15 +142,15 @@ export default function Home() {
     setTransactionStatus,
   };
 
+  // * START: USE EFFECTS * //
+
   // Fetch supported institutions based on currency
   useEffect(() => {
     const getInstitutions = async () => {
-      if (!currency) return;
-
       setIsFetchingInstitutions(true);
 
       try {
-        const institutions = await fetchSupportedInstitutions(currency);
+        const institutions = await fetchSupportedInstitutions("NGN");
         setInstitutions(institutions);
         setIsFetchingInstitutions(false);
       } catch (error) {
@@ -155,41 +160,7 @@ export default function Home() {
 
     getInstitutions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency]);
-
-  // Fetch recipient name based on institution and account identifier
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    const getRecipientName = async () => {
-      if (!accountIdentifier || !institution) return;
-
-      setIsFetchingRecipientName(true);
-
-      try {
-        const accountName = await fetchAccountName({
-          institution,
-          accountIdentifier,
-        });
-        setRecipientName(accountName);
-        setIsFetchingRecipientName(false);
-      } catch (error) {
-        setRecipientName("");
-        setIsFetchingRecipientName(false);
-      }
-    };
-
-    const debounceFetchRecipientName = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(getRecipientName, 1000);
-    };
-
-    debounceFetchRecipientName();
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountIdentifier, institution]);
+  }, []);
 
   // Reset transaction status and form values when account status changes
   useEffect(() => {
@@ -218,15 +189,15 @@ export default function Home() {
 
   // Fetch rate based on currency, amount, and token
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    // let timeoutId: NodeJS.Timeout;
     const getRate = async () => {
-      if (!currency || !amount || !token) return;
+      // if (!currency || !amount || !token) return;
       setIsFetchingRate(true);
       try {
         const rate = await fetchRate({
           token: "USDT",
-          amount: amount,
-          currency: currency,
+          amount: 0,
+          currency: "NGN",
         });
         setRate(rate.data);
         setIsFetchingRate(false);
@@ -235,18 +206,20 @@ export default function Home() {
       }
     };
 
-    const debounceFetchRate = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(getRate, 1000);
-    };
+    getRate();
 
-    debounceFetchRate();
+    // const debounceFetchRate = () => {
+    //   clearTimeout(timeoutId);
+    //   timeoutId = setTimeout(getRate, 1000);
+    // };
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    // debounceFetchRate();
+
+    // return () => {
+    //   clearTimeout(timeoutId);
+    // };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currency, amount, token]);
+  }, []);
 
   const tokenDecimals = fetchSupportedTokens(account.chain?.name)?.find(
     (t) => t.symbol.toUpperCase() === token,
@@ -271,52 +244,45 @@ export default function Home() {
     setIsPageLoading(false);
   }, []);
 
+  // * END: USE EFFECTS * //
+
+  const handleFormSubmit = (data: FormData) => {
+    setFormValues(data);
+    setCurrentStep(STEPS.PREVIEW);
+  };
+
+  const handleBackToForm = () => {
+    setCurrentStep(STEPS.FORM);
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case STEPS.FORM:
+        return (
+          <TransactionForm
+            onSubmit={handleFormSubmit}
+            formMethods={formMethods}
+            stateProps={stateProps}
+          />
+        );
+      case STEPS.PREVIEW:
+        return (
+          <TransactionPreview
+            handleBackButtonClick={handleBackToForm}
+            stateProps={stateProps}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <Preloader isLoading={isPageLoading} />
-
       <Disclaimer />
-
       <AnimatePresence mode="wait">
-        {transactionStatus !== "idle" ? (
-          <AnimatedPage componentKey="transaction-status">
-            <TransactionStatus
-              formMethods={formMethods}
-              transactionStatus={transactionStatus}
-              createdAt={createdAt}
-              orderId={orderId}
-              recipientName={stateProps.recipientName}
-              clearForm={() => setFormValues(INITIAL_FORM_STATE)}
-              clearTransactionStatus={() => {
-                setTransactionStatus("idle");
-              }}
-              setTransactionStatus={setTransactionStatus}
-            />
-          </AnimatedPage>
-        ) : (
-          <>
-            {Object.values(formValues).every(
-              (value) => value === "" || value === 0,
-            ) ? (
-              <AnimatedPage componentKey="transaction-form">
-                <TransactionForm
-                  onSubmit={(data: FormData) => setFormValues(data)}
-                  formMethods={formMethods}
-                  stateProps={stateProps}
-                />
-              </AnimatedPage>
-            ) : (
-              <AnimatedPage componentKey="transaction-preview">
-                <TransactionPreview
-                  handleBackButtonClick={() =>
-                    setFormValues(INITIAL_FORM_STATE)
-                  }
-                  stateProps={stateProps}
-                />
-              </AnimatedPage>
-            )}
-          </>
-        )}
+        <AnimatedPage componentKey={currentStep}>{renderStep()}</AnimatedPage>
       </AnimatePresence>
     </>
   );

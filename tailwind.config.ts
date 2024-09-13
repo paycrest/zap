@@ -7,11 +7,7 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      maxWidth: {
-        mobile: "428px", // 412px (width) + 16px (padding)
-      },
-    },
+    extend: {},
   },
   plugins: [],
   darkMode: "class",

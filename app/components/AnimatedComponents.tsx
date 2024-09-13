@@ -16,23 +16,6 @@ const pageTransition = {
   duration: 0.5,
 };
 
-// Animated wrapper component
-export const AnimatedPage: React.FC<{
-  children: ReactNode;
-  componentKey: string;
-}> = ({ children, componentKey }) => (
-  <motion.div
-    key={componentKey}
-    initial="initial"
-    animate="in"
-    exit="out"
-    variants={pageVariants}
-    transition={pageTransition}
-  >
-    {children}
-  </motion.div>
-);
-
 export const fadeInOut = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -57,24 +40,17 @@ export const scaleInOut = {
   exit: { scale: 0 },
 };
 
-// Animated component wrapper
-export const AnimatedComponent = ({
-  children,
-  variant = fadeInOut,
-  className = "",
-  delay = 0,
-}: AnimatedComponentProps) => (
-  <motion.div
-    variants={variant}
-    initial="initial"
-    animate="animate"
-    exit="exit"
-    transition={{ duration: 0.3, delay }}
-    className={className}
-  >
-    {children}
-  </motion.div>
-);
+export const fadeInLeft = {
+  initial: { opacity: 0, x: -20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -20 },
+};
+
+export const fadeInRight = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: 20 },
+};
 
 export const dropdownVariants = {
   open: {
@@ -96,3 +72,55 @@ export const dropdownVariants = {
     },
   },
 };
+
+// Animated wrapper component
+export const AnimatedPage: React.FC<{
+  children: ReactNode;
+  componentKey: string;
+}> = ({ children, componentKey }) => (
+  <motion.div
+    key={componentKey}
+    initial="initial"
+    animate="in"
+    exit="out"
+    variants={pageVariants}
+    transition={pageTransition}
+  >
+    {children}
+  </motion.div>
+);
+
+// Animated component wrapper
+export const AnimatedComponent = ({
+  children,
+  variant = fadeInOut,
+  className = "",
+  delay = 0,
+}: AnimatedComponentProps) => (
+  <motion.div
+    variants={variant}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    transition={{ duration: 0.3, delay }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
+
+// Animated feedback item wrapper
+export const AnimatedFeedbackItem = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <AnimatedComponent
+    variant={slideInDown}
+    className={`flex flex-1 items-center gap-1 ${className}`}
+  >
+    {children}
+  </AnimatedComponent>
+);

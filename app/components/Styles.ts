@@ -1,5 +1,5 @@
 export const primaryBtnClasses =
-  "text-sm rounded-xl bg-blue-600 px-4 py-2.5 font-medium text-white transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-zinc-800 dark:disabled:text-white/50 disabled:hover:scale-100";
+  "text-sm rounded-xl bg-blue-600 px-4 py-2.5 font-medium text-white transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-neutral-800 dark:disabled:text-white/50 disabled:hover:scale-100";
 
 export const secondaryBtnClasses =
   "text-sm rounded-xl bg-transparent border border-gray-400 px-4 py-2.5 font-medium text-neutral-900 transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 dark:bg-neutral-800 dark:text-white dark:border-transparent dark:focus-visible:ring-offset-neutral-900 disabled:hover:scale-100";

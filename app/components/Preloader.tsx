@@ -9,7 +9,7 @@ export const Preloader = ({ isLoading }: { isLoading: boolean }) => {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="pointer-events-none fixed inset-0 z-50 grid min-h-screen place-items-center gap-4 bg-white dark:bg-neutral-900"
+          className="pointer-events-none fixed inset-0 z-50 grid min-h-screen cursor-progress place-items-center gap-4 bg-white dark:bg-neutral-900"
         >
           <motion.div
             initial={{ scale: 1 }}

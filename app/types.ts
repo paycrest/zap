@@ -3,6 +3,9 @@ import type {
   FieldErrors,
   UseFormRegister,
   UseFormHandleSubmit,
+  UseFormSetValue,
+  Control,
+  UseFormReturn,
 } from "react-hook-form";
 
 export type InstitutionProps = {
@@ -14,35 +17,37 @@ export type InstitutionProps = {
 export type FormData = {
   network: string;
   token: string;
-  amount: number;
   currency: string;
   institution: string;
   accountIdentifier: string;
   recipientName: string;
   memo: string;
-};
 
-export type FormMethods = {
-  handleSubmit: UseFormHandleSubmit<FormData, undefined>;
-  register: UseFormRegister<FormData>;
-  watch: (name: string) => string | number | undefined;
-  formState: {
-    errors: FieldErrors<FormData>;
-    isValid: boolean;
-    isDirty: boolean;
-    isSubmitting: boolean;
-  };
+  amountSent: number;
+  amountReceived: number;
 };
 
 export type TransactionFormProps = {
   onSubmit: any;
-  formMethods: FormMethods;
+  formMethods: UseFormReturn<FormData, any, undefined>;
   stateProps: StateProps;
 };
 
 export type TransactionPreviewProps = {
   handleBackButtonClick: () => void;
   stateProps: StateProps;
+};
+
+export type RecipientDetailsFormProps = {
+  formMethods: UseFormReturn<FormData, any, undefined>;
+  stateProps: StateProps;
+};
+
+export type RecipientDetails = {
+  name: string;
+  institution: string;
+  institutionCode: string;
+  accountIdentifier: string;
 };
 
 export type TransactionStatusProps = {
@@ -69,7 +74,7 @@ export type TransactionStatusProps = {
       | "settled"
       | "refunded",
   ) => void;
-  formMethods: FormMethods;
+  formMethods: UseFormReturn<FormData, any, undefined>;
 };
 
 export type SelectFieldProps = {
@@ -147,7 +152,6 @@ export type StateProps = {
   rate: number;
   isFetchingRate: boolean;
   recipientName: string;
-  isFetchingRecipientName: boolean;
   institutions: InstitutionProps[];
   isFetchingInstitutions: boolean;
   selectedTab: string;
