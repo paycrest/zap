@@ -28,7 +28,7 @@ export default function RootLayout({
           <div className="min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
             <Navbar />
             <div className="relative z-10 mx-auto flex min-h-screen flex-col items-center px-4 pt-20 transition-all">
-              <main className="w-full max-w-mobile flex-grow">{children}</main>
+              <main className="w-full max-w-md flex-grow">{children}</main>
               <Footer />
             </div>
             <LogoOutlineBg />

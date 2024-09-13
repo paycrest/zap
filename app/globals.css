@@ -19,6 +19,10 @@ select {
   appearance: none;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .loader {
   width: 48px;
   height: 48px;

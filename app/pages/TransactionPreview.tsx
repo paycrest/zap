@@ -48,7 +48,6 @@ export const TransactionPreview = ({
     formValues,
     smartTokenBalance,
     rate,
-    recipientName,
     institutions: supportedInstitutions,
     setCreatedAt,
     setOrderId,
@@ -69,16 +68,32 @@ export const TransactionPreview = ({
   const [isOrderCreatedLogsFetched, setIsOrderCreatedLogsFetched] =
     useState<boolean>(false);
 
-  const { amount, token, currency, accountIdentifier, institution, memo } =
-    formValues;
+  const {
+    amountSent,
+    token,
+    currency,
+    accountIdentifier,
+    institution,
+    recipientName,
+    memo,
+    network,
+    amountReceived,
+  } = formValues;
+
+  console.log(institution);
 
   // Rendered transaction information
   const renderedInfo = {
-    amount: `${formatNumberWithCommas(amount)} ${token}`,
-    totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
-    recipient: recipientName,
+    amount: `${formatNumberWithCommas(amountSent ?? 0)} ${token}`,
+    totalValue: `${formatCurrency(amountReceived ?? 0, currency, `en-NG`)}`,
+    recipient: recipientName
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
-    memo: memo,
+    description: memo,
+    network: network,
   };
 
   const account = useAccount();
@@ -227,7 +242,7 @@ export const TransactionPreview = ({
 
           if (
             decodedLog.args.value ===
-            parseUnits(amount.toString(), tokenDecimals!)
+            parseUnits(amountSent.toString(), tokenDecimals!)
           ) {
             clearInterval(intervalId);
             setIsApprovalLogsFetched(true);
@@ -249,17 +264,13 @@ export const TransactionPreview = ({
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, isApprovalLogsFetched, isConfirming]);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    if (
-      !client ||
-      isOrderCreatedLogsFetched ||
-      !isConfirming
-    )
-      return;
+    if (!client || isOrderCreatedLogsFetched || !isConfirming) return;
 
     const getOrderCreatedLogs = async () => {
       try {
@@ -307,6 +318,8 @@ export const TransactionPreview = ({
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, isOrderCreatedLogsFetched, isConfirming]);
 
   const prepareCreateOrderParams = async () => {
@@ -326,7 +339,7 @@ export const TransactionPreview = ({
     // Prepare transaction parameters
     const params = {
       token: tokenAddress,
-      amount: parseUnits(amount.toString(), tokenDecimals!),
+      amount: parseUnits(amountSent.toString(), tokenDecimals!),
       rate: parseUnits(rate.toString(), 0),
       senderFeeRecipient: getAddress(
         "0x0000000000000000000000000000000000000000",
@@ -344,7 +357,7 @@ export const TransactionPreview = ({
       const params = await prepareCreateOrderParams();
       setCreatedAt(new Date().toISOString());
 
-      if (smartTokenBalance >= amount) {
+      if (smartTokenBalance >= amountSent) {
         // Create order with sponsored user operation
         let transactions = [
           {
@@ -365,7 +378,7 @@ export const TransactionPreview = ({
           },
         ];
 
-        if (smartGatewayAllowance < amount) {
+        if (smartGatewayAllowance < amountSent) {
           // Approve gateway contract to spend token
           transactions.push({
             to: tokenAddress,
@@ -374,13 +387,13 @@ export const TransactionPreview = ({
               functionName: "approve",
               args: [
                 getGatewayContractAddress(account.chain?.name) as `0x${string}`,
-                parseUnits(amount.toString(), tokenDecimals!),
+                parseUnits(amountSent.toString(), tokenDecimals!),
               ],
             }),
           });
         }
 
-        if (paymasterAllowance < amount) {
+        if (paymasterAllowance < amountSent) {
           // Approve paymaster contract to spend token
           transactions.push({
             to: tokenAddress,
@@ -389,7 +402,7 @@ export const TransactionPreview = ({
               functionName: "approve",
               args: [
                 getAddress("0x00000f79b7faf42eebadba19acc07cd08af44789"),
-                parseUnits(amount.toString(), tokenDecimals!),
+                parseUnits(amountSent.toString(), tokenDecimals!),
               ],
             }),
           });
@@ -432,18 +445,18 @@ export const TransactionPreview = ({
     try {
       setIsConfirming(true);
 
-      if (smartTokenBalance >= amount) {
+      if (smartTokenBalance >= amountSent) {
         await createOrder();
       } else {
         // Approve gateway contract to spend token
-        if (gatewayAllowance < amount) {
+        if (gatewayAllowance < amountSent) {
           await writeContractAsync({
             address: tokenAddress,
             abi: erc20Abi,
             functionName: "approve",
             args: [
               getAddress(getGatewayContractAddress(account.chain?.name)!),
-              parseUnits(amount.toString(), tokenDecimals!),
+              parseUnits(amountSent.toString(), tokenDecimals!),
             ],
           });
 
@@ -484,18 +497,26 @@ export const TransactionPreview = ({
         {/* Render transaction information */}
         {Object.entries(renderedInfo).map(([key, value]) => (
           <div key={key} className="flex items-center justify-between gap-2">
-            <h3 className="flex-1 text-gray-500 dark:text-white/50">
+            <h3 className="w-full max-w-28 capitalize text-gray-500 dark:text-white/50 sm:max-w-40">
               {/* Capitalize the first letter of the key */}
-              {key === "totalValue"
-                ? "Total Value"
-                : key.charAt(0).toUpperCase() + key.slice(1)}
+              {key === "totalValue" ? "Total value" : key}
             </h3>
-            <p className="flex flex-1 items-center gap-1 font-medium text-neutral-900 dark:text-white/80">
+            <p className="flex flex-grow items-center gap-1 text-neutral-900 dark:text-white/80">
               {/* Render token logo for amount and fee */}
               {(key === "amount" || key === "fee") && (
                 <Image
                   src={`/${token.toLowerCase()}-logo.svg`}
                   alt={`${token} logo`}
+                  width={14}
+                  height={14}
+                />
+              )}
+
+              {/* Render network logo for network */}
+              {key === "network" && (
+                <Image
+                  src={`/${value.toLowerCase()}-logo.svg`}
+                  alt={`${value} logo`}
                   width={14}
                   height={14}
                 />
@@ -518,20 +539,20 @@ export const TransactionPreview = ({
       <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
 
       {/* Confirm and Approve */}
-      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
+      {gatewayAllowance < amountSent && smartTokenBalance < amountSent && (
         <p className="text-gray-500 dark:text-white/50">
           To confirm order, you&apos;ll be required to approve these two
           permissions from your wallet
         </p>
       )}
 
-      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
-        <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
+      {gatewayAllowance < amountSent && smartTokenBalance < amountSent && (
+        <div className="flex flex-wrap items-center justify-between gap-y-4 text-gray-500 dark:text-white/50">
           <p>
             {/* replace 1 with 2 when the approve state is set to complete */}
             <span>{isGatewayApproved ? 2 : 1}</span> of 2
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 dark:bg-white/5">
               {isGatewayApproved ? (
                 <PiCheckCircleFill className="text-lg text-green-700 dark:text-green-500" />

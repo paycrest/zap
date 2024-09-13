@@ -1,44 +1,22 @@
 "use client";
-import Image from "next/image";
 import { useAccount } from "wagmi";
-import { ImSpinner2 } from "react-icons/im";
-import { FaRegHourglass } from "react-icons/fa6";
-import { useSmartAccount } from "@biconomy/use-aa";
-import { AnimatePresence, motion } from "framer-motion";
-import { PiCheckCircle } from "react-icons/pi";
+import { AnimatePresence } from "framer-motion";
 
 import {
   AnimatedComponent,
-  NetworksDropdown,
-  FundWalletModal,
   InputError,
-  NetworkButton,
-  SelectField,
-  TabButton,
-  Tooltip,
-  fadeInOut,
-  inputClasses,
   primaryBtnClasses,
-  slideInDown,
   slideInOut,
+  FormDropdown,
+  RecipientDetailsForm,
+  NetworksDropdown,
 } from "../components";
-import { fetchSupportedTokens, formatCurrency } from "../utils";
-import type { InstitutionProps, TransactionFormProps } from "../types";
-import { HiOutlineInformationCircle } from "react-icons/hi";
-
-const currencies = [
-  { value: "NGN", label: "\uD83C\uDDF3\uD83C\uDDEC Nigerian Naira (NGN)" },
-  {
-    value: "KES",
-    label: "\uD83C\uDDF0\uD83C\uDDEA Kenyan Shilling (KES)",
-    disabled: true,
-  },
-  {
-    value: "GHS",
-    label: "\uD83C\uDDEC\uD83C\uDDED Ghanaian Cedi (GHS)",
-    disabled: true,
-  },
-];
+import type { TransactionFormProps } from "../types";
+import { currencies, networks, tokens } from "../mocks";
+import { NoteIcon, WalletIcon } from "../components/ImageAssets";
+import { useState, useEffect } from "react";
+import { BsArrowDown } from "react-icons/bs";
+import { DevTool } from "@hookform/devtools";
 
 /**
  * TransactionForm component renders a form for submitting a transaction.
@@ -55,43 +33,31 @@ export const TransactionForm = ({
   stateProps,
 }: TransactionFormProps) => {
   // Destructure stateProps
-  const {
-    tokenBalance,
-    smartTokenBalance,
-    rate,
-    isFetchingRate,
-    recipientName,
-    isFetchingRecipientName,
-    selectedNetwork,
-    handleNetworkChange,
-    selectedTab,
-    handleTabChange,
-    isFetchingInstitutions: institutionsLoading,
-    institutions: supportedInstitutions,
-  } = stateProps;
+  const { tokenBalance, rate, isFetchingRate } = stateProps;
 
   // Destructure formMethods from react-hook-form
   const {
     handleSubmit,
     register,
     watch,
+    control,
+    setValue,
     formState: { errors, isValid, isDirty },
   } = formMethods;
 
   // Get values of currency, amount, and token from form
-  const currency = watch("currency");
-  const amount = watch("amount");
   const token = watch("token");
+  const amountSent = watch("amountSent");
+  const amountReceived = watch("amountReceived");
 
   // Get account information using custom hook
   const account = useAccount();
-  const { smartAccountAddress } = useSmartAccount();
 
   // Array of objects for rendering rate and fee information
   const rateInfo = {
     key: "rate",
     label: "Rate",
-    value: `${formatCurrency(rate, currency?.toString(), currency ? `en-${currency.toString().slice(0, 2)}` : "en-NG")}/${token}`,
+    value: rate,
   };
 
   const feeInfo = {
@@ -102,384 +68,225 @@ export const TransactionForm = ({
 
   const renderedInfo = [rateInfo, feeInfo];
 
-  // const handleSelect = (id: string) => {
-  //   console.log(`Selected item with id ${id}`);
-  // };
+  const [isReceiveInputActive, setIsReceiveInputActive] = useState(false);
 
-  // Array of available networks
-  const networks = ["base", "arbitrum", "polygon"];
+  const handleMaxClick = () => {
+    setValue("amountSent", tokenBalance);
+    setIsReceiveInputActive(false);
+  };
 
-  const otherNetworks = [
-    {
-      id: "1",
-      name: "Ethereum",
-      imageUrl: "/ethereum-logo.svg",
-      disabled: true,
-    },
-    {
-      id: "2",
-      name: "Binance",
-      imageUrl: "/binance-logo.svg",
-      disabled: true,
-    },
-  ];
+  // Effect to calculate receive amount based on send amount and rate
+  useEffect(() => {
+    if (rate) {
+      if (isReceiveInputActive) {
+        setValue(
+          "amountSent",
+          Number((Number(amountReceived) / rate).toFixed(4)),
+        );
+      } else {
+        setValue("amountReceived", Number((rate * amountSent).toFixed(4)));
+      }
+    }
+  }, [amountSent, amountReceived, rate, isReceiveInputActive, setValue]);
+
+  // set the default value of the currency and token
+  useEffect(() => {
+    register("currency", { value: currencies[0].name });
+    register("token", { value: tokens[0].name });
+    register("network", { value: networks[0].name });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="z-50 grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
-      noValidate
-    >
-      <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
-        <div className="flex items-start gap-4">
-          {/* Token */}
-          <div className="grid flex-1 gap-2">
-            <SelectField
-              id="token"
-              label="Token"
-              options={
-                fetchSupportedTokens(account.chain?.name)?.map((token) => ({
-                  value: token.symbol,
-                  label: token.symbol,
-                })) ?? []
+    <>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="z-50 grid gap-6 py-10 text-sm text-neutral-900 transition-all dark:text-white"
+        noValidate
+      >
+        <div className="space-y-2 rounded-2xl bg-gray-50 p-2 dark:bg-neutral-800">
+          {/* Header */}
+          <div className="flex items-center justify-between px-2">
+            <h3 className="font-medium">Swap</h3>
+            <NetworksDropdown
+              selectedId="1"
+              onSelect={(selectedNetwork) =>
+                setValue("network", selectedNetwork)
               }
-              validation={{
-                required: { value: true, message: "Token is required" },
-                disabled: !account.isConnected,
-              }}
-              errors={errors}
-              register={register}
-              value={watch("token")}
-              defaultValue="DAI"
-              title={
-                account.isConnected
-                  ? "Select token to send"
-                  : "Connect wallet to select token"
-              }
+              iconOnly={true}
             />
           </div>
 
-          {/* Amount */}
-          <div className="grid flex-1 gap-2">
-            <label htmlFor="amount" className="font-medium">
-              Amount <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
+          {/* Amount to send & Token w/ wallet balance */}
+          <div className="relative space-y-3.5 rounded-2xl bg-white px-4 py-3 dark:bg-neutral-900">
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="amount-sent"
+                className="text-gray-500 dark:text-white/80"
+              >
+                Send
+              </label>
+              <div className="flex items-center gap-2">
+                <WalletIcon className="fill-gray-500 dark:fill-none" />
+                <p>{Math.round(tokenBalance * 100) / 100}</p>
+                <button
+                  type="button"
+                  onClick={handleMaxClick}
+                  className="font-medium text-blue-600 dark:text-blue-500"
+                >
+                  Max
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-2">
               <input
-                id="amount"
+                id="amount-sent"
                 type="number"
                 step="0.0001"
-                {...register("amount", {
+                {...register("amountSent", {
                   required: { value: true, message: "Amount is required" },
                   disabled: !account.isConnected || token === "",
                   min: {
                     value: 0.5,
-                    message: `Min. amount is 0.5 ${token}`,
+                    message: `Min. amount is 0.5`,
                   },
                   max: {
                     value: 500,
-                    message: `Max. amount is 500 ${token}`,
+                    message: `Max. amount is 500`,
                   },
                   pattern: {
                     value: /^\d+(\.\d{1,4})?$/,
-                    message: "Max. of 4 decimal places",
+                    message: "Max. of 4 decimal places + no leading dot",
                   },
+                  onChange: () => setIsReceiveInputActive(false),
                 })}
-                className={`${inputClasses} pl-4 pr-14`}
-                placeholder="0.5000"
-                title={
-                  token === ""
-                    ? "Select token to enable amount field"
-                    : !account.isConnected
-                      ? "Connect wallet to enable amount field"
-                      : "Enter amount to send"
-                }
+                className="w-full rounded-xl border-b border-transparent bg-transparent py-2 text-2xl text-neutral-900 outline-none transition-all placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30"
+                placeholder="0"
+                title="Enter amount to send"
               />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                {watch("token")}
+
+              <FormDropdown
+                defaultTitle="Select token"
+                data={tokens}
+                defaultSelectedId="2"
+                onSelect={(selectedToken) => setValue("token", selectedToken)}
+              />
+            </div>
+            {errors.amountSent && (
+              <InputError message={errors.amountSent.message} />
+            )}
+
+            {/* Arrow showing swap direction */}
+            <div className="absolute -bottom-5 left-1/2 z-10 w-fit -translate-x-1/2 rounded-xl border-4 border-gray-50 bg-gray-50 dark:border-neutral-800 dark:bg-neutral-800">
+              <div className="rounded-lg bg-white p-1 dark:bg-neutral-900">
+                <BsArrowDown className="text-xl text-gray-500 dark:text-white/80" />
               </div>
             </div>
-            {errors.amount && <InputError message={errors.amount.message} />}
+          </div>
+
+          {/* Amount to receive & currency */}
+          <div className="space-y-3.5 rounded-2xl bg-white px-4 py-3 dark:bg-neutral-900">
+            <label
+              htmlFor="amount-received"
+              className="text-gray-500 dark:text-white/80"
+            >
+              Receive
+            </label>
+
+            <div className="flex items-center justify-between gap-2">
+              <input
+                id="amount-received"
+                type="number"
+                step="0.0001"
+                {...register("amountReceived", {
+                  onChange: () => setIsReceiveInputActive(true),
+                })}
+                className="w-full rounded-xl border-b border-transparent bg-transparent py-2 text-2xl text-neutral-900 outline-none transition-all placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30"
+                placeholder="0"
+                title="Amount to receive"
+              />
+
+              <FormDropdown
+                defaultTitle="Select currency"
+                data={currencies}
+                defaultSelectedId="2"
+                onSelect={(selectedCurrency) =>
+                  setValue("currency", selectedCurrency)
+                }
+              />
+            </div>
+            {errors.amountReceived && (
+              <InputError message={errors.amountReceived.message} />
+            )}
           </div>
         </div>
 
-        {/* Wallet and Smart Wallet Balance */}
-        <AnimatePresence mode="wait">
-          {account.status === "connected" && token !== "" && (
+        {/* Recipient and memo */}
+        <div className="space-y-2 rounded-2xl bg-gray-50 p-2 dark:bg-neutral-800">
+          <RecipientDetailsForm
+            formMethods={formMethods}
+            stateProps={stateProps}
+          />
+
+          {/* Memo */}
+          <div className="relative">
+            <NoteIcon className="absolute left-2 top-2.5 fill-gray-200 stroke-gray-300 dark:fill-transparent dark:stroke-none" />
+            <input
+              type="text"
+              id="memo"
+              {...register("memo", {
+                required: { value: true, message: "Add description" },
+              })}
+              className="w-full rounded-xl border border-gray-300 bg-transparent py-2 pl-8 pr-4 text-sm text-neutral-900 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/20 dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30 dark:focus-visible:ring-offset-neutral-900"
+              placeholder="Add description"
+              maxLength={25}
+            />
+          </div>
+          {errors.memo && <InputError message={errors.memo.message} />}
+        </div>
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          disabled={!isValid || !isDirty || !account.isConnected}
+          className={primaryBtnClasses}
+        >
+          {account.isConnected ? "Swap" : "Connect wallet to continue"}
+        </button>
+
+        {/* Rate and fee */}
+        <AnimatePresence>
+          {rate > 0 && Number(amountSent) > 0.5 && account.isConnected && (
             <AnimatedComponent
-              variant={slideInDown}
-              className="flex items-start justify-between rounded-2xl border border-gray-200 dark:border-white/10"
+              variant={slideInOut}
+              className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5"
             >
-              <div className="grid flex-1 gap-3 p-4">
-                <div className="flex items-center gap-1">
-                  <p className="text-gray-500 dark:text-white/50">
-                    Smart Wallet
+              {renderedInfo.map(({ key, label, value }, index) => (
+                <AnimatedComponent
+                  key={key}
+                  delay={index * 0.1}
+                  className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${index === 1 ? "border-t" : ""}`}
+                >
+                  <p>{label}</p>
+                  <p
+                    className={`rounded-full px-2 py-1 transition-all ${
+                      isFetchingRate
+                        ? "animate-pulse bg-gradient-to-r from-white to-gray-100 dark:from-neutral-800 dark:to-neutral-900"
+                        : "bg-white dark:bg-neutral-900"
+                    }`}
+                  >
+                    <span className={`${isFetchingRate ? "blur-xl" : ""}`}>
+                      {value}
+                    </span>
                   </p>
-                  <FundWalletModal address={smartAccountAddress} />
-                </div>
-                <div className="flex items-center gap-1">
-                  {token && (
-                    <Image
-                      src={`/${String(token)?.toLowerCase()}-logo.svg`}
-                      alt={`${token} logo`}
-                      width={14}
-                      height={14}
-                    />
-                  )}
-                  <p>
-                    {Math.round(smartTokenBalance * 100) / 100} {token}
-                  </p>
-                </div>
-              </div>
-
-              <div className="h-full w-px border border-dashed border-gray-200 dark:border-white/10" />
-
-              <div className="grid flex-1 gap-3 p-4">
-                <p className="text-gray-500 dark:text-white/50">
-                  {account.connector.name}
-                </p>
-                <div className="flex items-center gap-1">
-                  {token && (
-                    <Image
-                      src={`/${String(token)?.toLowerCase()}-logo.svg`}
-                      alt={`${token} logo`}
-                      width={14}
-                      height={14}
-                    />
-                  )}
-                  <p>
-                    {Math.round(tokenBalance * 100) / 100} {token}
-                  </p>
-                </div>
-              </div>
+                </AnimatedComponent>
+              ))}
             </AnimatedComponent>
           )}
         </AnimatePresence>
-      </div>
-
-      {/* Recipient Details */}
-      <div>
-        <div className="flex items-center gap-1 pb-2">
-          <h3 className="font-medium">
-            Recipient details <span className="text-rose-500">*</span>
-          </h3>
-          <Tooltip message="Recipient details will be encrypted onchain.">
-            <HiOutlineInformationCircle className="cursor-pointer text-gray-400 hover:text-gray-500" />
-          </Tooltip>
-        </div>
-
-        <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
-          {/* Tabs */}
-          <div className="flex items-center gap-2 rounded-full bg-gray-50 p-1 font-medium dark:bg-white/5">
-            <TabButton
-              tab="bank-transfer"
-              selectedTab={selectedTab}
-              handleTabChange={handleTabChange}
-            />
-            <TabButton
-              tab="mobile-money"
-              selectedTab={selectedTab}
-              handleTabChange={handleTabChange}
-            />
-          </div>
-
-          {/* Bank Transfer Tab Contents */}
-          {selectedTab === "bank-transfer" && (
-            <motion.div
-              key="bank-transfer"
-              {...fadeInOut}
-              transition={{ duration: 0.3 }}
-              className="grid gap-4"
-            >
-              {/* Currency */}
-              <SelectField
-                id="currency"
-                label="Currency"
-                defaultValue="NGN"
-                options={currencies}
-                validation={{
-                  required: { value: true, message: "Select currency" },
-                }}
-                errors={errors}
-                register={register}
-                value={watch("currency")}
-              />
-
-              {/* Recipient Bank */}
-              <SelectField
-                id="institution"
-                label="Recipient Bank"
-                options={supportedInstitutions.map(
-                  (institution: InstitutionProps) => ({
-                    value: institution.code,
-                    label: institution.name,
-                  }),
-                )}
-                validation={{
-                  required: { value: true, message: "Select recipient bank" },
-                  disabled: watch("currency") === "" || institutionsLoading,
-                }}
-                errors={errors}
-                register={register}
-                isLoading={institutionsLoading}
-                value={watch("institution")}
-                title={
-                  watch("currency") === ""
-                    ? "Select currency to enable recipient bank"
-                    : "Select recipient bank"
-                }
-              />
-
-              {/* Recipient Account */}
-              <div className="grid gap-2">
-                <label htmlFor="recipient-account" className="font-medium">
-                  Recipient Account <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="recipient-account"
-                    {...register("accountIdentifier", {
-                      required: {
-                        value: true,
-                        message: "Enter recipient account",
-                      },
-                      pattern: {
-                        value: /\d{10}/,
-                        message: "Invalid account identifier",
-                      },
-                    })}
-                    className={inputClasses}
-                    placeholder="12345678901"
-                    maxLength={10}
-                    pattern="\d{10}"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
-                    {10 - (watch("accountIdentifier")?.toString().length ?? 0)}
-                  </div>
-                </div>
-                {errors.accountIdentifier && (
-                  <InputError message={errors.accountIdentifier.message} />
-                )}
-
-                <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
-                  <AnimatePresence mode="wait">
-                    {isFetchingRecipientName ? (
-                      <AnimatedFeedbackItem>
-                        <ImSpinner2 className="animate-spin" />
-                        <p className="text-xs">Getting recipient name...</p>
-                      </AnimatedFeedbackItem>
-                    ) : (
-                      <>
-                        {recipientName && (
-                          <AnimatedFeedbackItem>
-                            <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
-                            <p className="capitalize text-gray-700 dark:text-white/80">
-                              {recipientName.toLocaleLowerCase()}
-                            </p>
-                          </AnimatedFeedbackItem>
-                        )}
-                        {recipientName === "" &&
-                          watch("accountIdentifier")?.toString().length ===
-                            10 &&
-                          !errors.accountIdentifier &&
-                          isValid && (
-                            <InputError message="Could not resolve account details" />
-                          )}
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-              {/* Memo */}
-              <div className="grid gap-2">
-                <label htmlFor="memo" className="font-medium">
-                  Memo <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="memo"
-                    {...register("memo", {
-                      required: { value: true, message: "Enter memo" },
-                    })}
-                    className={inputClasses}
-                    placeholder="Enter memo"
-                    maxLength={25}
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
-                    {25 - (watch("memo")?.toString().length ?? 0)}
-                  </div>
-                </div>
-                {errors.memo && <InputError message={errors.memo.message} />}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mobile Money Tab Contents */}
-          {selectedTab === "mobile-money" && (
-            <motion.div
-              key="mobile-money"
-              {...fadeInOut}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-5 dark:border-white/10"
-            >
-              <FaRegHourglass className="text-yellow-700 dark:text-yellow-400" />
-              <p className="text-gray-500">Coming soon</p>
-            </motion.div>
-          )}
-        </div>
-      </div>
-      {/* Submit button */}
-      <button
-        type="submit"
-        disabled={
-          !isValid || !isDirty || !account.isConnected || recipientName === ""
-        }
-        className={primaryBtnClasses}
-      >
-        {account.isConnected ? "Review Info" : "Connect wallet to continue"}
-      </button>
-      {/* Rate and fee */}
-      <AnimatePresence>
-        {rate > 0 && Number(amount) > 0 && account.isConnected && (
-          <AnimatedComponent
-            variant={slideInOut}
-            className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5"
-          >
-            {renderedInfo.map(({ key, label, value }, index) => (
-              <AnimatedComponent
-                key={key}
-                delay={index * 0.1}
-                className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${index === 1 ? "border-t" : ""}`}
-              >
-                <p>{label}</p>
-                <p
-                  className={`rounded-full px-2 py-1 transition-all ${
-                    isFetchingRate
-                      ? "animate-pulse bg-gradient-to-r from-white to-gray-100 dark:from-neutral-800 dark:to-neutral-900"
-                      : "bg-white dark:bg-neutral-900"
-                  }`}
-                >
-                  <span className={`${isFetchingRate ? "blur-xl" : ""}`}>
-                    {value}
-                  </span>
-                </p>
-              </AnimatedComponent>
-            ))}
-          </AnimatedComponent>
-        )}
-      </AnimatePresence>
-    </form>
+      </form>
+      {/* <DevTool control={control} /> */}
+    </>
   );
 };
-
-const AnimatedFeedbackItem = ({ children }: { children: React.ReactNode }) => (
-  <AnimatedComponent
-    variant={slideInDown}
-    className="flex flex-1 items-center gap-1"
-  >
-    {children}
-  </AnimatedComponent>
-);

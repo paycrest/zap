@@ -6,13 +6,6 @@ import { PaycrestLogo } from "./ImageAssets";
 import { useAccount, useConnect } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { primaryBtnClasses, secondaryBtnClasses } from "./Styles";
-import { Menu, MenuButton, MenuItems } from "@headlessui/react";
-import { PiCaretDown } from "react-icons/pi";
-import { classNames } from "../utils";
-import { Tooltip } from "./Tooltip";
-import { GoQuestion } from "react-icons/go";
-import { FundWalletModal } from "./FundWalletModal";
-import Image from "next/image";
 import { NetworksDropdown } from "./NetworksDropdown";
 import { WalletDetails } from "./WalletDetails";
 
@@ -21,7 +14,6 @@ export const Navbar = () => {
 
   const account = useAccount();
   const { connectors, connect } = useConnect();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { openConnectModal } = useConnectModal();
 
