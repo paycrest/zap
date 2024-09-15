@@ -22,19 +22,13 @@ import {
 import { erc20Abi } from "./api/abi";
 import { fetchSupportedTokens } from "./utils";
 import TransactionStatus from "./pages/TransactionStatus";
-import type { FormData, InstitutionProps, StateProps } from "./types";
-
-const INITIAL_FORM_STATE: FormData = {
-  network: "",
-  token: "",
-  currency: "",
-  institution: "",
-  accountIdentifier: "",
-  recipientName: "",
-  memo: "",
-  amountSent: 0,
-  amountReceived: 0,
-};
+import type {
+  FormData,
+  InstitutionProps,
+  RecipientDetails,
+  StateProps,
+} from "./types";
+import { currencies } from "./mocks";
 
 const STEPS = {
   FORM: "form",
@@ -53,13 +47,17 @@ export default function Home() {
   const [isFetchingRate, setIsFetchingRate] = useState(false);
 
   const [rate, setRate] = useState<number>(0);
-  const [formValues, setFormValues] = useState<FormData>(INITIAL_FORM_STATE);
+  const [formValues, setFormValues] = useState<FormData>({} as FormData);
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
+  const [currentStep, setCurrentStep] = useState(STEPS.FORM);
   const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
   const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
-  const [currentStep, setCurrentStep] = useState(STEPS.FORM);
-  const [formData, setFormData] = useState({});
+
+  const [userLocation, setUserLocation] = useState<string>("NGN");
+
+  const [selectedRecipient, setSelectedRecipient] =
+    useState<RecipientDetails | null>(null);
 
   const [transactionStatus, setTransactionStatus] = useState<
     | "idle"
@@ -75,7 +73,7 @@ export default function Home() {
 
   // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
-  const { watch, setValue, control } = formMethods;
+  const { watch, setValue, control, register } = formMethods;
   const { currency, token, accountIdentifier, institution } = watch();
 
   // Get account information using custom hook
@@ -107,50 +105,73 @@ export default function Home() {
 
   const { switchChain } = useSwitchChain();
 
-  /**
-   * Handles network change.
-   * @param network - The selected network.
-   */
-  const handleNetworkChange = (network: string) => {
-    setSelectedNetwork(network);
-  };
-
-  /**
-   * Handles tab change.
-   * @param tab - The selected tab.
-   */
-  const handleTabChange = (tab: string) => {
-    setSelectedTab(tab);
-  };
-
   // State props for child components
   const stateProps: StateProps = {
     formValues,
-    tokenBalance,
-    smartTokenBalance,
-    rate,
-    isFetchingRate,
-    recipientName: "",
-    institutions,
-    isFetchingInstitutions,
-    selectedTab,
-    handleTabChange,
-    selectedNetwork,
     setCreatedAt,
     setOrderId,
-    handleNetworkChange,
     setTransactionStatus,
+
+    tokenBalance,
+    smartTokenBalance,
+
+    rate,
+    isFetchingRate,
+
+    institutions,
+    isFetchingInstitutions,
+
+    selectedTab,
+    handleTabChange: setSelectedTab,
+    selectedNetwork,
+    handleNetworkChange: setSelectedNetwork,
+
+    selectedRecipient,
+    setSelectedRecipient,
+
+    defaultCurrency: userLocation,
   };
 
   // * START: USE EFFECTS * //
 
+  // Detect user location and set default currency
+  useEffect(() => {
+    const detectUserLocation = async () => {
+      try {
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+        const country = data.country_code;
+
+        if (country === "KE") {
+          setUserLocation("KES");
+        } else if (country === "GH") {
+          setUserLocation("GHS");
+        } else if (country === "NG") {
+          setUserLocation("NGN");
+        } else {
+          setUserLocation("KES"); // for testing purposes, should default to NGN
+        }
+
+        register("currency", { value: userLocation });
+      } catch (error) {
+        console.error("Error detecting user location:", error);
+        setUserLocation("NGN"); // Default to NGN if detection fails
+        register("currency", { value: "NGN" });
+      }
+    };
+
+    detectUserLocation();
+  }, [register, setValue, userLocation]);
+
   // Fetch supported institutions based on currency
   useEffect(() => {
     const getInstitutions = async () => {
+      if (!currency) return;
+      console.log("Fetching institutions for", currency);
       setIsFetchingInstitutions(true);
 
       try {
-        const institutions = await fetchSupportedInstitutions("NGN");
+        const institutions = await fetchSupportedInstitutions(currency);
         setInstitutions(institutions);
         setIsFetchingInstitutions(false);
       } catch (error) {
@@ -160,13 +181,21 @@ export default function Home() {
 
     getInstitutions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currency]);
+
+  useEffect(() => {
+    // Set default currency based on user location
+    const defaultCurrency = currencies.find((c) => c.name === userLocation);
+    if (defaultCurrency) {
+      setValue("currency", defaultCurrency.name);
+    }
+  }, [userLocation, setValue]);
 
   // Reset transaction status and form values when account status changes
   useEffect(() => {
     if (account.status !== "connected" && account.status !== "connecting") {
-      setTransactionStatus("idle");
-      setFormValues(INITIAL_FORM_STATE);
+      setCurrentStep(STEPS.FORM);
+      setFormValues({} as FormData);
     }
 
     if (account.status === "connected" && account.chainId) {
@@ -197,7 +226,7 @@ export default function Home() {
         const rate = await fetchRate({
           token: "USDT",
           amount: 0,
-          currency: "NGN",
+          currency: currency,
         });
         setRate(rate.data);
         setIsFetchingRate(false);
@@ -219,7 +248,7 @@ export default function Home() {
     //   clearTimeout(timeoutId);
     // };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currency]);
 
   const tokenDecimals = fetchSupportedTokens(account.chain?.name)?.find(
     (t) => t.symbol.toUpperCase() === token,

@@ -151,7 +151,6 @@ export type StateProps = {
   smartTokenBalance: number;
   rate: number;
   isFetchingRate: boolean;
-  recipientName: string;
   institutions: InstitutionProps[];
   isFetchingInstitutions: boolean;
   selectedTab: string;
@@ -170,6 +169,9 @@ export type StateProps = {
       | "settled"
       | "refunded",
   ) => void;
+  selectedRecipient: RecipientDetails | null;
+  setSelectedRecipient: (recipient: RecipientDetails | null) => void;
+  defaultCurrency: string;
 };
 
 export type NetworkButtonProps = {

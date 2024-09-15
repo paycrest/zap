@@ -33,7 +33,7 @@ export const TransactionForm = ({
   stateProps,
 }: TransactionFormProps) => {
   // Destructure stateProps
-  const { tokenBalance, rate, isFetchingRate } = stateProps;
+  const { tokenBalance, rate, isFetchingRate, defaultCurrency } = stateProps;
 
   // Destructure formMethods from react-hook-form
   const {
@@ -89,9 +89,8 @@ export const TransactionForm = ({
     }
   }, [amountSent, amountReceived, rate, isReceiveInputActive, setValue]);
 
-  // set the default value of the currency and token
+  // set the default value of the token and network
   useEffect(() => {
-    register("currency", { value: currencies[0].name });
     register("token", { value: tokens[0].name });
     register("network", { value: networks[0].name });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +109,7 @@ export const TransactionForm = ({
             <h3 className="font-medium">Swap</h3>
             <NetworksDropdown
               selectedId="1"
-              onSelect={(selectedNetwork) =>
+              onSelect={(selectedNetwork: string) =>
                 setValue("network", selectedNetwork)
               }
               iconOnly={true}
@@ -210,7 +209,9 @@ export const TransactionForm = ({
               <FormDropdown
                 defaultTitle="Select currency"
                 data={currencies}
-                defaultSelectedId="2"
+                defaultSelectedId={
+                  currencies.find((c) => c.name === defaultCurrency)?.id || "1"
+                }
                 onSelect={(selectedCurrency) =>
                   setValue("currency", selectedCurrency)
                 }
