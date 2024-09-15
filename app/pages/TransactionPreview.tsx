@@ -80,12 +80,10 @@ export const TransactionPreview = ({
     amountReceived,
   } = formValues;
 
-  console.log(institution);
-
   // Rendered transaction information
   const renderedInfo = {
     amount: `${formatNumberWithCommas(amountSent ?? 0)} ${token}`,
-    totalValue: `${formatCurrency(amountReceived ?? 0, currency, `en-NG`)}`,
+    totalValue: `${formatCurrency(amountReceived ?? 0, currency, `en-${currency.slice(0, 2)}`)}`,
     recipient: recipientName
       .toLowerCase()
       .split(" ")

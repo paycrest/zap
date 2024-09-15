@@ -1,6 +1,4 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AddUserIcon, TrashIcon } from "./ImageAssets";
 import {
   Button,
   Dialog,
@@ -8,33 +6,39 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
+import { CiSearch } from "react-icons/ci";
+import { ImSpinner } from "react-icons/im";
+import { FaRegHourglass } from "react-icons/fa6";
+import { PiCaretDown, PiCheck } from "react-icons/pi";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import {
   AnimatedFeedbackItem,
   dropdownVariants,
   fadeInOut,
 } from "./AnimatedComponents";
-import { AnimatePresence, motion } from "framer-motion";
-import { FaRegHourglass } from "react-icons/fa6";
 import {
   InstitutionProps,
   RecipientDetails,
   RecipientDetailsFormProps,
 } from "../types";
-import {
-  fetchAccountName,
-  fetchSupportedInstitutions,
-} from "../api/aggregator";
-import { useOutsideClick } from "../hooks";
-import { CiSearch } from "react-icons/ci";
-import { PiCaretDown, PiCheck } from "react-icons/pi";
+import { colors } from "../mocks";
 import { classNames } from "../utils";
-import { ImSpinner } from "react-icons/im";
 import { InputError } from "./InputError";
+import { useOutsideClick } from "../hooks";
+import { fetchAccountName } from "../api/aggregator";
+import { AddUserIcon, TrashIcon } from "./ImageAssets";
 import { primaryBtnClasses, secondaryBtnClasses } from "./Styles";
 
 export const RecipientDetailsForm = ({
   formMethods,
-  stateProps,
+  stateProps: {
+    isFetchingInstitutions,
+    institutions,
+    selectedRecipient,
+    setSelectedRecipient,
+  },
 }: RecipientDetailsFormProps) => {
   const {
     watch,
@@ -52,8 +56,6 @@ export const RecipientDetailsForm = ({
   const [bankSearchTerm, setBankSearchTerm] = useState("");
   const [beneficiarySearchTerm, setBeneficiarySearchTerm] = useState("");
 
-  const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
-  const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
   const [isInstitutionsDropdownOpen, setIsInstitutionsDropdownOpen] =
     useState(false);
   const [selectedInstitution, setSelectedInstitution] =
@@ -66,8 +68,7 @@ export const RecipientDetailsForm = ({
   const [savedRecipients, setSavedRecipients] = useState<RecipientDetails[]>(
     [],
   );
-  const [selectedRecipient, setSelectedRecipient] =
-    useState<RecipientDetails | null>(null);
+
   const [isSavedRecipientsOpen, setIsSavedRecipientsOpen] = useState(false);
   const [recipientToDelete, setRecipientToDelete] =
     useState<RecipientDetails | null>(null);
@@ -174,23 +175,6 @@ export const RecipientDetailsForm = ({
   }, [savedRecipients, beneficiarySearchTerm]);
 
   const getRandomColor = (name: string) => {
-    const colors = [
-      "bg-blue-600",
-      "bg-indigo-600",
-      "bg-purple-600",
-      "bg-pink-600",
-      "bg-red-600",
-      "bg-orange-600",
-      "bg-amber-600",
-      "bg-yellow-600",
-      "bg-lime-600",
-      "bg-green-600",
-      "bg-emerald-600",
-      "bg-teal-600",
-      "bg-cyan-600",
-      "bg-sky-600",
-    ];
-
     // Generate a color based on the recipient's name
     const index = name
       .split("")
@@ -215,24 +199,6 @@ export const RecipientDetailsForm = ({
       setRecipientNameError("");
     }
   }, [selectedInstitution, register]);
-
-  // Fetch supported institutions based on currency
-  useEffect(() => {
-    const getInstitutions = async () => {
-      setIsFetchingInstitutions(true);
-
-      try {
-        const institutions = await fetchSupportedInstitutions("NGN");
-        setInstitutions(institutions);
-        setIsFetchingInstitutions(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getInstitutions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Fetch recipient name based on institution and account identifier
   useEffect(() => {
@@ -631,9 +597,9 @@ export const RecipientDetailsForm = ({
 
                       <AnimatePresence>
                         {filteredSavedRecipients.length > 0 ? (
-                          filteredSavedRecipients.map((recipient) => (
+                          filteredSavedRecipients.map((recipient, index) => (
                             <motion.div
-                              key={`${recipient.accountIdentifier}-${recipient.institution}`}
+                              key={`${recipient.accountIdentifier}-${index}`}
                               initial={{ opacity: 1, height: "auto" }}
                               exit={{
                                 opacity: 0,
