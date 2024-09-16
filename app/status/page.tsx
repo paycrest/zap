@@ -51,7 +51,7 @@ export default function TransactionStatus() {
     | "validated"
     | "settled"
     | "refunded"
-  >("refunded");
+  >("idle");
   const [enabled, setEnabled] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
 
@@ -67,6 +67,26 @@ export default function TransactionStatus() {
 
   useEffect(() => {
     setIsPageLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTransactionStatus((prevStatus) => {
+        switch (prevStatus) {
+          case "pending":
+            return "processing";
+          case "processing":
+            return "fulfilled";
+          case "fulfilled":
+            return "refunded";
+          case "refunded":
+            return "pending";
+          default:
+            return "pending";
+        }
+      });
+    }, 2000);
+    return () => clearInterval(timer);
   }, []);
 
   const StatusIndicator = () => (
