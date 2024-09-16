@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-import { PaycrestLogo } from "./ImageAssets";
+import { NoblocksLogo } from "./ImageAssets";
 import { useAccount, useConnect } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { primaryBtnClasses, secondaryBtnClasses } from "./Styles";
@@ -38,8 +38,7 @@ export const Navbar = () => {
       >
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center gap-1">
-            <div className="text-lg font-semibold">noblocks</div>
-            <PaycrestLogo className="size-3" />
+            <NoblocksLogo />
           </Link>
         </div>
 
