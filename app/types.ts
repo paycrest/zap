@@ -1,12 +1,5 @@
 import type { ReactNode } from "react";
-import type {
-  FieldErrors,
-  UseFormRegister,
-  UseFormHandleSubmit,
-  UseFormSetValue,
-  Control,
-  UseFormReturn,
-} from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 
 export type InstitutionProps = {
   name: string;
@@ -153,10 +146,6 @@ export type StateProps = {
   isFetchingRate: boolean;
   institutions: InstitutionProps[];
   isFetchingInstitutions: boolean;
-  selectedTab: string;
-  handleTabChange: (tab: string) => void;
-  selectedNetwork: string;
-  handleNetworkChange: (network: string) => void;
   setCreatedAt: (createdAt: string) => void;
   setOrderId: (orderId: string) => void;
   setTransactionStatus: (

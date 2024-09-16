@@ -14,21 +14,16 @@ import {
   TransactionForm,
   TransactionPreview,
 } from "./components";
-import {
-  fetchRate,
-  fetchAccountName,
-  fetchSupportedInstitutions,
-} from "./api/aggregator";
 import { erc20Abi } from "./api/abi";
+import { currencies } from "./mocks";
 import { fetchSupportedTokens } from "./utils";
-import TransactionStatus from "./pages/TransactionStatus";
+import { fetchRate, fetchSupportedInstitutions } from "./api/aggregator";
 import type {
   FormData,
   InstitutionProps,
   RecipientDetails,
   StateProps,
 } from "./types";
-import { currencies } from "./mocks";
 
 const STEPS = {
   FORM: "form",
@@ -51,8 +46,6 @@ export default function Home() {
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
   const [currentStep, setCurrentStep] = useState(STEPS.FORM);
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
-  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
 
   const [userLocation, setUserLocation] = useState<string>("NGN");
 
@@ -120,11 +113,6 @@ export default function Home() {
 
     institutions,
     isFetchingInstitutions,
-
-    selectedTab,
-    handleTabChange: setSelectedTab,
-    selectedNetwork,
-    handleNetworkChange: setSelectedNetwork,
 
     selectedRecipient,
     setSelectedRecipient,

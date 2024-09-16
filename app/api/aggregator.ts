@@ -8,7 +8,6 @@ import type {
   OrderStatusResponse,
 } from "../types";
 
-const TEST_AGGREGATOR_URL = "https://staging-api.paycrest.io/v1";
 const AGGREGATOR_URL = process.env.NEXT_PUBLIC_AGGREGATOR_URL;
 const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
 
