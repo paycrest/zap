@@ -726,3 +726,167 @@ export const XFailIcon = (props: ImageProps) => {
     </svg>
   );
 };
+
+export const UserDetailsIcon = (props: ImageProps) => {
+  return (
+    <svg
+      width="26"
+      height="24"
+      viewBox="0 0 26 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <title>User details icon</title>
+      <path
+        d="M15.332 8.5H19.9987"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      <path
+        d="M15.332 12.584H18.832"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <rect
+        x="1.33203"
+        y="1.5"
+        width="23.3333"
+        height="21"
+        rx="5"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M4.83203 16.6673C6.24173 13.6561 11.4962 13.4579 12.9987 16.6673"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.2487 8.49935C11.2487 9.78801 10.204 10.8327 8.91536 10.8327C7.6267 10.8327 6.58203 9.78801 6.58203 8.49935C6.58203 7.21068 7.6267 6.16602 8.91536 6.16602C10.204 6.16602 11.2487 7.21068 11.2487 8.49935Z"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+      />
+    </svg>
+  );
+};
+
+export const CopyIcon = (props: ImageProps) => {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <title>Copy icon</title>
+      <path
+        d="M7.5 12.5C7.5 10.143 7.5 8.96447 8.23223 8.23223C8.96447 7.5 10.143 7.5 12.5 7.5L13.3333 7.5C15.6904 7.5 16.8689 7.5 17.6011 8.23223C18.3333 8.96447 18.3333 10.143 18.3333 12.5V13.3333C18.3333 15.6904 18.3333 16.8689 17.6011 17.6011C16.8689 18.3333 15.6904 18.3333 13.3333 18.3333H12.5C10.143 18.3333 8.96447 18.3333 8.23223 17.6011C7.5 16.8689 7.5 15.6904 7.5 13.3333L7.5 12.5Z"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14.1679 7.49935C14.1659 5.03511 14.1286 3.75869 13.4113 2.88471C13.2728 2.71592 13.1181 2.56116 12.9493 2.42265C12.0273 1.66602 10.6575 1.66602 7.91797 1.66602C5.1784 1.66602 3.80862 1.66602 2.88666 2.42265C2.71788 2.56116 2.56312 2.71592 2.4246 2.8847C1.66797 3.80666 1.66797 5.17645 1.66797 7.91601C1.66797 10.6556 1.66797 12.0254 2.4246 12.9473C2.56311 13.1161 2.71788 13.2709 2.88666 13.4094C3.76064 14.1266 5.03706 14.164 7.5013 14.1659"
+        stroke="white"
+        stroke-opacity="0.5"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const VerificationPendingIcon = (props: ImageProps) => {
+  return (
+    <svg
+      width="36"
+      height="36"
+      viewBox="0 0 36 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <title>Verification pending icon</title>
+      <path
+        d="M17.9919 17C17.4396 17 16.9919 17.4477 16.9919 18C16.9919 18.5523 17.4396 19 17.9919 19H18.0068C18.5591 19 19.0068 18.5523 19.0068 18C19.0068 17.4477 18.5591 17 18.0068 17H17.9919Z"
+        stroke="#F2C71C"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M24.6637 17C24.1115 17 23.6637 17.4477 23.6637 18C23.6637 18.5523 24.1115 19 24.6637 19H24.6787C25.231 19 25.6787 18.5523 25.6787 18C25.6787 17.4477 25.231 17 24.6787 17H24.6637Z"
+        stroke="#F2C71C"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.3317 17C10.7794 17 10.3317 17.4477 10.3317 18C10.3317 18.5523 10.7794 19 11.3317 19H11.3467C11.899 19 12.3467 18.5523 12.3467 18C12.3467 17.4477 11.899 17 11.3467 17H11.3317Z"
+        stroke="#F2C71C"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M34.6654 18.0013C34.6654 8.79655 27.2034 1.33463 17.9987 1.33463C8.79395 1.33463 1.33203 8.79655 1.33203 18.0013C1.33203 27.206 8.79395 34.668 17.9987 34.668C27.2034 34.668 34.6654 27.206 34.6654 18.0013Z"
+        stroke="#F2C71C"
+        stroke-width="1.5"
+      />
+    </svg>
+  );
+};
+
+export const SadFaceIcon = (props: ImageProps) => {
+  return (
+    <svg
+      width="36"
+      height="36"
+      viewBox="0 0 36 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <title>Sad face icon</title>
+      <circle
+        cx="17.9987"
+        cy="17.9987"
+        r="16.6667"
+        stroke="#F53D6B"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14.6641 16.332L12.1641 13.832M12.1641 13.832L9.66406 11.332M12.1641 13.832L9.66406 16.332M12.1641 13.832L14.6641 11.332M26.3307 16.332L23.8307 13.832M23.8307 13.832L21.3307 11.332M23.8307 13.832L21.3307 16.332M23.8307 13.832L26.3307 11.332"
+        stroke="#F53D6B"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.332 26.332C12.8522 24.308 15.2726 22.9987 17.9987 22.9987C20.7248 22.9987 23.1452 24.308 24.6654 26.332"
+        stroke="#F53D6B"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
