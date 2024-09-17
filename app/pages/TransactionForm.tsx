@@ -46,27 +46,10 @@ export const TransactionForm = ({
   } = formMethods;
 
   // Get values of currency, amount, and token from form
-  const token = watch("token");
-  const amountSent = watch("amountSent");
-  const amountReceived = watch("amountReceived");
+  const { amountSent, amountReceived, token, currency } = watch();
 
   // Get account information using custom hook
   const account = useAccount();
-
-  // Array of objects for rendering rate and fee information
-  const rateInfo = {
-    key: "rate",
-    label: "Rate",
-    value: rate,
-  };
-
-  const feeInfo = {
-    key: "eta",
-    label: "Funds available in",
-    value: "15s",
-  };
-
-  const renderedInfo = [rateInfo, feeInfo];
 
   const [isReceiveInputActive, setIsReceiveInputActive] = useState(false);
 
@@ -256,33 +239,21 @@ export const TransactionForm = ({
           {account.isConnected ? "Swap" : "Connect wallet to continue"}
         </button>
 
-        {/* Rate and fee */}
         <AnimatePresence>
           {rate > 0 && Number(amountSent) > 0.5 && account.isConnected && (
             <AnimatedComponent
               variant={slideInOut}
-              className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition-all dark:border-white/10 dark:bg-white/5"
+              className="flex w-full flex-col justify-between gap-2 text-xs text-gray-500 transition-all dark:text-white/30 sm:flex-row sm:items-center"
             >
-              {renderedInfo.map(({ key, label, value }, index) => (
-                <AnimatedComponent
-                  key={key}
-                  delay={index * 0.1}
-                  className={`flex items-center justify-between border-dashed border-white/10 px-4 py-3 font-normal text-gray-500 transition-all dark:text-white/50 ${index === 1 ? "border-t" : ""}`}
-                >
-                  <p>{label}</p>
-                  <p
-                    className={`rounded-full px-2 py-1 transition-all ${
-                      isFetchingRate
-                        ? "animate-pulse bg-gradient-to-r from-white to-gray-100 dark:from-neutral-800 dark:to-neutral-900"
-                        : "bg-white dark:bg-neutral-900"
-                    }`}
-                  >
-                    <span className={`${isFetchingRate ? "blur-xl" : ""}`}>
-                      {value}
-                    </span>
-                  </p>
-                </AnimatedComponent>
-              ))}
+              <div className="min-w-fit">
+                1 {token} ~ {rate} {currency}
+              </div>
+              <div className="ml-auto flex w-full flex-col justify-end gap-2 sm:flex-row sm:items-center">
+                <div className="h-px w-1/2 flex-shrink bg-gradient-to-tr from-white to-gray-300 dark:bg-gradient-to-tr dark:from-neutral-900 dark:to-neutral-700 sm:w-full" />
+                <p className="min-w-fit">
+                  Swap usually completes in 15s or less
+                </p>
+              </div>
             </AnimatedComponent>
           )}
         </AnimatePresence>
