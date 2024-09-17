@@ -10,13 +10,13 @@ import {
   FormDropdown,
   RecipientDetailsForm,
   NetworksDropdown,
+  VerifyIDModal,
 } from "../components";
 import type { TransactionFormProps } from "../types";
 import { currencies, networks, tokens } from "../mocks";
 import { NoteIcon, WalletIcon } from "../components/ImageAssets";
 import { useState, useEffect } from "react";
 import { BsArrowDown } from "react-icons/bs";
-import { DevTool } from "@hookform/devtools";
 
 /**
  * TransactionForm component renders a form for submitting a transaction.
@@ -108,17 +108,19 @@ export const TransactionForm = ({
               >
                 Send
               </label>
-              <div className="flex items-center gap-2">
-                <WalletIcon className="fill-gray-500 dark:fill-none" />
-                <p>{Math.round(tokenBalance * 100) / 100}</p>
-                <button
-                  type="button"
-                  onClick={handleMaxClick}
-                  className="font-medium text-blue-600 dark:text-blue-500"
-                >
-                  Max
-                </button>
-              </div>
+              {account.isConnected && token && (
+                <div className="flex items-center gap-2">
+                  <WalletIcon className="fill-gray-500 dark:fill-none" />
+                  <p>{Math.round(tokenBalance * 100) / 100}</p>
+                  <button
+                    type="button"
+                    onClick={handleMaxClick}
+                    className="font-medium text-blue-600 dark:text-blue-500"
+                  >
+                    Max
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between gap-2">
@@ -231,13 +233,17 @@ export const TransactionForm = ({
         </div>
 
         {/* Submit button */}
-        <button
-          type="submit"
-          disabled={!isValid || !isDirty || !account.isConnected}
-          className={primaryBtnClasses}
-        >
-          {account.isConnected ? "Swap" : "Connect wallet to continue"}
-        </button>
+        {account.isConnected ? (
+          <VerifyIDModal />
+        ) : (
+          <button
+            type="submit"
+            disabled={!isValid || !isDirty || !account.isConnected}
+            className={primaryBtnClasses}
+          >
+            {account.isConnected ? "Swap" : "Connect"}
+          </button>
+        )}
 
         <AnimatePresence>
           {rate > 0 && Number(amountSent) > 0.5 && account.isConnected && (
@@ -258,7 +264,6 @@ export const TransactionForm = ({
           )}
         </AnimatePresence>
       </form>
-      {/* <DevTool control={control} /> */}
     </>
   );
 };

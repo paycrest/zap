@@ -19,6 +19,7 @@ export {
 } from "./AnimatedComponents";
 
 export { Tooltip } from "./Tooltip";
+export { VerifyIDModal } from "./VerifyIDModal";
 export { FundWalletModal } from "./FundWalletModal";
 
 export { TransactionForm } from "../pages/TransactionForm";
