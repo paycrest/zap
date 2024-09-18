@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { PiCheckCircle, PiSpinnerBold } from "react-icons/pi";
-import { RiRefund2Line } from "react-icons/ri";
+import { PiSpinnerBold } from "react-icons/pi";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 import {
   AnimatedComponent,
@@ -14,6 +15,7 @@ import {
   slideInOut,
   Preloader,
   primaryBtnClasses,
+  TransactionReceipt,
 } from "../components";
 import { useRouter } from "next/navigation";
 import { Checkbox, Field, Label } from "@headlessui/react";
@@ -32,12 +34,16 @@ import { classNames } from "../utils";
 // Mock data
 const mockData = {
   recipientName: "John Doe",
-  orderId: "123456",
+  orderId: "3473846342745274526424538246742",
   createdAt: "2024-09-16T10:00:00Z",
   token: "USDT",
   amount: "13.5",
   completedAt: "2024-09-16T10:05:00Z",
   createdHash: "0x1234567890abcdef",
+  currency: "GHS",
+  accountIdentifier: "1234567890",
+  institution: "Bank of Ghana",
+  description: "Payment for goods",
 };
 
 export default function TransactionStatus() {
@@ -54,6 +60,7 @@ export default function TransactionStatus() {
   >("idle");
   const [enabled, setEnabled] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isGettingReceipt, setIsGettingReceipt] = useState(false);
 
   const getImageSrc = () => {
     const base = !["validated", "settled", "refunded", "fulfilled"].includes(
@@ -63,6 +70,30 @@ export default function TransactionStatus() {
       : "/stepper-long";
     const themeSuffix = resolvedTheme === "dark" ? "-dark.svg" : ".svg";
     return base + themeSuffix;
+  };
+
+  const receiptRef = useRef<HTMLDivElement | null>(null);
+
+  const handleGetReceipt = async () => {
+    setIsGettingReceipt(true);
+    if (receiptRef.current) {
+      const canvas = await html2canvas(receiptRef.current);
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height],
+      });
+
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      window.open(pdfUrl, "_blank");
+    }
+    setIsGettingReceipt(false);
   };
 
   useEffect(() => {
@@ -85,7 +116,7 @@ export default function TransactionStatus() {
             return "pending";
         }
       });
-    }, 2000);
+    }, 3000);
     return () => clearInterval(timer);
   }, []);
 
@@ -236,10 +267,13 @@ export default function TransactionStatus() {
                   ) && (
                     <button
                       type="button"
-                      onClick={() => router.push("/receipt")}
+                      onClick={handleGetReceipt}
                       className={`w-fit ${secondaryBtnClasses}`}
+                      disabled={isGettingReceipt}
                     >
-                      Get receipt
+                      {isGettingReceipt
+                        ? "Generating receipt..."
+                        : "Get receipt"}
                     </button>
                   )}
 
@@ -411,6 +445,13 @@ export default function TransactionStatus() {
           </AnimatePresence>
         </div>
       </AnimatedComponent>
+
+      {/* Hidden receipt component for PDF generation */}
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+        <div ref={receiptRef}>
+          <TransactionReceipt transaction={mockData} />
+        </div>
+      </div>
     </>
   );
 }

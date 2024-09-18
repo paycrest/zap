@@ -22,6 +22,7 @@ export { Tooltip } from "./Tooltip";
 export { VerifyIDModal } from "./VerifyIDModal";
 export { FundWalletModal } from "./FundWalletModal";
 
+export { TransactionReceipt } from "./TransactionReceipt";
 export { TransactionForm } from "../pages/TransactionForm";
 export { TransactionPreview } from "../pages/TransactionPreview";
 
