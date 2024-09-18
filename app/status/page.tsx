@@ -34,7 +34,7 @@ import { classNames } from "../utils";
 // Mock data
 const mockData = {
   recipientName: "John Doe",
-  orderId: "3473846342745274526424538246742",
+  orderId: "23afb1caffcc0fcd29f1fedbf87f4ac8f7319a06084699cf3a135bb4bc958da9",
   createdAt: "2024-09-16T10:00:00Z",
   token: "USDT",
   amount: "13.5",
