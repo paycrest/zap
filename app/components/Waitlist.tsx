@@ -65,7 +65,7 @@ export const Waitlist = ({
         Transfer them seamlessly to any bank account or mobile wallet.
       </AnimatedComponent>
 
-      <AnimatedComponent variant={scaleInOut} delay={0.8}>
+      <AnimatedComponent variant={fadeInOut} delay={0.8}>
         <WaitlistForm onSuccess={() => setIsSubmitted(true)} />
       </AnimatedComponent>
 
