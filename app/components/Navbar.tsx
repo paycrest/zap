@@ -1,10 +1,9 @@
-'use client';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-import { ThemeSwitch } from './ThemeSwitch';
-import { PaycrestLogo } from './ImageAssets';
-import { AnimatedComponent, slideInOut } from './AnimatedComponents';
+import { NoblocksLogo } from "./ImageAssets";
+import { AnimatedComponent, slideInOut } from "./AnimatedComponents";
 
 export const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -14,15 +13,14 @@ export const Navbar = () => {
   if (!mounted) return null;
 
   return (
-    <header className='sticky left-0 top-0 z-10 w-full bg-white/20 backdrop-blur dark:bg-neutral-900/80 transition-colors'>
+    <header className="sticky left-0 top-0 z-10 w-full bg-white dark:bg-neutral-900 transition-colors">
       <AnimatedComponent variant={slideInOut} delay={0.2}>
         <nav
-          className='mx-auto flex items-center justify-between py-4 rounded-2xl'
-          aria-label='Navbar'
+          className="mx-auto flex items-center justify-between py-10 rounded-2xl"
+          aria-label="Navbar"
         >
-          <Link href='/' className='flex items-center gap-1'>
-            <div className='text-lg font-semibold'>noblocks</div>
-            <PaycrestLogo />
+          <Link href="/">
+            <NoblocksLogo />
           </Link>
         </nav>
       </AnimatedComponent>

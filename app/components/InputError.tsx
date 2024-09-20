@@ -1,6 +1,6 @@
-'use client';
-import { TiInfo } from 'react-icons/ti';
-import { AnimatePresence, motion } from 'framer-motion';
+"use client";
+import { TiInfo } from "react-icons/ti";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const InputError = ({ message }: { message: string }) => (
   <AnimatePresence>
@@ -9,7 +9,7 @@ export const InputError = ({ message }: { message: string }) => (
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
-      className='flex items-center gap-1 text-xs font-medium text-rose-500'
+      className="flex items-center gap-1 text-xs font-medium text-primary"
     >
       <TiInfo />
       <p>{message}</p>

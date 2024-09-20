@@ -3,7 +3,10 @@ import { useForm } from "react-hook-form";
 import { InputError } from "./InputError";
 import axios from "axios";
 
-export const WaitlistForm = () => {
+export const buttonStyles =
+  "min-w-fit rounded-full bg-primary px-5 py-2.5 font-medium text-white transition-colors hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-zinc-800 dark:disabled:text-white/50";
+
+export const WaitlistForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const {
     watch,
     reset,
@@ -19,8 +22,7 @@ export const WaitlistForm = () => {
       const response = await axios.post("/api/waitlist", { email });
 
       if (response.status === 200) {
-        toast.success("Successfully added to waitlist");
-
+        onSuccess();
         reset();
       } else {
         toast.error("Failed to add to waitlist. Please try again later.");
@@ -57,11 +59,7 @@ export const WaitlistForm = () => {
         {errors.email?.message && <InputError message={errors.email.message} />}
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="min-w-fit rounded-full bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-white dark:focus-visible:ring-offset-neutral-900 dark:disabled:bg-zinc-800 dark:disabled:text-white/50"
-      >
+      <button type="submit" disabled={isSubmitting} className={buttonStyles}>
         {isSubmitting ? "Submitting..." : "Join waitlist"}
       </button>
     </form>
