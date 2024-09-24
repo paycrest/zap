@@ -300,7 +300,7 @@ export default function TransactionStatus() {
                       <Checkbox
                         checked={enabled}
                         onChange={setEnabled}
-                        className="group block size-4 rounded bg-gray-200 data-[checked]:bg-blue-500 dark:bg-neutral-800 dark:data-[checked]:bg-blue-500"
+                        className="group block size-4 rounded bg-gray-200 data-[checked]:bg-primary dark:bg-neutral-800 dark:data-[checked]:bg-primary"
                       >
                         <svg
                           className="stroke-white opacity-0 group-data-[checked]:opacity-100"
@@ -376,7 +376,7 @@ export default function TransactionStatus() {
                   <p className="flex-1">
                     <a
                       href={`https://basescan.io/tx/${mockData.createdHash}`}
-                      className="text-blue-600 hover:underline dark:text-blue-500"
+                      className="text-primary hover:underline dark:text-primary"
                       target="_blank"
                       rel="noreferrer"
                     >

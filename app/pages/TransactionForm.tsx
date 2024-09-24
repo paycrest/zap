@@ -115,7 +115,7 @@ export const TransactionForm = ({
                   <button
                     type="button"
                     onClick={handleMaxClick}
-                    className="font-medium text-blue-600 dark:text-blue-500"
+                    className="font-medium text-primary dark:text-primary"
                   >
                     Max
                   </button>
@@ -224,7 +224,7 @@ export const TransactionForm = ({
               {...register("memo", {
                 required: { value: true, message: "Add description" },
               })}
-              className="w-full rounded-xl border border-gray-300 bg-transparent py-2 pl-8 pr-4 text-sm text-neutral-900 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/20 dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30 dark:focus-visible:ring-offset-neutral-900"
+              className="w-full rounded-xl border border-gray-300 bg-transparent py-2 pl-8 pr-4 text-sm text-neutral-900 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/20 dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30 dark:focus-visible:ring-offset-neutral-900"
               placeholder="Add description"
               maxLength={25}
             />

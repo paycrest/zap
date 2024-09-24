@@ -309,7 +309,7 @@ export default function TransactionStatus({
                 <p className="flex-1">
                   <a
                     href={`${account.chain?.blockExplorers?.default.url}/tx/${createdHash}`}
-                    className="text-blue-600 hover:underline dark:text-blue-500"
+                    className="text-primary hover:underline dark:text-primary"
                     target="_blank"
                     rel="noreferrer"
                   >

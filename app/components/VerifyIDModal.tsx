@@ -130,7 +130,7 @@ export const VerifyIDModal = () => {
             <Checkbox
               checked={termsAccepted[term.id]}
               onChange={(checked) => handleTermChange(term.id, checked)}
-              className="group mt-1 block size-5 flex-shrink-0 cursor-pointer rounded border-2 border-gray-300 bg-transparent data-[checked]:border-blue-500 data-[checked]:bg-blue-500 dark:border-white/30 dark:data-[checked]:border-blue-500"
+              className="group mt-1 block size-5 flex-shrink-0 cursor-pointer rounded border-2 border-gray-300 bg-transparent data-[checked]:border-primary data-[checked]:bg-primary dark:border-white/30 dark:data-[checked]:border-primary"
             >
               <svg
                 className="stroke-neutral-800 opacity-0 group-data-[checked]:opacity-100"
@@ -154,7 +154,7 @@ export const VerifyIDModal = () => {
                 href={term.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
+                className="text-primary hover:underline"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
