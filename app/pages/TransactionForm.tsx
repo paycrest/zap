@@ -40,7 +40,6 @@ export const TransactionForm = ({
     handleSubmit,
     register,
     watch,
-    control,
     setValue,
     formState: { errors, isValid, isDirty },
   } = formMethods;
@@ -195,7 +194,7 @@ export const TransactionForm = ({
                 defaultTitle="Select currency"
                 data={currencies}
                 defaultSelectedId={
-                  currencies.find((c) => c.name === defaultCurrency)?.id || "1"
+                  currencies.find(currency => currency.name === "KES")?.id || "1"
                 }
                 onSelect={(selectedCurrency) =>
                   setValue("currency", selectedCurrency)

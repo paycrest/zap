@@ -66,8 +66,8 @@ export default function Home() {
 
   // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
-  const { watch, setValue, control, register } = formMethods;
-  const { currency, token, accountIdentifier, institution } = watch();
+  const { watch} = formMethods;
+  const { currency, token } = watch();
 
   // Get account information using custom hook
   const account = useAccount();
@@ -122,34 +122,21 @@ export default function Home() {
 
   // * START: USE EFFECTS * //
 
-  // Detect user location and set default currency
+  // Detect user location
   useEffect(() => {
     const detectUserLocation = async () => {
       try {
         const response = await fetch("https://ipapi.co/json/");
         const data = await response.json();
-        const country = data.country_code;
-
-        if (country === "KE") {
-          setUserLocation("KES");
-        } else if (country === "GH") {
-          setUserLocation("GHS");
-        } else if (country === "NG") {
-          setUserLocation("NGN");
-        } else {
-          setUserLocation("KES"); // for testing purposes, should default to NGN
-        }
-
-        register("currency", { value: userLocation });
+        setUserLocation(data.country_code);
       } catch (error) {
         console.error("Error detecting user location:", error);
-        setUserLocation("NGN"); // Default to NGN if detection fails
-        register("currency", { value: "NGN" });
+        setUserLocation("");
       }
     };
 
     detectUserLocation();
-  }, [register, setValue, userLocation]);
+  }, [userLocation]);
 
   // Fetch supported institutions based on currency
   useEffect(() => {
@@ -170,14 +157,6 @@ export default function Home() {
     getInstitutions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
-
-  useEffect(() => {
-    // Set default currency based on user location
-    const defaultCurrency = currencies.find((c) => c.name === userLocation);
-    if (defaultCurrency) {
-      setValue("currency", defaultCurrency.name);
-    }
-  }, [userLocation, setValue]);
 
   // Reset transaction status and form values when account status changes
   useEffect(() => {

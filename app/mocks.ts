@@ -19,13 +19,13 @@ export const tokens = [
 export const currencies = [
   {
     id: "1",
-    name: "NGN",
-    imageUrl: "/ngn-logo.svg",
+    name: "KES",
+    imageUrl: "/kes-logo.svg",
   },
   {
     id: "2",
-    name: "KES",
-    imageUrl: "/kes-logo.svg",
+    name: "NGN",
+    imageUrl: "/ngn-logo.svg",
   },
   {
     id: "3",
