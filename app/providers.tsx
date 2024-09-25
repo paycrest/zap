@@ -93,6 +93,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           appearance: {
             theme: "dark",
             accentColor: "#8B85F4",
+            landingHeader: "Connect",
             logo: "/logos/noblocks-logo.svg",
           },
           embeddedWallets: {
