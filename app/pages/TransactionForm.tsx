@@ -1,5 +1,7 @@
 "use client";
-import { useAccount } from "wagmi";
+import { useState, useEffect } from "react";
+import { BsArrowDown } from "react-icons/bs";
+import { usePrivy } from "@privy-io/react-auth";
 import { AnimatePresence } from "framer-motion";
 
 import {
@@ -9,14 +11,11 @@ import {
   slideInOut,
   FormDropdown,
   RecipientDetailsForm,
-  NetworksDropdown,
   VerifyIDModal,
 } from "../components";
 import type { TransactionFormProps } from "../types";
 import { currencies, networks, tokens } from "../mocks";
 import { NoteIcon, WalletIcon } from "../components/ImageAssets";
-import { useState, useEffect } from "react";
-import { BsArrowDown } from "react-icons/bs";
 
 /**
  * TransactionForm component renders a form for submitting a transaction.
@@ -44,11 +43,10 @@ export const TransactionForm = ({
     formState: { errors, isValid, isDirty },
   } = formMethods;
 
+  const { user, authenticated, ready, login } = usePrivy();
+
   // Get values of currency, amount, and token from form
   const { amountSent, amountReceived, token, currency } = watch();
-
-  // Get account information using custom hook
-  const account = useAccount();
 
   const [isReceiveInputActive, setIsReceiveInputActive] = useState(false);
 
@@ -86,17 +84,7 @@ export const TransactionForm = ({
         noValidate
       >
         <div className="space-y-2 rounded-2xl bg-gray-50 p-2 dark:bg-neutral-800">
-          {/* Header */}
-          <div className="flex items-center justify-between px-2">
-            <h3 className="font-medium">Swap</h3>
-            <NetworksDropdown
-              selectedId="1"
-              onSelect={(selectedNetwork: string) =>
-                setValue("network", selectedNetwork)
-              }
-              iconOnly={true}
-            />
-          </div>
+          <h3 className="px-2 font-medium">Swap</h3>
 
           {/* Amount to send & Token w/ wallet balance */}
           <div className="relative space-y-3.5 rounded-2xl bg-white px-4 py-3 dark:bg-neutral-900">
@@ -107,7 +95,7 @@ export const TransactionForm = ({
               >
                 Send
               </label>
-              {account.isConnected && token && (
+              {authenticated && token && (
                 <div className="flex items-center gap-2">
                   <WalletIcon className="fill-gray-500 dark:fill-none" />
                   <p>{Math.round(tokenBalance * 100) / 100}</p>
@@ -129,7 +117,7 @@ export const TransactionForm = ({
                 step="0.0001"
                 {...register("amountSent", {
                   required: { value: true, message: "Amount is required" },
-                  disabled: !account.isConnected || token === "",
+                  disabled: !authenticated || token === "",
                   min: {
                     value: 0.5,
                     message: `Min. amount is 0.5`,
@@ -156,9 +144,9 @@ export const TransactionForm = ({
                 onSelect={(selectedToken) => setValue("token", selectedToken)}
               />
             </div>
-            {errors.amountSent && (
+            {/* {errors.amountSent && (
               <InputError message={errors.amountSent.message} />
-            )}
+            )} */}
 
             {/* Arrow showing swap direction */}
             <div className="absolute -bottom-5 left-1/2 z-10 w-fit -translate-x-1/2 rounded-xl border-4 border-gray-50 bg-gray-50 dark:border-neutral-800 dark:bg-neutral-800">
@@ -183,27 +171,29 @@ export const TransactionForm = ({
                 type="number"
                 step="0.0001"
                 {...register("amountReceived", {
+                  disabled: !authenticated || token === "",
                   onChange: () => setIsReceiveInputActive(true),
                 })}
                 className="w-full rounded-xl border-b border-transparent bg-transparent py-2 text-2xl text-neutral-900 outline-none transition-all placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed dark:bg-neutral-900 dark:text-white/80 dark:placeholder:text-white/30"
                 placeholder="0"
-                title="Amount to receive"
+                title="Enter amount to receive"
               />
 
               <FormDropdown
                 defaultTitle="Select currency"
                 data={currencies}
                 defaultSelectedId={
-                  currencies.find(currency => currency.name === "KES")?.id || "1"
+                  currencies.find((currency) => currency.name === "KES")?.id ||
+                  "1"
                 }
                 onSelect={(selectedCurrency) =>
                   setValue("currency", selectedCurrency)
                 }
               />
             </div>
-            {errors.amountReceived && (
+            {/* {errors.amountReceived && (
               <InputError message={errors.amountReceived.message} />
-            )}
+            )} */}
           </div>
         </div>
 
@@ -228,24 +218,20 @@ export const TransactionForm = ({
               maxLength={25}
             />
           </div>
-          {errors.memo && <InputError message={errors.memo.message} />}
+          {/* {errors.memo && <InputError message={errors.memo.message} />} */}
         </div>
 
         {/* Submit button */}
-        {account.isConnected ? (
+        {ready && authenticated ? (
           <VerifyIDModal />
         ) : (
-          <button
-            type="submit"
-            disabled={!isValid || !isDirty || !account.isConnected}
-            className={primaryBtnClasses}
-          >
-            {account.isConnected ? "Swap" : "Connect"}
+          <button type="button" className={primaryBtnClasses} onClick={login}>
+            Connect
           </button>
         )}
 
         <AnimatePresence>
-          {rate > 0 && Number(amountSent) > 0.5 && account.isConnected && (
+          {rate > 0 && Number(amountSent) > 0.5 && authenticated && (
             <AnimatedComponent
               variant={slideInOut}
               className="flex w-full flex-col justify-between gap-2 text-xs text-gray-500 transition-all dark:text-white/30 sm:flex-row sm:items-center"
