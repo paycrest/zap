@@ -32,8 +32,13 @@ export const WalletDetails = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-2 shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 dark:bg-neutral-800 dark:focus-visible:ring-offset-neutral-900"
       >
-        <div className="py-2.5">
-          <PaycrestLogo className="h-4 w-4" />
+        <div className="px-0.5 py-2.5">
+          <Image
+            src="/logos/coinbase-logo.svg"
+            alt="Coinbase logo"
+            width={20}
+            height={20}
+          />
         </div>
         <div className="h-10 w-px border-r border-dashed border-gray-100 dark:border-white/10" />
         <div className="flex items-center gap-2 py-2.5 dark:text-white/80">

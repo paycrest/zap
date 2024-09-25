@@ -6,6 +6,7 @@ export { LogoOutlineBg } from "./LogoOutlineBg";
 export { Disclaimer } from "./Disclaimer";
 export { ThemeSwitch } from "./ThemeSwitch";
 export { WalletDetails } from "./WalletDetails";
+export { SettingsDropdown } from "./SettingsDropdown";
 
 export {
   AnimatedPage,

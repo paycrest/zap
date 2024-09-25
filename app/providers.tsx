@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
+import { PrivyProvider } from "@privy-io/react-auth";
 
 import { BiconomyProvider } from "@biconomy/use-aa";
 import { WagmiProvider } from "wagmi";
@@ -80,33 +81,48 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const biconomyPaymasterApiKey =
     process.env.NEXT_PUBLIC_PAYMASTER_API_KEY || "";
   const bundlerUrl = process.env.NEXT_PUBLIC_BUNDLER_URL || "";
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "";
 
   const queryClient = new QueryClient();
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            initialChain={environment === "mainnet" ? base : baseSepolia}
-            theme={darkTheme({
-              borderRadius: "large",
-              accentColor: "#3384F7",
-              fontStack: "Inter" as "system",
-            })}
-          >
-            <BiconomyProvider
-              config={{
-                biconomyPaymasterApiKey,
-                bundlerUrl,
-              }}
-              queryClient={queryClient}
+      <PrivyProvider
+        appId={privyAppId}
+        config={{
+          appearance: {
+            theme: "dark",
+            accentColor: "#8B85F4",
+            logo: "/logos/noblocks-logo.svg",
+          },
+          embeddedWallets: {
+            createOnLogin: "all-users",
+          },
+        }}
+      >
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider
+              initialChain={environment === "mainnet" ? base : baseSepolia}
+              theme={darkTheme({
+                borderRadius: "large",
+                accentColor: "#3384F7",
+                fontStack: "Inter" as "system",
+              })}
             >
-              {children}
-            </BiconomyProvider>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
+              <BiconomyProvider
+                config={{
+                  biconomyPaymasterApiKey,
+                  bundlerUrl,
+                }}
+                queryClient={queryClient}
+              >
+                {children}
+              </BiconomyProvider>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </PrivyProvider>
     </ThemeProvider>
   );
 }

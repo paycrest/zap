@@ -1,30 +1,18 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 
 import { NoblocksLogo } from "./ImageAssets";
-import { useAccount, useConnect } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { primaryBtnClasses, secondaryBtnClasses } from "./Styles";
-import { NetworksDropdown } from "./NetworksDropdown";
+import { primaryBtnClasses } from "./Styles";
 import { WalletDetails } from "./WalletDetails";
+import { NetworksDropdown } from "./NetworksDropdown";
+import { SettingsDropdown } from "./SettingsDropdown";
 
 export const Navbar = () => {
   const [mounted, setMounted] = useState(false);
 
-  const account = useAccount();
-  const { connectors, connect } = useConnect();
-
-  const { openConnectModal } = useConnectModal();
-
-  const createWallet = useCallback(() => {
-    const coinbaseWalletConnector = connectors.find(
-      (connector) => connector.id === "coinbaseWalletSDK",
-    );
-    if (coinbaseWalletConnector) {
-      connect({ connector: coinbaseWalletConnector });
-    }
-  }, [connectors, connect]);
+  const { ready, authenticated, login } = usePrivy();
 
   useEffect(() => setMounted(true), []);
 
@@ -43,27 +31,7 @@ export const Navbar = () => {
         </div>
 
         <div className="flex gap-4 text-sm font-medium">
-          {!account.isConnected ? (
-            <>
-              <button
-                type="button"
-                className={secondaryBtnClasses}
-                onClick={createWallet}
-              >
-                Create wallet
-              </button>
-
-              {openConnectModal && (
-                <button
-                  type="button"
-                  className={primaryBtnClasses}
-                  onClick={openConnectModal}
-                >
-                  Connect wallet
-                </button>
-              )}
-            </>
-          ) : (
+          {ready && authenticated ? (
             <>
               <WalletDetails />
 
@@ -71,6 +39,18 @@ export const Navbar = () => {
                 selectedId="1"
                 // onSelect={handleSelect}
               />
+
+              <SettingsDropdown />
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={primaryBtnClasses}
+                onClick={login}
+              >
+                Connect Wallet
+              </button>
             </>
           )}
         </div>
