@@ -17,7 +17,7 @@ import { shortenAddress } from "../utils";
 import { PiCheck } from "react-icons/pi";
 
 export const SettingsDropdown = () => {
-  const { user, logout } = usePrivy();
+  const { user, logout, exportWallet } = usePrivy();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
 
@@ -86,6 +86,7 @@ export const SettingsDropdown = () => {
             <li
               role="menuitem"
               className="flex cursor-pointer items-center gap-2.5 px-4 py-2 transition hover:bg-gray-200 dark:hover:bg-neutral-700"
+              onClick={exportWallet}
             >
               <PrivateKeyIcon />
               <p>Export Private Key</p>
