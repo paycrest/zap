@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
       <h3 className="text-base font-medium">1. Introduction</h3>
       <p>
         Welcome to Paycrest, Inc. (“The Company”"we," "our," or "us"), the
-        company behind noblocks.xyz and paycrest protocol ("the Services"). We are
+        company behind noblocks.xyz and Paycrest Protocol ("the Services"). We are
         committed to protecting the privacy and personal information of our
         users ("you," "your," or "user"). This Privacy Policy outlines how we
         collect, use, share, and protect your personal data when you use our
