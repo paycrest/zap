@@ -54,6 +54,15 @@ select {
   animation: jump7456 0.5s linear infinite;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 @keyframes jump7456 {
   15% {
     border-bottom-right-radius: 3px;

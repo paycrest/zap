@@ -990,3 +990,25 @@ export const LogoutIcon = (props: ImageProps) => {
     </svg>
   );
 };
+
+export const ArrowDownIcon = (props: ImageProps) => {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <title>Arrow down</title>
+      <path
+        d="M13.5 6.75004C13.5 6.75004 10.1858 11.25 8.99996 11.25C7.81413 11.25 4.5 6.75 4.5 6.75"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};

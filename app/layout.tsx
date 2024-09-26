@@ -8,7 +8,8 @@ import { Inter } from "next/font/google";
 import Providers from "./providers";
 import { Footer, LogoOutlineBg, Navbar } from "./components";
 import { ToastContainer } from "react-toastify";
-
+import React from "react";
+import MainContent from "./mainContent";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -28,7 +30,7 @@ export default function RootLayout({
           <div className="min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
             <Navbar />
             <div className="relative z-10 mx-auto flex min-h-screen flex-col items-center px-4 pt-20 transition-all">
-              <main className="w-full max-w-md flex-grow">{children}</main>
+              <MainContent>{children}</MainContent>
               <Footer />
             </div>
             <LogoOutlineBg />
