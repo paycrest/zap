@@ -36,7 +36,7 @@ export const Navbar = () => {
             onMouseLeave={() => setIsHovered(false)}
           >
             {isHovered && (
-              <AnimatedComponent className="ml-4 mr-4 flex items-center gap-4 text-sm font-normal" delay={0.1}>
+              <AnimatedComponent className="ml-4 mr-4 flex items-center gap-4 text-sm font-normal dark:text-white/80" delay={0.1}>
                 <Link href="/terms">Terms</Link>
                 <Link href="/privacy_policy">Privacy Policy</Link>
               </AnimatedComponent>
