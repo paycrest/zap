@@ -1,12 +1,18 @@
 import Image from 'next/image';
 import { AnimatedComponent, fadeInOut, slideInOut } from './AnimatedComponents';
-import { BNBIcon, BaseIcon, PolygonIcon, ZapIcon } from './ImageAssets';
+import {
+  ArbitrumIcon,
+  BNBIcon,
+  BaseIcon,
+  PolygonIcon,
+  ZapIcon,
+} from './ImageAssets';
 import { VideoDialog } from './VideoDialog';
 import { WaitlistForm } from './WaitlistForm';
 
 const networks = [
   { name: 'Base', Icon: BaseIcon },
-  // { name: 'Arbitrum', Icon: ArbitrumIcon },
+  { name: 'Arbitrum', Icon: ArbitrumIcon },
   { name: 'Polygon', Icon: PolygonIcon },
   { name: 'BNB', Icon: BNBIcon },
 ];
@@ -80,7 +86,7 @@ export const Waitlist = ({
             className='flex items-center gap-3.5 group'
           >
             <Image
-              src='/video-icon.svg'
+              src='/images/video-icon.svg'
               alt='Video Icon'
               width={24}
               height={24}

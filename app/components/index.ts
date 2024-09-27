@@ -1,7 +1,7 @@
 export { Navbar } from './Navbar';
 export { Footer } from './Footer';
 export { Waitlist } from './Waitlist';
-export { YouAreIn } from './YouAreIn';
+export { Success } from './Success';
 export { Preloader } from './Preloader';
 export { InputError } from './InputError';
 export { ThemeSwitch } from './ThemeSwitch';
