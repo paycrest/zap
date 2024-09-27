@@ -24,7 +24,7 @@ import {
   RecipientDetailsFormProps,
 } from "../types";
 import { colors } from "../mocks";
-import { classNames } from "../utils";
+import { classNames, kenyaMobileMoneyOptions } from "../utils";
 import { InputError } from "./InputError";
 import { useOutsideClick } from "../hooks";
 import { fetchAccountName } from "../api/aggregator";
@@ -79,8 +79,8 @@ export const RecipientDetailsForm = ({
 
   const [selectedMobileMoneyInstitution, setSelectedMobileMoneyInstitution] =
     useState<InstitutionProps | null>({
-      name: "MOMO",
-      code: "momo",
+      name: "SAFARICOM (MPESA)",
+      code: "MPESA",
       type: "mobile-money",
     });
 
@@ -629,33 +629,34 @@ export const RecipientDetailsForm = ({
                       transition={{ duration: 0.3 }}
                       className="space-y-4"
                     >
-                      <div className="flex w-full justify-between gap-3">
-                        {["MOMO", "SAFKEN", "MPESA"].map((provider) => (
+                      <div className="flex w-full gap-3">
+                        {/* {["MOMO", "SAFKEN", "MPESA"].map((provider) => ( */}
+                          {kenyaMobileMoneyOptions.map((provider) => (
                           <button
-                            key={provider}
+                            key={provider.code}
                             type="button"
-                            className={`flex items-center gap-2 rounded-lg border border-gray-300 p-1 pr-2 uppercase outline-none transition focus-within:border-gray-400 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:focus-within:border-white/20 ${selectedMobileMoneyInstitution?.name === provider ? "bg-gray-200 dark:bg-white/5" : ""}`}
+                            className={`flex items-center gap-2 rounded-lg border border-gray-300 p-1 pr-2 uppercase outline-none transition focus-within:border-gray-400 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:focus-within:border-white/20 ${selectedMobileMoneyInstitution?.name === provider.code ? "bg-gray-200 dark:bg-white/5" : ""}`}
                             onClick={() => {
                               setSelectedMobileMoneyInstitution({
-                                name: provider,
-                                code: provider.toLowerCase(),
+                                name: provider.name,
+                                code: provider.code.toLowerCase(),
                                 type: "mobile-money",
                               });
                               register("institution", {
-                                value: provider.toLowerCase(),
+                                value: provider.code.toLowerCase(),
                               });
                             }}
                           >
                             <Image
-                              src={`/logos/${provider.toLowerCase()}-logo.svg`}
+                              src={`/logos/${provider.code.toLowerCase()}-logo.svg`}
                               alt={`${provider} logo`}
                               width={0}
                               height={0}
                               className="size-8"
                             />
-                            <div>{provider}</div>
-                            {selectedMobileMoneyInstitution?.name ===
-                            provider ? (
+                            <div>{provider.name}</div>
+                            {selectedMobileMoneyInstitution?.code.toLowerCase() ===
+                            provider.code.toLowerCase() ? (
                               <PiCheckCircleFill className="text-lg text-green-700 dark:text-green-500" />
                             ) : (
                               <TbCircle className="text-lg text-gray-300 dark:text-white/10" />
