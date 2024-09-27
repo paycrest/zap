@@ -358,9 +358,9 @@ export const RecipientDetailsForm = ({
       ) : (
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-transparent px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/10 dark:text-white/80 dark:hover:bg-white/5 dark:focus-visible:ring-offset-neutral-900"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-transparent px-3 py-2.5 text-sm text-black outline-none transition-all hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed dark:border-white/10 dark:text-white dark:hover:bg-white/5 dark:focus-visible:ring-offset-neutral-900"
         >
-          <AddUserIcon className="fill-gray-300 stroke-gray-300 dark:fill-transparent dark:stroke-gray-600" />
+          <AddUserIcon className="text-outline-gray dark:text-white/50" />
           <p>Add recipient</p>
         </Button>
       )}
