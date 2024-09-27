@@ -630,7 +630,6 @@ export const RecipientDetailsForm = ({
                       className="space-y-4"
                     >
                       <div className="flex w-full gap-3">
-                        {/* {["MOMO", "SAFKEN", "MPESA"].map((provider) => ( */}
                           {kenyaMobileMoneyOptions.map((provider) => (
                           <button
                             key={provider.code}
