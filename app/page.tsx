@@ -68,7 +68,6 @@ export default function Home() {
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch} = formMethods;
   const { currency, token } = watch();
-  console.log("currency", currency)
 
   // Get account information using custom hook
   const account = useAccount();
