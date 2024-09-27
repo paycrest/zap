@@ -325,6 +325,10 @@ export const RecipientDetailsForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountIdentifier, institution]);
 
+  useEffect(()=> {
+    setSelectedTab("bank-transfer")
+  },[currency])
+
   return (
     <>
       {selectedRecipient ? (
