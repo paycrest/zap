@@ -226,7 +226,7 @@ export const TransactionForm = ({
           <VerifyIDModal />
         ) : (
           <button type="button" className={primaryBtnClasses} onClick={login}>
-            Connect
+            Get Started
           </button>
         )}
 

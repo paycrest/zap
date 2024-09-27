@@ -66,7 +66,7 @@ export const Navbar = () => {
                 className={primaryBtnClasses}
                 onClick={login}
               >
-                Connect Wallet
+                Sign In
               </button>
             </>
           )}
