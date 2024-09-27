@@ -496,21 +496,21 @@ export const NoteIcon = (props: ImageProps) => {
       <title>Note icon</title>
       <path
         d="M13.332 7.33398V6.66732C13.332 4.15316 13.332 2.89608 12.505 2.11503C11.678 1.33398 10.347 1.33398 7.68497 1.33398L6.97909 1.33398C4.31704 1.33398 2.98602 1.33398 2.15902 2.11503C1.33203 2.89608 1.33203 4.15316 1.33203 6.66732L1.33203 9.33398C1.33203 11.8481 1.33203 13.1052 2.15902 13.8863C2.98602 14.6673 4.31704 14.6673 6.97909 14.6673H7.33203"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.3"
         strokeWidth="1.2"
         strokeLinecap="round"
       />
       <path
         d="M4.66406 4.66797H9.9974"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.3"
         strokeWidth="1.2"
         strokeLinecap="round"
       />
       <path
         d="M4.66406 8H9.9974"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.3"
         strokeWidth="1.2"
         strokeLinecap="round"
@@ -537,7 +537,7 @@ export const AddUserIcon = (props: ImageProps) => {
       <title>Add user icon</title>
       <path
         d="M8.83203 14.6673H4.89261C3.86236 14.6673 3.0429 14.166 2.30714 13.465C0.800941 12.0301 3.2739 10.8833 4.21708 10.3217C5.61761 9.48777 7.25659 9.18191 8.83203 9.40411C9.4037 9.48474 9.96045 9.6349 10.4987 9.85459"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.5"
         strokeWidth="1.5"
         strokeLinecap="round"
@@ -545,13 +545,13 @@ export const AddUserIcon = (props: ImageProps) => {
       />
       <path
         d="M11.5 4.33398C11.5 5.99084 10.1569 7.33398 8.5 7.33398C6.84315 7.33398 5.5 5.99084 5.5 4.33398C5.5 2.67713 6.84315 1.33398 8.5 1.33398C10.1569 1.33398 11.5 2.67713 11.5 4.33398Z"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.5"
         strokeWidth="1.5"
       />
       <path
         d="M12.8333 14.6667L12.8333 10M10.5 12.3333H15.1667"
-        stroke="white"
+        stroke="currentColor"
         strokeOpacity="0.5"
         strokeWidth="1.5"
         strokeLinecap="round"

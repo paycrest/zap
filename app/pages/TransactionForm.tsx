@@ -206,7 +206,7 @@ export const TransactionForm = ({
 
           {/* Memo */}
           <div className="relative">
-            <NoteIcon className="absolute left-2 top-2.5 fill-gray-200 stroke-gray-300 dark:fill-transparent dark:stroke-none" />
+            <NoteIcon className="absolute left-2 top-2.5 fill-white stroke-gray-300 dark:fill-transparent dark:stroke-none" />
             <input
               type="text"
               id="memo"
