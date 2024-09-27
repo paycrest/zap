@@ -662,7 +662,7 @@ export const RecipientDetailsForm = ({
                               alt={`${provider.code} logo`}
                               width={0}
                               height={0}
-                              className="size-8"
+                              className="size-8 rounded-md"
                             />
                             <div>{provider.name}</div>
                             {selectedMobileMoneyInstitution?.code.toLowerCase() ===
