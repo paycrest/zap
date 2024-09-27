@@ -49,6 +49,7 @@ export const RecipientDetailsForm = ({
     formState: { errors },
   } = formMethods;
 
+  const { currency } = watch();
   const institution = watch("institution");
   const accountIdentifier = watch("accountIdentifier");
 
@@ -395,14 +396,20 @@ export const RecipientDetailsForm = ({
                     </button>
                     <button
                       type="button"
-                      className={`transition-all duration-300 ${
+                      className={`flex items-center gap-1 transition-all duration-300 disabled:cursor-not-allowed ${
                         selectedTab === "mobile-money"
                           ? "text-neutral-900 dark:text-white"
                           : "text-gray-400 dark:text-white/40"
                       }`}
+                      disabled={currency !== "KES"}
                       onClick={() => setSelectedTab("mobile-money")}
                     >
                       Mobile money
+                      {currency !== "KES" && (
+                        <span className="text-xs font-light italic">
+                          (Coming soon!)
+                        </span>
+                      )}
                     </button>
                   </div>
 
@@ -630,7 +637,7 @@ export const RecipientDetailsForm = ({
                       className="space-y-4"
                     >
                       <div className="flex w-full gap-3">
-                          {kenyaMobileMoneyOptions.map((provider) => (
+                        {kenyaMobileMoneyOptions.map((provider) => (
                           <button
                             key={provider.code}
                             type="button"
@@ -648,7 +655,7 @@ export const RecipientDetailsForm = ({
                           >
                             <Image
                               src={`/logos/${provider.code.toLowerCase()}-logo.svg`}
-                              alt={`${provider} logo`}
+                              alt={`${provider.code} logo`}
                               width={0}
                               height={0}
                               className="size-8"
