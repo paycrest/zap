@@ -68,6 +68,7 @@ export default function Home() {
   const formMethods = useForm<FormData>({ mode: "onChange" });
   const { watch} = formMethods;
   const { currency, token } = watch();
+  console.log("currency", currency)
 
   // Get account information using custom hook
   const account = useAccount();
@@ -147,7 +148,7 @@ export default function Home() {
 
       try {
         const institutions = await fetchSupportedInstitutions(currency);
-        setInstitutions(institutions);
+        setInstitutions(institutions.filter((institution) => institution.type === "bank"));
         setIsFetchingInstitutions(false);
       } catch (error) {
         console.log(error);

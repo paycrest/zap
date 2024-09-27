@@ -169,3 +169,16 @@ export function getGatewayContractAddress(network = ""): string | undefined {
     "Base Sepolia": "0x847dfdaa218f9137229cf8424378871a1da8f625",
   }[network];
 }
+
+export const kenyaMobileMoneyOptions: InstitutionProps[] = [
+  {
+    name: "SAFARICOM (MPESA)",
+    code: "MPESA",
+    type: "mobile-money",
+  },
+  {
+    name: "AIRTEL",
+    code: "AIRTEL",
+    type: "mobile-money",
+  },
+];
