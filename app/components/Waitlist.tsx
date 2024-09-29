@@ -1,20 +1,20 @@
-import Image from 'next/image';
-import { AnimatedComponent, fadeInOut, slideInOut } from './AnimatedComponents';
+import Image from "next/image";
+import { AnimatedComponent, fadeInOut, slideInOut } from "./AnimatedComponents";
 import {
   ArbitrumIcon,
   BNBIcon,
   BaseIcon,
   PolygonIcon,
   ZapIcon,
-} from './ImageAssets';
-import { VideoDialog } from './VideoDialog';
-import { WaitlistForm } from './WaitlistForm';
+} from "./ImageAssets";
+import { VideoDialog } from "./VideoDialog";
+import { WaitlistForm } from "./WaitlistForm";
 
 const networks = [
-  { name: 'Base', Icon: BaseIcon },
-  { name: 'Arbitrum', Icon: ArbitrumIcon },
-  { name: 'Polygon', Icon: PolygonIcon },
-  { name: 'BNB', Icon: BNBIcon },
+  { name: "Base", Icon: BaseIcon },
+  { name: "Arbitrum", Icon: ArbitrumIcon },
+  { name: "Polygon", Icon: PolygonIcon },
+  { name: "BNB", Icon: BNBIcon },
 ];
 
 const NetworkIcon = ({
@@ -25,7 +25,7 @@ const NetworkIcon = ({
   index: number;
 }) => (
   <Icon
-    className={`size-7 border-2 border-white bg-white transition dark:bg-neutral-900 dark:border-neutral-900 rounded-full ${index > 0 ? '-ml-2' : ''}`}
+    className={`size-7 border-2 border-white bg-white transition dark:bg-neutral-900 dark:border-neutral-900 rounded-full ${index > 0 ? "-ml-2" : ""}`}
   />
 );
 
@@ -41,20 +41,20 @@ export const Waitlist = ({
   return (
     <>
       <AnimatedComponent variant={slideInOut} delay={0.4}>
-        <h1 className='text-3xl font-semibold leading-normal text-neutral-900 dark:text-white'>
-          So{' '}
-          <span className='text-primary font-extrabold font-playfair-display'>
+        <h1 className="text-3xl font-semibold leading-normal text-neutral-900 dark:text-white">
+          So{" "}
+          <span className="text-primary font-extrabold font-playfair-display">
             fast
-          </span>{' '}
+          </span>{" "}
           they ask "How's that even possible?"
-          <ZapIcon className='size-6 inline-block align-middle' />
+          <ZapIcon className="size-6 inline-block align-middle" />
         </h1>
       </AnimatedComponent>
 
       <AnimatedComponent
         variant={fadeInOut}
         delay={0.6}
-        className='leading-normal text-neutral-900 dark:text-white/80 font-light'
+        className="leading-normal text-neutral-900 dark:text-white/80 font-light"
       >
         Convert your crypto to fiat at lightening speed. <br />
         Transfer them seamlessly to any bank account or mobile wallet.
@@ -67,10 +67,10 @@ export const Waitlist = ({
       <AnimatedComponent
         variant={fadeInOut}
         delay={1}
-        className='text-neutral-900 dark:text-white/80 font-light'
+        className="text-neutral-900 dark:text-white/80 font-light"
       >
         Supports
-        <div className='inline-flex align-middle mx-2'>
+        <div className="inline-flex align-middle mx-2">
           {networks.map(({ name, Icon }, index) => (
             <NetworkIcon key={name} Icon={Icon} index={index} />
           ))}
@@ -81,20 +81,20 @@ export const Waitlist = ({
       <AnimatedComponent variant={fadeInOut} delay={1.2}>
         <>
           <button
-            type='button'
+            type="button"
             onClick={() => setIsModalOpen(true)}
-            className='flex items-center gap-3.5 group'
+            className="flex items-center gap-3.5 group"
           >
             <Image
-              src='/images/video-icon.svg'
-              alt='Video Icon'
+              src="/images/video-icon.svg"
+              alt="Video Icon"
               width={24}
               height={24}
-              aria-label='Video Icon'
-              className='transition rounded-md w-6 h-5 inline-block align-middle border border-transparent group-hover:border-gray-300 group-hover:dark:border-white/20'
+              aria-label="Video Icon"
+              className="transition rounded-md w-6 h-5 inline-block align-middle border border-transparent group-hover:border-gray-300 group-hover:dark:border-white/20"
             />
 
-            <p className='text-neutral-900 dark:text-white/80 font-light group-hover:text-neutral-700 dark:group-hover:text-white transition-colors'>
+            <p className="text-neutral-900 dark:text-white/80 font-light group-hover:text-neutral-700 dark:group-hover:text-white transition-colors">
               See how it works
             </p>
           </button>
