@@ -9,11 +9,11 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "noblocks",
+  title: "noblocks • Waitlist",
   description: "Crypto-to-fiat payments with no blocks.",
   publisher: "Paycrest",
   authors: [{ name: "Paycrest", url: "https://paycrest.io" }],
-  metadataBase: new URL("https://paycrest.io"),
+  metadataBase: new URL("https://noblocks.xyz"),
   openGraph: {
     title: "noblocks",
     description: "Crypto-to-fiat payments with no blocks.",
