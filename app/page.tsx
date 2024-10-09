@@ -52,7 +52,7 @@ export default function Home() {
   const [institutions, setInstitutions] = useState<InstitutionProps[]>([]);
 
   const [selectedNetwork, setSelectedNetwork] = useState<string>("base");
-  const [selectedTab, setSelectedTab] = useState<string>("bank-transfer");
+  const [selectedTab, setSelectedTab] = useState<string>("mobile-money");
 
   // Form methods and watch
   const formMethods = useForm<FormData>({ mode: "onChange" });
@@ -146,7 +146,7 @@ export default function Home() {
 
       try {
         const institutions = await fetchSupportedInstitutions(currency);
-        setInstitutions(institutions);
+        setInstitutions(institutions.sort((a, b) => a.name.localeCompare(b.name)));
         setIsFetchingInstitutions(false);
       } catch (error) {
         console.log(error);
@@ -154,6 +154,7 @@ export default function Home() {
     };
 
     getInstitutions();
+    formMethods.setValue("accountIdentifier", "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
 
@@ -220,13 +221,17 @@ export default function Home() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     const getRate = async () => {
-      if (!currency || !amount || !token) return;
+      let selectedCurrency = currency;
+      if (!selectedCurrency) {
+        selectedCurrency = "NGN";
+      }
+      if (!selectedCurrency || !amount || !token) return;
       setIsFetchingRate(true);
       try {
         const rate = await fetchRate({
           token: "USDT",
           amount: amount,
-          currency: currency,
+          currency: selectedCurrency,
         });
         setRate(rate.data);
         setIsFetchingRate(false);

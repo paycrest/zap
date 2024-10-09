@@ -28,11 +28,7 @@ import { HiOutlineInformationCircle } from "react-icons/hi";
 
 const currencies = [
   { value: "NGN", label: "\uD83C\uDDF3\uD83C\uDDEC Nigerian Naira (NGN)" },
-  {
-    value: "KES",
-    label: "\uD83C\uDDF0\uD83C\uDDEA Kenyan Shilling (KES)",
-    disabled: true,
-  },
+  { value: "KES", label: "\uD83C\uDDF0\uD83C\uDDEA Kenyan Shilling (KES)" },
   {
     value: "GHS",
     label: "\uD83C\uDDEC\uD83C\uDDED Ghanaian Cedi (GHS)",
@@ -298,54 +294,278 @@ export const TransactionForm = ({
         </div>
 
         <div className="grid gap-4 rounded-3xl border border-gray-200 p-4 transition-all dark:border-white/10">
-          {/* Tabs */}
-          <div className="flex items-center gap-2 rounded-full bg-gray-50 p-1 font-medium dark:bg-white/5">
-            <TabButton
-              tab="bank-transfer"
-              selectedTab={selectedTab}
-              handleTabChange={handleTabChange}
-            />
-            <TabButton
-              tab="mobile-money"
-              selectedTab={selectedTab}
-              handleTabChange={handleTabChange}
-            />
-          </div>
+          {/* Currency */}
+          <SelectField
+            id="currency"
+            label="Currency"
+            defaultValue="NGN"
+            options={currencies}
+            validation={{
+              required: { value: true, message: "Select currency" },
+            }}
+            errors={errors}
+            register={register}
+            value={watch("currency")}
+          />
 
-          {/* Bank Transfer Tab Contents */}
-          {selectedTab === "bank-transfer" && (
+          {currency === "KES" ? (
+            <>
+              {/* Tabs */}
+              <div className="flex items-center gap-2 rounded-full bg-gray-50 p-1 font-medium dark:bg-white/5">
+                <TabButton
+                  tab="mobile-money"
+                  selectedTab={selectedTab}
+                  handleTabChange={handleTabChange}
+                />
+                <TabButton
+                  tab="bank-transfer"
+                  selectedTab={selectedTab}
+                  handleTabChange={handleTabChange}
+                />
+              </div>
+
+              {/* Bank Transfer Tab Contents */}
+              {selectedTab === "bank-transfer" && (
+                <motion.div
+                  key="bank-transfer"
+                  {...fadeInOut}
+                  transition={{ duration: 0.3 }}
+                  className="grid gap-4"
+                >
+                  {/* Recipient Bank */}
+                  <SelectField
+                    id="institution"
+                    label="Bank Name"
+                    options={supportedInstitutions
+                      .filter((institution) => institution.type === "bank")
+                      .map((institution: InstitutionProps) => ({
+                        value: institution.code,
+                        label: institution.name,
+                      }))}
+                    validation={{
+                      required: { value: true, message: "Select bank name" },
+                      disabled: watch("currency") === "" || institutionsLoading,
+                    }}
+                    errors={errors}
+                    register={register}
+                    isLoading={institutionsLoading}
+                    value={watch("institution")}
+                    title={
+                      watch("currency") === ""
+                        ? "Select currency to enable bank name field"
+                        : "Select bank name"
+                    }
+                  />
+
+                  {/* Recipient Account */}
+                  <div className="grid gap-2">
+                    <label htmlFor="recipient-account" className="font-medium">
+                      Account Number <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="recipient-account"
+                        {...register("accountIdentifier", {
+                          required: {
+                            value: true,
+                            message: "Enter account number",
+                          },
+                          pattern: {
+                            value: /\d{10}/,
+                            message: "Invalid account number",
+                          },
+                        })}
+                        className={inputClasses}
+                        placeholder="1234567890"
+                        maxLength={10}
+                        pattern="\d{10}"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
+                        {10 -
+                          (watch("accountIdentifier")?.toString().length ?? 0)}
+                      </div>
+                    </div>
+                    {errors.accountIdentifier && (
+                      <InputError message={errors.accountIdentifier.message} />
+                    )}
+
+                    <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
+                      <AnimatePresence mode="wait">
+                        {isFetchingRecipientName ? (
+                          <AnimatedFeedbackItem>
+                            <ImSpinner2 className="animate-spin" />
+                            <p className="text-xs">Getting recipient name...</p>
+                          </AnimatedFeedbackItem>
+                        ) : (
+                          <>
+                            {recipientName && (
+                              <AnimatedFeedbackItem>
+                                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+                                <p className="capitalize text-gray-700 dark:text-white/80">
+                                  {recipientName.toLocaleLowerCase()}
+                                </p>
+                              </AnimatedFeedbackItem>
+                            )}
+                            {recipientName === "" &&
+                              watch("accountIdentifier")?.toString().length ===
+                                10 &&
+                              !errors.accountIdentifier &&
+                              isValid && (
+                                <InputError message="Could not resolve account details" />
+                              )}
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  {/* Memo */}
+                  <div className="grid gap-2">
+                    <label htmlFor="memo" className="font-medium">
+                      Memo
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="memo"
+                        className={inputClasses}
+                        placeholder="Enter memo"
+                        maxLength={25}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
+                        {25 - (watch("memo")?.toString().length ?? 0)}
+                      </div>
+                    </div>
+                    {errors.memo && (
+                      <InputError message={errors.memo.message} />
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Mobile Money Tab Contents */}
+              {selectedTab === "mobile-money" && (
+                <motion.div
+                  key="mobile-money"
+                  {...fadeInOut}
+                  transition={{ duration: 0.3 }}
+                  className="grid gap-4"
+                >
+                  {/* Recipient Mobile Number */}
+                  <SelectField
+                    id="institution"
+                    label="Mobile Network"
+                    options={supportedInstitutions
+                      .filter(
+                        (institution) => institution.type === "mobile_money",
+                      )
+                      .map((institution: InstitutionProps) => ({
+                        value: institution.code,
+                        label: institution.name,
+                      }))}
+                    validation={{
+                      required: {
+                        value: true,
+                        message: "Select mobile network",
+                      },
+                      disabled: watch("currency") === "" || institutionsLoading,
+                    }}
+                    errors={errors}
+                    register={register}
+                    isLoading={institutionsLoading}
+                    value={watch("institution")}
+                    title={
+                      watch("currency") === ""
+                        ? "Select currency to enable mobile network"
+                        : "Select recipient mobile network"
+                    }
+                  />
+
+                  {/* Recipient Account */}
+                  <div className="grid gap-2">
+                    <label htmlFor="recipient-account" className="font-medium">
+                      Mobile Number <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="recipient-account"
+                        {...register("accountIdentifier", {
+                          required: {
+                            value: true,
+                            message: "Enter mobile number",
+                          },
+                          pattern: {
+                            value: /\d{10}/,
+                            message: "Invalid mobile number",
+                          },
+                        })}
+                        className={inputClasses}
+                        placeholder="7025678901"
+                        maxLength={10}
+                        pattern="\d{10}"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
+                        {10 -
+                          (watch("accountIdentifier")?.toString().length ?? 0)}
+                      </div>
+                    </div>
+                    {errors.accountIdentifier && (
+                      <InputError message={errors.accountIdentifier.message} />
+                    )}
+
+                    <div className="flex items-center gap-1 text-gray-400 dark:text-white/50">
+                      <AnimatePresence mode="wait">
+                        {isFetchingRecipientName ? (
+                          <AnimatedFeedbackItem>
+                            <ImSpinner2 className="animate-spin" />
+                            <p className="text-xs">Getting recipient name...</p>
+                          </AnimatedFeedbackItem>
+                        ) : (
+                          <>
+                            {recipientName && (
+                              <AnimatedFeedbackItem>
+                                <PiCheckCircle className="text-lg text-green-700 dark:text-green-500" />
+                                <p className="capitalize text-gray-700 dark:text-white/80">
+                                  {recipientName.toLocaleLowerCase()}
+                                </p>
+                              </AnimatedFeedbackItem>
+                            )}
+                            {recipientName === "" &&
+                              watch("accountIdentifier")?.toString().length ===
+                                10 &&
+                              !errors.accountIdentifier &&
+                              isValid && (
+                                <InputError message="Could not resolve account details" />
+                              )}
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </>
+          ) : (
             <motion.div
               key="bank-transfer"
               {...fadeInOut}
               transition={{ duration: 0.3 }}
               className="grid gap-4"
             >
-              {/* Currency */}
-              <SelectField
-                id="currency"
-                label="Currency"
-                defaultValue="NGN"
-                options={currencies}
-                validation={{
-                  required: { value: true, message: "Select currency" },
-                }}
-                errors={errors}
-                register={register}
-                value={watch("currency")}
-              />
-
               {/* Recipient Bank */}
               <SelectField
                 id="institution"
-                label="Recipient Bank"
-                options={supportedInstitutions.map(
-                  (institution: InstitutionProps) => ({
+                label="Bank Name"
+                options={supportedInstitutions
+                  .filter((institution) => institution.type === "bank")
+                  .map((institution: InstitutionProps) => ({
                     value: institution.code,
                     label: institution.name,
-                  }),
-                )}
+                  }))}
                 validation={{
-                  required: { value: true, message: "Select recipient bank" },
+                  required: { value: true, message: "Select bank name" },
                   disabled: watch("currency") === "" || institutionsLoading,
                 }}
                 errors={errors}
@@ -354,15 +574,15 @@ export const TransactionForm = ({
                 value={watch("institution")}
                 title={
                   watch("currency") === ""
-                    ? "Select currency to enable recipient bank"
-                    : "Select recipient bank"
+                    ? "Select currency to enable bank name field"
+                    : "Select bank name"
                 }
               />
 
               {/* Recipient Account */}
               <div className="grid gap-2">
                 <label htmlFor="recipient-account" className="font-medium">
-                  Recipient Account <span className="text-rose-500">*</span>
+                  Account Number <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -371,15 +591,15 @@ export const TransactionForm = ({
                     {...register("accountIdentifier", {
                       required: {
                         value: true,
-                        message: "Enter recipient account",
+                        message: "Enter account number",
                       },
                       pattern: {
                         value: /\d{10}/,
-                        message: "Invalid account identifier",
+                        message: "Invalid account number",
                       },
                     })}
                     className={inputClasses}
-                    placeholder="12345678901"
+                    placeholder="1234567890"
                     maxLength={10}
                     pattern="\d{10}"
                   />
@@ -424,15 +644,12 @@ export const TransactionForm = ({
               {/* Memo */}
               <div className="grid gap-2">
                 <label htmlFor="memo" className="font-medium">
-                  Memo <span className="text-rose-500">*</span>
+                  Memo
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     id="memo"
-                    {...register("memo", {
-                      required: { value: true, message: "Enter memo" },
-                    })}
                     className={inputClasses}
                     placeholder="Enter memo"
                     maxLength={25}
@@ -443,19 +660,6 @@ export const TransactionForm = ({
                 </div>
                 {errors.memo && <InputError message={errors.memo.message} />}
               </div>
-            </motion.div>
-          )}
-
-          {/* Mobile Money Tab Contents */}
-          {selectedTab === "mobile-money" && (
-            <motion.div
-              key="mobile-money"
-              {...fadeInOut}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-5 dark:border-white/10"
-            >
-              <FaRegHourglass className="text-yellow-700 dark:text-yellow-400" />
-              <p className="text-gray-500">Coming soon</p>
             </motion.div>
           )}
         </div>

@@ -33,7 +33,8 @@ import { toast } from "react-toastify";
 import { useSendSponsoredTransaction, useUserOpWait } from "@biconomy/use-aa";
 import { PiCheckCircleFill } from "react-icons/pi";
 
-const PROVIDER_ID = process.env.NEXT_PUBLIC_PROVIDER_ID;
+const NGN_PROVIDER_ID = process.env.NEXT_PUBLIC_NGN_PROVIDER_ID;
+const KES_PROVIDER_ID = process.env.NEXT_PUBLIC_KES_PROVIDER_ID;
 
 /**
  * Renders a preview of a transaction with the provided details.
@@ -78,7 +79,7 @@ export const TransactionPreview = ({
     totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
     recipient: recipientName,
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
-    memo: memo,
+    memo: memo || "N/A",
   };
 
   const account = useAccount();
@@ -254,12 +255,7 @@ export const TransactionPreview = ({
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    if (
-      !client ||
-      isOrderCreatedLogsFetched ||
-      !isConfirming
-    )
-      return;
+    if (!client || isOrderCreatedLogsFetched || !isConfirming) return;
 
     const getOrderCreatedLogs = async () => {
       try {
@@ -315,7 +311,7 @@ export const TransactionPreview = ({
       accountIdentifier: formValues.accountIdentifier,
       accountName: recipientName,
       institution: formValues.institution,
-      providerId: PROVIDER_ID,
+      providerId: currency === "NGN" ? NGN_PROVIDER_ID : KES_PROVIDER_ID,
       memo: formValues.memo,
     };
 
@@ -518,14 +514,14 @@ export const TransactionPreview = ({
       <hr className="w-full border-dashed border-gray-200 dark:border-white/10" />
 
       {/* Confirm and Approve */}
-      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
+      {gatewayAllowance < amount && smartTokenBalance < amount && (
         <p className="text-gray-500 dark:text-white/50">
           To confirm order, you&apos;ll be required to approve these two
           permissions from your wallet
         </p>
       )}
 
-      {(gatewayAllowance < amount && smartTokenBalance < amount) && (
+      {gatewayAllowance < amount && smartTokenBalance < amount && (
         <div className="flex items-center justify-between text-gray-500 dark:text-white/50">
           <p>
             {/* replace 1 with 2 when the approve state is set to complete */}
