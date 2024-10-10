@@ -497,14 +497,14 @@ export const TransactionForm = ({
                             message: "Enter mobile number",
                           },
                           pattern: {
-                            value: /\d{10}/,
+                            value: /^\d{9,10}/,
                             message: "Invalid mobile number",
                           },
                         })}
                         className={inputClasses}
-                        placeholder="7025678901"
+                        placeholder="07025678901"
                         maxLength={10}
-                        pattern="\d{10}"
+                        pattern="\^\d{9,10}"
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white/20">
                         {10 -
