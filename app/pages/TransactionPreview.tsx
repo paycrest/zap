@@ -79,7 +79,7 @@ export const TransactionPreview = ({
     totalValue: `${formatCurrency(Math.floor(amount * rate), currency, `en-${currency.slice(0, 2)}`)}`,
     recipient: recipientName,
     account: `${accountIdentifier} • ${getInstitutionNameByCode(institution, supportedInstitutions)}`,
-    memo: memo || "N/A",
+    memo,
   };
 
   const account = useAccount();
@@ -312,7 +312,7 @@ export const TransactionPreview = ({
       accountName: recipientName,
       institution: formValues.institution,
       providerId: currency === "NGN" ? NGN_PROVIDER_ID : KES_PROVIDER_ID,
-      memo: formValues.memo,
+      memo: formValues.memo || "N/A",
     };
 
     // Fetch aggregator public key

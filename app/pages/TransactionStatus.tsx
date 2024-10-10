@@ -92,7 +92,7 @@ export default function TransactionStatus({
     getOrderStatus();
 
     // Set up polling
-    intervalId = setInterval(getOrderStatus, 2000);
+    intervalId = setInterval(getOrderStatus, 3000);
 
     // Cleanup function
     return () => {
