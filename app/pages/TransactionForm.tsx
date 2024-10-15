@@ -240,7 +240,7 @@ export const TransactionForm = ({
                   <p className="text-gray-500 dark:text-white/50">
                     Smart Wallet
                   </p>
-                  <FundWalletModal address={smartAccountAddress} />
+                  {/* <FundWalletModal address={smartAccountAddress} /> */}
                 </div>
                 <div className="flex items-center gap-1">
                   {token && (
@@ -429,6 +429,12 @@ export const TransactionForm = ({
                       <input
                         type="text"
                         id="memo"
+                        {...register("memo", {
+                          required: {
+                            value: false,
+                            message: "Enter memo",
+                          },
+                        })}
                         className={inputClasses}
                         placeholder="Enter memo"
                         maxLength={25}
@@ -650,6 +656,12 @@ export const TransactionForm = ({
                   <input
                     type="text"
                     id="memo"
+                    {...register("memo", {
+                      required: {
+                        value: false,
+                        message: "Enter memo",
+                      },
+                    })}
                     className={inputClasses}
                     placeholder="Enter memo"
                     maxLength={25}
