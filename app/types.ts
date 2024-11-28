@@ -196,3 +196,14 @@ export type Token = {
   decimals: number;
   address: string;
 };
+
+export type Config = {
+  env: string;
+  environment: string;
+  mixpanelToken: string;
+  hotjarSiteId: number;
+  aggregatorUrl: string;
+  paymasterApiKey: string;
+  paymasterUrl: string;
+  bundlerUrl: string;
+};

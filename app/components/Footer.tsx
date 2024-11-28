@@ -9,6 +9,7 @@ import {
   XIconDarkTheme,
   XIconLightTheme,
 } from "./ImageAssets";
+import { trackEvent } from "@/hooks/analytics";
 
 const SocialLink = ({
   href,
@@ -20,7 +21,19 @@ const SocialLink = ({
   LogoSvg: React.FC<React.SVGProps<SVGSVGElement>>;
 }) => {
   return (
-    <a href={href} title={title} target="_blank" rel="noopener noreferrer">
+    <a
+      href={href}
+      title={title}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent("cta_clicked", {
+          cta: "Social media buttons",
+          social: title,
+          position: "Footer",
+        });
+      }}
+    >
       <LogoSvg className="size-5 transition-opacity hover:opacity-70" />
     </a>
   );
@@ -84,6 +97,12 @@ export const Footer = () => {
           href="https://paycrest.io"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            trackEvent("cta_clicked", {
+              cta: "Powered by Paycrest Protocol",
+              position: "Footer",
+            });
+          }}
           className="text-neutral-900 hover:underline dark:text-white/80"
         >
           Paycrest Protocol

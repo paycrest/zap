@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { BsExclamationOctagon } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { primaryBtnClasses, secondaryBtnClasses } from "./Styles";
+import { trackEvent } from "@/hooks/analytics";
 
 export const Disclaimer = () => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
@@ -16,11 +17,19 @@ export const Disclaimer = () => {
   }, []);
 
   const handleAccept = () => {
+    trackEvent("dismissed_ui_element", {
+      element: "Disclaimer",
+      action: "Accepted",
+    });
     localStorage.setItem("hasAcceptedDisclaimer", "true");
     setShowDisclaimer(false);
   };
 
   const handleClose = () => {
+    trackEvent("dismissed_ui_element", {
+      element: "Disclaimer",
+      action: "Closed",
+    });
     // go a step back in the browser history
     window.history.back();
     toast.error("You must accept the disclaimer to proceed.");

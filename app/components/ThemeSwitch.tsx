@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/hooks/analytics";
 import { useTheme } from "next-themes";
 import { useState, useEffect, type ReactElement } from "react";
 
@@ -36,14 +37,24 @@ export const ThemeSwitch = () => {
     <div className="flex items-center justify-between gap-2 rounded-full border border-gray-300 p-1.5 transition-all dark:border-white/20">
       <IconButton
         icon={<FiSun className="h-auto w-4 text-gray-400 dark:text-white/50" />}
-        onClick={() => setTheme("light")}
+        onClick={() => {
+          setTheme("light");
+          trackEvent("cta_clicked", {
+            cta: "Theme toggle",
+            theme: "light",
+            position: "Navbar",
+          });
+        }}
         isActive={resolvedTheme === "light"}
       />
       <IconButton
         icon={
           <FiMoon className="h-auto w-4 text-gray-400 dark:text-white/50" />
         }
-        onClick={() => setTheme("dark")}
+        onClick={() => {
+          setTheme("dark");
+          trackEvent("cta_clicked", { cta: "Theme toggle", theme: "dark" });
+        }}
         isActive={resolvedTheme === "dark"}
       />
     </div>
