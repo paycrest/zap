@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSmartAccount } from "@biconomy/use-aa";
 import { useAccount, useReadContract, useSwitchChain } from "wagmi";
+import { trackEvent, useHotjar } from "@/hooks/analytics";
 
 import {
   AnimatedPage,
@@ -40,6 +41,7 @@ const INITIAL_FORM_STATE: FormData = {
  * This component handles the logic and rendering of the home page.
  */
 export default function Home() {
+  useHotjar();
   // State variables
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
@@ -146,7 +148,9 @@ export default function Home() {
 
       try {
         const institutions = await fetchSupportedInstitutions(currency);
-        setInstitutions(institutions.sort((a, b) => a.name.localeCompare(b.name)));
+        setInstitutions(
+          institutions.sort((a, b) => a.name.localeCompare(b.name)),
+        );
         setIsFetchingInstitutions(false);
       } catch (error) {
         console.log(error);
@@ -274,7 +278,18 @@ export default function Home() {
   // Set page loading state to false after initial render
   useEffect(() => {
     setIsPageLoading(false);
+    trackEvent("page_view", { page: "Swap interface", app: "Zap Web App" });
   }, []);
+
+  const handleSubmit = (data: FormData) => {
+    setFormValues(data);
+    trackEvent("swap_initiated", {
+      token: data.token,
+      amount: data.amount,
+      currency: data.currency,
+      memo: data.memo,
+    });
+  };
 
   return (
     <>
@@ -305,7 +320,7 @@ export default function Home() {
             ) ? (
               <AnimatedPage componentKey="transaction-form">
                 <TransactionForm
-                  onSubmit={(data: FormData) => setFormValues(data)}
+                  onSubmit={handleSubmit}
                   formMethods={formMethods}
                   stateProps={stateProps}
                 />

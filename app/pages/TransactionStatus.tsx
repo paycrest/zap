@@ -17,6 +17,7 @@ import {
 import { useAccount } from "wagmi";
 import { fetchOrderStatus } from "../api/aggregator";
 import { RiRefund2Line } from "react-icons/ri";
+import { trackEvent } from "@/hooks/analytics";
 
 /**
  * Renders the transaction status component.
@@ -82,9 +83,32 @@ export default function TransactionStatus({
             );
             setCreatedHash(createdReceipt?.txHash!);
           }
+
+          // Track swap_completed event
+          if (
+            ["validated", "settled", "fulfilled"].includes(
+              orderStatus.data.status,
+            )
+          ) {
+            trackEvent("swap_completed", {
+              orderId,
+              amount,
+              token,
+              recipientName,
+            });
+          }
         }
       } catch (error) {
         console.error("Error fetching order status:", error);
+
+        // Track swap_failed event
+        trackEvent("swap_failed", {
+          orderId,
+          amount,
+          token,
+          recipientName,
+          errorMessage: (error as any).message,
+        });
       }
     };
 
@@ -98,6 +122,7 @@ export default function TransactionStatus({
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, transactionStatus]);
 
   /**
@@ -107,6 +132,12 @@ export default function TransactionStatus({
   const handleBackButtonClick = () => {
     if (transactionStatus === "refunded") {
       clearTransactionStatus();
+
+      trackEvent("retry_swap", {
+        orderId,
+        amount,
+        token,
+      });
     } else {
       clearForm();
       clearTransactionStatus();

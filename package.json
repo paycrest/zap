@@ -12,11 +12,13 @@
     "@biconomy/account": "^4.4.6",
     "@biconomy/use-aa": "^1.0.14",
     "@headlessui/react": "^2.1.1",
+    "@hotjar/browser": "^1.0.9",
     "@rainbow-me/rainbowkit": "^2.1.2",
     "@tanstack/react-query": "^5.45.1",
     "axios": "^1.7.2",
     "framer-motion": "^11.2.12",
     "jsencrypt": "^3.3.2",
+    "mixpanel-browser": "^2.56.0",
     "next": "^14.2.6",
     "next-themes": "^0.3.0",
     "react": "^18",
@@ -29,6 +31,7 @@
     "wagmi": "^2.10.4"
   },
   "devDependencies": {
+    "@types/mixpanel-browser": "^2.50.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
