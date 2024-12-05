@@ -1,37 +1,31 @@
-import config from "@/app/lib/config";
-import Hotjar from "@hotjar/browser";
 import { useEffect } from "react";
+import Hotjar from "@hotjar/browser";
+import config from "@/app/lib/config";
 
 export const useHotjar = () => {
-  const { hotjarSiteId, env } = config;
+  const { hotjarSiteId } = config;
   const hotjarVersion = 6;
 
   useEffect(() => {
-    if (hotjarSiteId) {
-      Hotjar.init(hotjarSiteId, hotjarVersion, {
-        debug: env === "development",
-      });
-    } else {
-      console.warn("Hotjar ID is not defined");
-    }
-  }, [hotjarSiteId, env]);
-};
+    const handleConsentChange = () => {
+      const consent = localStorage.getItem("cookieConsent");
 
-export const identifyHotjarUser = (
-  userId: string,
-  userProperties?: Record<string, string | number | boolean>,
-) => {
-  if (userProperties) {
-    Hotjar.identify(userId, userProperties);
-  } else {
-    Hotjar.identify(userId, {});
-  }
-};
+      if (consent && JSON.parse(consent).analytics) {
+        if (hotjarSiteId) {
+          Hotjar.init(hotjarSiteId, hotjarVersion);
+        } else {
+          console.warn("Hotjar ID is not defined");
+        }
+      } else {
+        console.warn("User has not consented to analytics cookies");
+      }
+    };
 
-export const triggerHotjarEvent = (eventName: string) => {
-  Hotjar.event(eventName);
-};
+    window.addEventListener("cookieConsent", handleConsentChange);
+    handleConsentChange();
 
-export const updateHotjarState = (newPath: string) => {
-  Hotjar.stateChange(newPath);
+    return () => {
+      window.removeEventListener("cookieConsent", handleConsentChange);
+    };
+  }, [hotjarSiteId]);
 };
