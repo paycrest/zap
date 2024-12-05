@@ -86,7 +86,7 @@ export default function TransactionStatus({
 
           // Track swap_completed event
           if (
-            ["validated", "settled", "fulfilled"].includes(
+            ["validated", "settled"].includes(
               orderStatus.data.status,
             )
           ) {
