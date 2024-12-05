@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSmartAccount } from "@biconomy/use-aa";
 import { useAccount, useReadContract, useSwitchChain } from "wagmi";
-import { trackEvent, useHotjar } from "@/hooks/analytics";
+import { trackEvent, useHotjar, useMixpanel } from "@/hooks/analytics";
 
 import {
   AnimatedPage,
@@ -42,6 +42,7 @@ const INITIAL_FORM_STATE: FormData = {
  */
 export default function Home() {
   useHotjar();
+  useMixpanel();
   // State variables
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isFetchingInstitutions, setIsFetchingInstitutions] = useState(false);
