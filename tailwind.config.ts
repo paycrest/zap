@@ -11,6 +11,9 @@ const config: Config = {
       maxWidth: {
         mobile: "428px", // 412px (width) + 16px (padding)
       },
+      colors: {
+        royal: "#0065F5",
+      },
     },
   },
   plugins: [],
