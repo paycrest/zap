@@ -166,7 +166,8 @@ export default function Home() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     const getRecipientName = async () => {
-      if (!accountIdentifier || !institution) return;
+      if (!accountIdentifier || !institution || accountIdentifier.length < 10)
+        return;
 
       setIsFetchingRecipientName(true);
 

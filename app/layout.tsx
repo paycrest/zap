@@ -25,9 +25,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <div className="min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
+          <div className="relative min-h-full min-w-full bg-white transition-colors dark:bg-neutral-900">
             <Navbar />
-            <div className="relative z-10 mx-auto flex min-h-screen max-w-mobile flex-col items-center px-4 pt-20 transition-all">
+            <div className="relative z-10 mx-auto flex min-h-screen max-w-mobile flex-col items-center px-4 transition-all">
               <main className="w-full flex-grow">{children}</main>
               <Footer />
             </div>
