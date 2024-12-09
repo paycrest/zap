@@ -21,8 +21,8 @@ export const WaitlistBanner = () => {
               fill="white"
             />
           </svg>
-          Introducing Noblocks, our sleek on and off ramp experience. Join the
-          waitlist ↗
+          Introducing Noblocks, our improved zap experience. Join the waitlist
+          ↗
         </a>
       </p>
     </div>
