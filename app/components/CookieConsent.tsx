@@ -174,7 +174,7 @@ export const CookieConsent = () => {
               </Button>
               <Button
                 onClick={handleAcceptAll}
-                className="flex-1 bg-blue-600 text-white hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400"
+                className="flex-1 bg-blue-600 text-white hover:bg-blue-500 dark:hover:bg-blue-400"
               >
                 Accept all
               </Button>
@@ -252,7 +252,7 @@ export const CookieConsent = () => {
                   </Button>
                   <Button
                     onClick={handleAcceptSelected}
-                    className="flex-1 bg-blue-600 text-white hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400"
+                    className="flex-1 bg-blue-600 text-white hover:bg-blue-500 dark:hover:bg-blue-400"
                   >
                     Accept
                   </Button>

@@ -10,7 +10,6 @@ import { trackEvent, useHotjar, useMixpanel } from "@/hooks/analytics";
 
 import {
   AnimatedPage,
-  Disclaimer,
   Preloader,
   TransactionForm,
   TransactionPreview,
@@ -296,8 +295,6 @@ export default function Home() {
   return (
     <>
       <Preloader isLoading={isPageLoading} />
-
-      <Disclaimer />
 
       <AnimatePresence mode="wait">
         {transactionStatus !== "idle" ? (
