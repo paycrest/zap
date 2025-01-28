@@ -72,7 +72,9 @@ export const fetchOrderStatus = async (
   orderId: string,
 ): Promise<OrderStatusResponse> => {
   try {
-    const response = await axios.get(`${AGGREGATOR_URL}/orders/${orderId}`);
+    const response = await axios.get(
+      `${AGGREGATOR_URL}/orders/8453/${orderId}`, // 8453 is the chain id for Base
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching order status:", error);
