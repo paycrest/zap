@@ -323,7 +323,7 @@ export const TransactionPreview = ({
     const params = {
       token: tokenAddress,
       amount: parseUnits(amount.toString(), tokenDecimals!),
-      rate: parseUnits((rate * 100).toString(), 0),
+      rate: BigInt(rate * 100),
       senderFeeRecipient: getAddress(
         "0x0000000000000000000000000000000000000000",
       ),
